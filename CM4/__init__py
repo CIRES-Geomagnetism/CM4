@@ -1,0 +1,7 @@
+# CM4/__init__.py
+
+from .lib import python_wrapper
+
+__all__ = ['python_wrapper']
+
+__version__ = "0.1.0"
