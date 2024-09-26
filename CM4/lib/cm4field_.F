@@ -3703,13 +3703,13 @@ C=======================================================================
       jmdl = 0.0
       gmdl = 0.0
 
-      call hello()
+      !call hello()
       call CM4FIELD(PATH, UNIT, LOAD, INDX, GMUT, CORD, PRED, 
      1                CURR, COEF, NHMF, NLMF, UT, MUT, thet, phi, alt, 
      2                dst, f107, bmdl, jmdl, gmdl, perr, oerr, cerr)
-      print *, bmdl
-      print *, CHAR(10)
-      print *, jmdl
+      !print *, bmdl
+      !print *, CHAR(10)
+      !print *, jmdl
       !print *, CHAR(10)
       UT = 8888
       !print *, gmdl
