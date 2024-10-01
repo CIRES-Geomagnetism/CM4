@@ -3637,7 +3637,8 @@ C=======================================================================
       end subroutine hello
 
       subroutine call_cm4(UT,thet, phi, alt, dst,f107,
-     1 bmdl,jmdl)
+     1 bmdl,jmdl,pred1,pred2,pred3,pred4,pred5,pred6,
+     2 CORD, NHMF1,NHMF2, NLMF1,NLMF2)
       implicit none
 
       ! Declare variables
@@ -3647,9 +3648,11 @@ C=======================================================================
       logical :: INDX(2)
       logical :: GMUT
       real(8) :: UT, MUT
+      logical :: pred1,pred2,pred3,pred4,pred5,pred6
       logical :: CORD
       logical :: PRED(6)
       logical :: CURR, COEF
+      integer :: NHMF1,NHMF2, NLMF1,NLMF2
       integer :: NHMF(2), NLMF(2)
       real(8) :: alt, thet, phi
       real(8) :: dst, f107
@@ -3675,12 +3678,16 @@ C=======================================================================
       INDX(2) = .false.!
       GMUT = .true.
       MUT = 51544.50847222
-      CORD = .true.
+      CORD = .false.!.true.
       PRED = [.true.,.true.,.true., .true., .true., .true.]
+      PRED = [pred1,pred2,pred3,pred4,pred5,pred6]
       CURR = .true.
       COEF = .false.
-      NHMF = [13, 15]
+
+      NHMF = [13, 45]
       NLMF = [1, 14]
+      NHMF = [NHMF1, NHMF2] 
+      NLMF = [NLMF1, NLMF2]
 
       ! Initialize altitude
       ! Set all elements to this value
