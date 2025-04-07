@@ -1,4 +1,4 @@
-#!/Users/coka4389/Library/CloudStorage/OneDrive-UCB-O365/Desktop/CM4_Wrapper/.venv/bin/python
+#!/Users/coka4389/Library/CloudStorage/OneDrive-UCB-O365/Desktop/CM4_Wrapper/.venv/bin/python3.10
 # -*- coding: utf-8 -*-
 import re
 import sys

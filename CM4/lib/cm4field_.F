@@ -753,6 +753,7 @@ C=======================================================================
       DIMENSION HT(2*NYMF),HQ(6*NYMF),WS(IXMF),WB(2*(2*NXOR+NXKN+2))
 C=======================================================================
       DATA DRAD /0.017453292519943D0/, DSTT /0.D0/
+
 C=======================================================================
       IF (CERR.LT.50) THEN                                                      
          IF (LOAD(1)) THEN
@@ -3637,7 +3638,8 @@ C=======================================================================
       end subroutine hello
 
       subroutine call_cm4(UT,thet, phi, alt, dst,f107,
-     1 bmdl,jmdl)
+     1 bmdl,jmdl,pred1,pred2,pred3,pred4,pred5,pred6,
+     2 CORD, NHMF1,NHMF2, NLMF1,NLMF2)
       implicit none
 
       ! Declare variables
@@ -3647,9 +3649,11 @@ C=======================================================================
       logical :: INDX(2)
       logical :: GMUT
       real(8) :: UT, MUT
+      logical :: pred1,pred2,pred3,pred4,pred5,pred6
       logical :: CORD
       logical :: PRED(6)
       logical :: CURR, COEF
+      integer :: NHMF1,NHMF2, NLMF1,NLMF2
       integer :: NHMF(2), NLMF(2)
       real(8) :: alt, thet, phi
       real(8) :: dst, f107
@@ -3661,8 +3665,8 @@ C=======================================================================
 
       ! Assigning values
       PATH(1) = "/Users/coka4389/Downloads/CM4/umdl.CM4"
-      PATH(2) = "strings are weird"
-      PATH(3) = "weird1"
+      !PATH(2) = "strings are weird"
+      !PATH(3) = "weird1"
 
       UNIT(1) = 11![10, 20, 30]
       UNIT(2) = 22
@@ -3674,13 +3678,19 @@ C=======================================================================
       INDX(1) = .false.![.false., .false.]
       INDX(2) = .false.!
       GMUT = .true.
-      MUT = 51544.50847222
-      CORD = .true.
-      PRED = [.true.,.true.,.true., .true., .true., .true.]
+      !MUT = 51544.50847222
+      !CORD = .false.!.true.
+      !PRED = [.true.,.true.,.true., .true., .true., .true.]
+      
+      PRED = [pred1,pred2,pred3,pred4,pred5,pred6]
+      
       CURR = .true.
       COEF = .false.
-      NHMF = [13, 15]
+
+      NHMF = [13, 45]
       NLMF = [1, 14]
+      NHMF = [NHMF1, NHMF2] 
+      NLMF = [NLMF1, NLMF2]
 
       ! Initialize altitude
       ! Set all elements to this value
@@ -3695,8 +3705,8 @@ C=======================================================================
       !dst = 7
       !f107 = 723!723
       perr = 1
-      oerr = 0
-      cerr = 0.0
+      oerr = 50
+      cerr = 0
 
       ! Initialize bmdl, jmdl, gmdl
       bmdl = 0.0
@@ -3704,14 +3714,14 @@ C=======================================================================
       gmdl = 0.0
 
       !call hello()
+      print *, UT
       call CM4FIELD(PATH, UNIT, LOAD, INDX, GMUT, CORD, PRED, 
      1                CURR, COEF, NHMF, NLMF, UT, MUT, thet, phi, alt, 
      2                dst, f107, bmdl, jmdl, gmdl, perr, oerr, cerr)
-      !print *, bmdl
       !print *, CHAR(10)
       !print *, jmdl
       !print *, CHAR(10)
-      UT = 8888
+      !UT = 8888
       !print *, gmdl
       end subroutine call_cm4
       !end program variable_declarations
