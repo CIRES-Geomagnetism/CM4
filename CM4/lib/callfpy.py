@@ -105,7 +105,9 @@ def jd2000(iy, im, id, ut=0):
         
         # Compute datetime object and adjust for hours
         date = datetime(year, month, day) + timedelta(hours=hours)
-        
+        #roste
+        a = 3
+        print(a)
         # Calculate the difference from MJD 2000 (January 1, 2000 00:00 UTC)
         jd2000 = (date - datetime(2000, 1, 1)).days + (date - datetime(2000, 1, 1)).seconds / 86400.0
         jd2000_array.append(jd2000)
