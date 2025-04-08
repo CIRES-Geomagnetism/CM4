@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
+import geomaglib.util
 import numpy as np
 import importlib
 import csv
 import cm4_py310
+import cm4_py310_arr
 # import geomaglib
 # Force reimport of the module
 importlib.reload(cm4_py310)
@@ -472,7 +474,7 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
 
         tmp = jd2000(year,month,day, hour + minute/60)
         UT = mjd2000_to_ut(tmp)
-        print(f"calc UT time", UT)
+        # print(f"calc UT time", UT)
     else:
         UT = MJD_time
 
@@ -508,6 +510,51 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
     return out_b,out_j, core, magnetosphere, ionoshere
 
+def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_time = None):
+    if MJD_time is None and ymd_time is None:raise ValueError("a time input must be provided")
+    #Change yyyymmddhhmmss time to Year decimal time
+
+    if ymd_time is not None:
+        year, month, day, hour, minute = parse_time(ymd_time)
+        # hour = hour - 1
+
+        tmp = jd2000(year,month,day, hour + minute/60)
+        UT = mjd2000_to_ut(tmp)
+        # print(f"calc UT time", UT)
+    else:
+        UT = MJD_time
+
+    # print(UT,1.990326027397260e3)
+    # UT = 1.990326027397260e3
+    #Change geodetic lat/radius into geocentric
+    if(geodflag):
+        r_geoc ,thet_geoc= geod2geoc(np.deg2rad(lat_geod), alt)
+        thet_geoc = np.rad2deg(thet_geoc)
+        r_geoc = r_geoc-6371.2
+        # r_geoc = #6.367857428238093e+03 - 6371.2
+    else:
+        r_geoc = alt
+        thet_geoc = lat_geod
+    # print(r_geoc, thet_geoc)
+    nmin = np.array([1,14])
+    nmax =np.array([13,45])
+    pred = np.array([True,True,True,True,True,True])
+    cord = False
+    out_b, out_j = cm4_py310_arr.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
+                                      pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
+                                      ,cord,
+                                      nmax[0],nmax[1], nmin[0],nmin[1], len(UT))
+    out_b = np.array(out_b)
+    out_j = np.array(out_j)
+    ionoshere = np.array([-out_b[2,4]-out_b[2,5], -out_b[0,4]-out_b[0,5],out_b[1,4]+out_b[1,5]])
+    magnetosphere = np.array([-out_b[2,2]-out_b[2,3], -out_b[0,2]-out_b[0,3],out_b[1,2]+out_b[1,3]])
+    core = np.array([-out_b[2,0], -out_b[0,0],out_b[1,0]])
+    # print('core',core, "f", np.sqrt(core[0]**2 + core[1]**2 + core[2]**2))
+    # print('magnetosphere',magnetosphere)
+    # print('ionoshere', ionoshere)
+    # print('raw', out_b, np.shape(out_b))
+    # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
+    return out_b,out_j, core, magnetosphere, ionoshere
 def parse_survey_file(filename):
     with open(filename, 'r') as file:
         # Read the first line as headers
@@ -602,22 +649,64 @@ def fortran_unit_test():
             
     print("runtime", time.time() - time1)
     
+def run_input_bound_test():
+    Num_elements = 10
+    for Num_elements in 2**np.arange(18):
+        lats = list(np.linspace(-900.024, 900.024, Num_elements))
+        lats = np.ones(Num_elements)*50
+        lons = np.ones(Num_elements)*50
+        dyear = np.linspace(2014.202739, 2014.219178, Num_elements)
+        dyear = np.linspace(2000.202739, 2009.219178, Num_elements)
+        # dyear = np.ones(Num_elements)*1960.00001
+        dyear = np.ones(Num_elements)*1990
+        import geomaglib
+
+        # print("datetime",geomaglib.util.decimalYearToDateTime(dyear[0]))
+
+        # dyear = np.linspace(2009.502739, 1990.519178, Num_elements)
+
+        hours = np.linspace(1,22,Num_elements)  
+        height = np.linspace(1,1,Num_elements)
+        dst = np.linspace(0,30,Num_elements)
+        
+        # f107 =[133.07838542 ,133.04515625 ,133.01192708 ,132.96208333 ,132.92885417, 132.895625,   132.426325,   132.390335,   132.354345,   132.30036   ]
+        f1071_val = 10
+        f107 = np.linspace(f1071_val, f1071_val, Num_elements)
+        iono = []
+        iono_temp = []
+        time1 = time.time()
+        out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4_arr(height,lats,lons, dst, f107, MJD_time = dyear,geodflag=0)
+        print(f"runtime for {Num_elements}", time.time()- time1)
+    raise ValueError
+    for i in range(0,Num_elements):
+        out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4(height[i],lats[i],lons[i], dst[i], f107[i], MJD_time = dyear[i],geodflag=0)
+        iono_temp.append(ionoshere)
+        print("inputs", height[i],lats[i],lons[i], dst[i], f107[i],  dyear[i])
+        print(out_b)
+    # iono.append(iono_temp)
+
+    raise ValueError
 def run_unit_tests():
     Ionosphere_Unit_test()
     Magnetosphere_Unit_test()
     Core_unit_test()
+
 # run_unit_tests()
 if __name__ == '__main__':
     # run_unit_tests()
+    run_input_bound_test()
 
     ans = parse_bmdl_output("fortran_CM4_test_values.txt")
     UT = 1964.49738353192675
+
+    Num_elements = 200
+    
     Num_elements = 200
     lats = list(np.linspace(48.024, 48.024, Num_elements))
     lons = np.linspace(2.259, 2.259, Num_elements)
     dyear = np.linspace(2014.202739, 2014.219178, Num_elements)
     dyear = np.linspace(2009.202739, 2009.219178, Num_elements)
-    dyear = np.linspace(1990.502739, 1990.519178, Num_elements)
+    dyear = np.linspace(2011.502739, 2010.519178, Num_elements)
 
     hours = np.linspace(1,22,Num_elements)  
     height = np.linspace(0,0,Num_elements)
@@ -637,7 +726,6 @@ if __name__ == '__main__':
         iono_temp.append(ionoshere)
         print("inputs", height[i],lats[i],lons[i], dst[i], f107[i],  dyear[i])
 
-    iono.append(iono_temp)
     
     # f107 =[133.07838542 ,133.04515625 ,133.01192708 ,132.96208333 ,132.92885417, 132.895625,   132.426325,   132.390335,   132.354345,   132.30036   ]
     f1072_val = 100
