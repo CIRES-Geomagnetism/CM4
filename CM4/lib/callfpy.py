@@ -512,12 +512,12 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
     return out_b,out_j, core, magnetosphere, ionoshere
 
-def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_time = None):
-    if MJD_time is None and ymd_time is None:raise ValueError("a time input must be provided")
+def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,core_nmin = 1, core_nmax = 13, crust_nmin = 14, crust_nmax = 45, geodflag = 1,year = None, month = None, day = None, hour = None, minute = None, MJD_time = None):
+    if MJD_time is None and year is None:raise ValueError("a time input must be provided")
     #Change yyyymmddhhmmss time to Year decimal time
 
-    if ymd_time is not None:
-        year, month, day, hour, minute = parse_time(ymd_time)
+    if year is not None:
+        # year, month, day, hour, minute = parse_time(ymd_time)
         # hour = hour - 1
 
         tmp = jd2000(year,month,day, hour + minute/60)
@@ -538,8 +538,8 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, M
         r_geoc = alt
         thet_geoc = lat_geod
     # print(r_geoc, thet_geoc)
-    nmin = np.array([1,14])
-    nmax =np.array([13,45])
+    nmin = np.array([core_nmin,crust_nmin])
+    nmax =np.array([core_nmax,crust_nmax])
     pred = np.array([True,True,True,True,True,True])
     cord = False
     out_b, out_j = cm4_py310_arr.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
@@ -551,12 +551,13 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, M
     ionoshere = np.array([-out_b[2,4]-out_b[2,5], -out_b[0,4]-out_b[0,5],out_b[1,4]+out_b[1,5]])
     magnetosphere = np.array([-out_b[2,2]-out_b[2,3], -out_b[0,2]-out_b[0,3],out_b[1,2]+out_b[1,3]])
     core = np.array([-out_b[2,0], -out_b[0,0],out_b[1,0]])
+    crust = np.array([-out_b[2,1], -out_b[0,1],out_b[1,1]])
     # print('core',core, "f", np.sqrt(core[0]**2 + core[1]**2 + core[2]**2))
     # print('magnetosphere',magnetosphere)
     # print('ionoshere', ionoshere)
     # print('raw', out_b, np.shape(out_b))
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
-    return out_b,out_j, core, magnetosphere, ionoshere
+    return out_b,out_j, core,crust, magnetosphere, ionoshere
 def parse_survey_file(filename):
     with open(filename, 'r') as file:
         # Read the first line as headers
@@ -653,8 +654,7 @@ def fortran_unit_test():
     
 def run_input_bound_test():
     Num_elements = 10
-    for Num_elements in 2**np.arange(18):
-        lats = list(np.linspace(-900.024, 900.024, Num_elements))
+    for Num_elements in 2**np.arange(1):#2**np.arange(18):
         lats = np.ones(Num_elements)*50
         lons = np.ones(Num_elements)*50
         dyear = np.linspace(2014.202739, 2014.219178, Num_elements)
@@ -677,7 +677,7 @@ def run_input_bound_test():
         iono = []
         iono_temp = []
         time1 = time.time()
-        out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4_arr(height,lats,lons, dst, f107, MJD_time = dyear,geodflag=0)
+        out_b,out_j, core, crust,magnetosphere, ionoshere = py_mat_cm4_arr(height,lats,lons, dst, f107, crust_nmax= 65, MJD_time = dyear,geodflag=0)
         print(f"runtime for {Num_elements}", time.time()- time1)
     raise ValueError
     for i in range(0,Num_elements):
