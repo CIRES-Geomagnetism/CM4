@@ -37,7 +37,6 @@ def parse_bmdl_output(file_name):
     return bmdl_array
 
 
-=======
 def datetime_to_mjd2000(date_str):
     # Parse the input string into a datetime object
     dt = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
@@ -357,19 +356,19 @@ def call_py_cm4(ymd_time, alt, lat_geod, lon, dst, f107, nmin, nmax, geoc_coord_
     
 
 def Core_unit_test(filepath = '/Users/coka4389/Library/CloudStorage/OneDrive-UCB-O365/Desktop/CM4_Wrapper/CM4/lib/Core_unittest_inputs.csv'):
-time = '196407011059'
-alt = 0
-lat = 43
-lon = 34
-dst = 7
-f107 = 465
-nmin = np.array([1,14])
-nmax =np.array([13,45])
-pred = np.array([True,True,True,True,True,True])
-cord = True
-print('hello!!!')
-call_py_cm4(time,alt,lat,lon,dst,f107,nmin,nmax,cord,pred)
-print('finished!!!')
+    time = '196407011059'
+    alt = 0
+    lat = 43
+    lon = 34
+    dst = 7
+    f107 = 465
+    nmin = np.array([1,14])
+    nmax =np.array([13,45])
+    pred = np.array([True,True,True,True,True,True])
+    cord = True
+    print('hello!!!')
+    call_py_cm4(time,alt,lat,lon,dst,f107,nmin,nmax,cord,pred)
+    print('finished!!!')
 def read_csv(filepath = 'Core_unittest_inputs.csv'):
     data = []
         
