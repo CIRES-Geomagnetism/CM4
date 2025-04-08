@@ -4,7 +4,7 @@ from callfpy import py_mat_cm4_arr
 import numpy as np
 if __name__ == '__main__':
 
-    Num_elements = 10
+    Num_elements = 2
     co_lats = np.ones(Num_elements)*50
     lons = np.ones(Num_elements)*50
     dyear = np.linspace(2014.202739, 2014.219178, Num_elements)
@@ -26,28 +26,30 @@ if __name__ == '__main__':
     f107 = np.linspace(f1071_val, f1071_val, Num_elements)
     iono = []
     iono_temp = []
-
-    out_b,out_j, core,crust, magnetosphere, ionoshere = py_mat_cm4_arr(height,co_lats,lons, dst, f107, crust_nmax= 65, MJD_time = dyear,geodflag=0)
-    print("""out_b is the raw output containing the outputs:*     BMDL(3,7) Dble   O     Array storing computed B field vectors from various
-                            sources (nT):
-                                                                               
-                            Row label:
-                            (1) X.
-                            (2) Y.
-                            (3) Z.
-                                                                               
-                            Column label:
-                            (1) Main field 1.
-                            (2) Main field 2.
-                            (3) Primary magnetospheric field.
-                            (4) Induced magnetospheric field.
-                            (5) Primary ionospheric field.
-                            (6) Induced ionospheric field.
-                            (7) Toroidal field.""")
+    print("""out_b is the raw output containing the outputs:*     BMDL(3,7,Num_elements)
+           Dble   O     Array storing computed B field vectors from various
+            sources (nT):
+                                                                
+            Row label:
+            (1) X.
+            (2) Y.
+            (3) Z.
+                                                                
+            Column label:
+            (1) Main field 1.
+            (2) Main field 2.
+            (3) Primary magnetospheric field.
+            (4) Induced magnetospheric field.
+            (5) Primary ionospheric field.
+            (6) Induced ionospheric field.
+            (7) Toroidal field.""")
     print("""core, crust, magnetosphere, ionoshere contain
           the described fields with sign convention
           shifted for r, theta, phi (in that order) from X,Y,Z which 
           is the order the values are contained in out_b
           out_j contains currents and is probably won't be used
           """)
+    
+    out_b,out_j, core,crust, magnetosphere, ionoshere = py_mat_cm4_arr(height,co_lats,lons, dst, f107, crust_nmax= 65, MJD_time = dyear,geodflag=0)
+    print(out_b)
     
