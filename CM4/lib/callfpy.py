@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+
 import geomaglib.util
 import numpy as np
 import importlib
@@ -36,7 +37,7 @@ def parse_bmdl_output(file_name):
     return bmdl_array
 
 
-
+=======
 def datetime_to_mjd2000(date_str):
     # Parse the input string into a datetime object
     dt = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
@@ -105,13 +106,10 @@ def jd2000(iy, im, id, ut=0):
         
         # Compute datetime object and adjust for hours
         date = datetime(year, month, day) + timedelta(hours=hours)
-        #roste
-        a = 3
-        print(a)
+
         # Calculate the difference from MJD 2000 (January 1, 2000 00:00 UTC)
         jd2000 = (date - datetime(2000, 1, 1)).days + (date - datetime(2000, 1, 1)).seconds / 86400.0
         jd2000_array.append(jd2000)
-
 
 
     # Convert to numpy array to keep structure similar to input
@@ -147,7 +145,6 @@ def mjd2000_to_ut(t):
     
     # Compute UT in years
     ut = iy + (dof0[im - 1] + id - 1 + i2 + (ih + minute / 60 + sec / 3600) / 24) / (365 + ifleapyr)
-    
     return (ut - 2000.002739726)/1.00000029 +0.000577188811121232
 
 # Example usage
@@ -184,6 +181,7 @@ cm4_cof_path = np.array([
     "/Users/coka4389/Library/CloudStorage/OneDrive-UCB-O365/Desktop/CM4_Wrapper/CM4/lib/fake_dst.txt",
     "/Users/coka4389/Library/CloudStorage/OneDrive-UCB-O365/Desktop/CM4_Wrapper/CM4/lib/fake_f107.txt"
 ])
+
 
 def geod2geoc(alpha, h, *args):
     """
@@ -230,7 +228,7 @@ def geod2geoc(alpha, h, *args):
     
     return r, theta
 def parse_time(time_str):
-    print(time_str, type(time_str))
+
     year = int(time_str[0:4])
     month = int(time_str[4:6])
     day = int(time_str[6:8])
@@ -245,6 +243,7 @@ def parse_time(time_str):
     return year, month, day, hour, minute
 #Core read answers
 def read_answers(filepath = 'CM4/lib/testvalBcore.csv'):
+
     data = []
     with open(filepath, mode='r') as file:
         reader = csv.reader(file)
@@ -257,7 +256,7 @@ def read_answers(filepath = 'CM4/lib/testvalBcore.csv'):
             for i in range(0,len(data[-1])):
                 data[-1][i] = float(data[-1][i])
     return data
-
+  
 def read_answers_ext(filepath = 'CM4/lib/testvalBcore.csv'):
     data = []
     with open(filepath, mode='r') as file:
@@ -275,6 +274,8 @@ def read_answers_ext(filepath = 'CM4/lib/testvalBcore.csv'):
 
 # UT = 1964.49738353192675
 def py_mat_cm4_unittest_core(ymd_time, alt, lat_geod, lon, dst, f107):
+
+
     #Change yyyymmddhhmmss time to Year decimal time
     year, month, day, hour, minute = parse_time(ymd_time)
     tmp = jd2000(year,month,day, hour + minute/60)
@@ -288,6 +289,7 @@ def py_mat_cm4_unittest_core(ymd_time, alt, lat_geod, lon, dst, f107):
     nmax =np.array([13,45])
     pred = np.array([True,True,True,True,True,True])
     cord = False
+
     out_b, out_j = cm4_py310.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
@@ -353,20 +355,22 @@ def call_py_cm4(ymd_time, alt, lat_geod, lon, dst, f107, nmin, nmax, geoc_coord_
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
     return out_b,out_j
     
-# time = '196407011059'
-# alt = 0
-# lat = 43
-# lon = 34
-# dst = 7
-# f107 = 465
-# nmin = np.array([1,14])
-# nmax =np.array([13,45])
-# pred = np.array([True,True,True,True,True,True])
-# cord = True
-# print('hello!!!')
-# call_py_cm4(time,alt,lat,lon,dst,f107,nmin,nmax,cord,pred)
-# print('finished!!!')
+
 def Core_unit_test(filepath = '/Users/coka4389/Library/CloudStorage/OneDrive-UCB-O365/Desktop/CM4_Wrapper/CM4/lib/Core_unittest_inputs.csv'):
+time = '196407011059'
+alt = 0
+lat = 43
+lon = 34
+dst = 7
+f107 = 465
+nmin = np.array([1,14])
+nmax =np.array([13,45])
+pred = np.array([True,True,True,True,True,True])
+cord = True
+print('hello!!!')
+call_py_cm4(time,alt,lat,lon,dst,f107,nmin,nmax,cord,pred)
+print('finished!!!')
+def read_csv(filepath = 'Core_unittest_inputs.csv'):
     data = []
         
     with open(filepath, mode='r') as file:
@@ -1010,3 +1014,4 @@ def old_fortran_to_forget():
     """
     do = 'nothing'
     return do
+
