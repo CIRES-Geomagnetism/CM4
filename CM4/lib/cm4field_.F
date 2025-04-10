@@ -3664,7 +3664,7 @@ C=======================================================================
       integer :: i
 
       ! Assigning values
-      PATH(1) = "/Users/coka4389/Downloads/CM4/umdl.CM4"
+      PATH(1) = "umdl.CM4"
       !PATH(2) = "strings are weird"
       !PATH(3) = "weird1"
 
@@ -3679,7 +3679,7 @@ C=======================================================================
       INDX(2) = .false.!
       GMUT = .true.
       !MUT = 51544.50847222
-      !CORD = .false.!.true.
+      !CORD = .true.!.false.!.true.
       !PRED = [.true.,.true.,.true., .true., .true., .true.]
       
       PRED = [pred1,pred2,pred3,pred4,pred5,pred6]

@@ -1,5 +1,4 @@
 
-import cm4_py310_arr
 from callfpy import py_mat_cm4_arr
 import numpy as np
 if __name__ == '__main__':
@@ -11,7 +10,6 @@ if __name__ == '__main__':
     dyear = np.linspace(2000.202739, 2009.219178, Num_elements)
     # dyear = np.ones(Num_elements)*1960.00001
     dyear = np.ones(Num_elements)*1990
-    import geomaglib
 
     # print("datetime",geomaglib.util.decimalYearToDateTime(dyear[0]))
 

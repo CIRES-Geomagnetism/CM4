@@ -8,7 +8,7 @@ import cm4_py310
 import cm4_py310_arr
 # import geomaglib
 # Force reimport of the module
-importlib.reload(cm4_py310)
+# importlib.reload(cm4_py310)
 # import cm4_py310
 import time
 
@@ -241,7 +241,7 @@ def parse_time(time_str):
     
     return year, month, day, hour, minute
 #Core read answers
-def read_answers(filepath = 'CM4/lib/testvalBcore.csv'):
+def read_answers(filepath = 'test_values/testvalBcore.csv'):
 
     data = []
     with open(filepath, mode='r') as file:
@@ -303,12 +303,18 @@ def py_mat_cm4_unittest_ext(ymd_time, alt, lat_geod, lon, dst, f107,geodflag = 1
     #Change yyyymmddhhmmss time to Year decimal time
     year, month, day, hour, minute = parse_time(ymd_time)
     hour = hour - 1
+    print(year, month, day, hour, minute)
 
     tmp = jd2000(year,month,day, hour + minute/60)
     UT = mjd2000_to_ut(tmp)
+    tmp = UT
+    UT = calc_dec_year(year, month, day, hour = hour, minutes=minute)
+
+    # print("through here?", UT, tmp)
 
     # print(UT,1.990326027397260e3)
     # UT = 1.990326027397260e3
+    # UT = 1964.49738353192675
     #Change geodetic lat/radius into geocentric
     if(geodflag):
         r_geoc ,thet_geoc= geod2geoc(np.deg2rad(lat_geod), alt)
@@ -322,7 +328,8 @@ def py_mat_cm4_unittest_ext(ymd_time, alt, lat_geod, lon, dst, f107,geodflag = 1
     nmax =np.array([13,45])
     pred = np.array([True,True,True,True,True,True])
     cord = False
-    out_b, out_j = cm4_py310.call_cm4(UT, thet_geoc, lon, r_geoc, dst, f107,
+    print(thet_geoc, lon, r_geoc)
+    out_b, out_j = cm4_py310.call_cm4(UT,thet_geoc, lon, r_geoc, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
                                       nmax[0],nmax[1], nmin[0],nmin[1])
@@ -330,12 +337,41 @@ def py_mat_cm4_unittest_ext(ymd_time, alt, lat_geod, lon, dst, f107,geodflag = 1
     out_j = np.array(out_j)
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
     return out_b,out_j
+import calendar
+import datetime as dt
+def calc_dec_year(year: int, month: int, day:int, hour:int = 0, minutes:int=0, seconds:int=0 ) -> float:
+    """
+    Takes year, month, and day and calculates the decimal year from those inputs
+
+    Parameters:
+    year (int): The year fully written for example 2024
+    month (int): The month from 1-12 where is 1 is January and 12 is December
+    day (int): The day of the month from 1-31
+    hour(int): The hour of the day from 0-23
+    minutes (int): The current minutes of the hour 0-59
+    seconds (int): The current seocnds 0-59
+
+    Returns:
+    (float): The decimal year
+
+    """
+    num_days_year = 365
+    if calendar.isleap(year):
+        num_days_year = 366
+    date = dt.datetime(year, month, day)
+    day_of_year = date.timetuple().tm_yday
+    day_frac = ((day_of_year - 1) / num_days_year)
+    hour_frac = (1/24) * (1/num_days_year) * hour
+    min_frac = (1/24) * (1/60) * (1/num_days_year) * minutes
+    sec_frac = (1/24) * (1/60) * (1/60) * (1/num_days_year) * seconds
+    return year + day_frac + hour_frac + min_frac + sec_frac
 
 def call_py_cm4(ymd_time, alt, lat_geod, lon, dst, f107, nmin, nmax, geoc_coord_flag, pred_flag_arr):
     #Change yyyymmddhhmmss time to Year decimal time
     year, month, day, hour, minute = parse_time(ymd_time)
     tmp = jd2000(year,month,day, hour + minute/60)
     UT = mjd2000_to_ut(tmp)
+    # UT = calc_dec_year(year, month, day, hour = hour, minutes = minute)
     
     #Change geodetic lat/radius into geocentric
     if(geoc_coord_flag):
@@ -355,21 +391,23 @@ def call_py_cm4(ymd_time, alt, lat_geod, lon, dst, f107, nmin, nmax, geoc_coord_
     return out_b,out_j
     
 
-def Core_unit_test(filepath = '/Users/coka4389/Library/CloudStorage/OneDrive-UCB-O365/Desktop/CM4_Wrapper/CM4/lib/Core_unittest_inputs.csv'):
-    time = '196407011059'
-    alt = 0
-    lat = 43
-    lon = 34
-    dst = 7
-    f107 = 465
-    nmin = np.array([1,14])
-    nmax =np.array([13,45])
-    pred = np.array([True,True,True,True,True,True])
-    cord = True
-    print('hello!!!')
-    call_py_cm4(time,alt,lat,lon,dst,f107,nmin,nmax,cord,pred)
-    print('finished!!!')
-def read_csv(filepath = 'Core_unittest_inputs.csv'):
+# def Core_unit_test(filepath = 'test_values/Core_unittest_inputs.csv'):
+#     time = '196407011059'
+#     alt = 0
+#     lat = 43
+#     lon = 34
+#     dst = 7
+#     f107 = 465
+#     nmin = np.array([1,14])
+#     nmax =np.array([13,45])
+#     pred = np.array([True,True,True,True,True,True])
+#     cord = True
+#     print('hello!!!')
+#     call_py_cm4(time,alt,lat,lon,dst,f107,nmin,nmax,cord,pred)
+#     print('finished!!!')
+# def read_csv(filepath = 'Core_unittest_inputs.csv'):
+def Core_unit_test(filepath = 'test_values/Core_unittest_inputs.csv'):
+
     data = []
         
     with open(filepath, mode='r') as file:
@@ -393,13 +431,13 @@ def read_csv(filepath = 'Core_unittest_inputs.csv'):
         if(not np.all(np.isclose(answers[i],core,rtol = 1e-4))):
             print('Do matlab and py cm4_core dont agree to 5 digits',np.isclose(answers[i],core,rtol = 1e-4), answers[i], core)
         else:
-            print('core unittest passed')
+            print('core unittest passed', core, answers[i])
 
         # else:
         #     print('core agrees to 5 digits')
 #Core_unit_test()#=======================
 
-def Magnetosphere_Unit_test(filepath = '/Users/coka4389/Library/CloudStorage/OneDrive-UCB-O365/Desktop/CM4_Wrapper/CM4/lib/Core_unittest_inputs.csv'):
+def Magnetosphere_Unit_test(filepath = 'test_values/Core_unittest_inputs.csv'):
     data = []
         
     with open(filepath, mode='r') as file:
@@ -412,7 +450,7 @@ def Magnetosphere_Unit_test(filepath = '/Users/coka4389/Library/CloudStorage/One
                 data[-1][2] = float(data[-1][2])
                 data[-1][2] = str(data[-1][2])
                 # print(data[-1])
-    answers = read_answers_ext('CM4/lib/testvalB_magn.csv')
+    answers = read_answers_ext('test_values/testvalB_magn.csv')
     # print()
     for i in range(0,len(data)):
         lat = data[i][0]
@@ -431,7 +469,7 @@ def Magnetosphere_Unit_test(filepath = '/Users/coka4389/Library/CloudStorage/One
             print('magnetosphere unittest passed')
             
 
-def Ionosphere_Unit_test(filepath = '/Users/coka4389/Library/CloudStorage/OneDrive-UCB-O365/Desktop/CM4_Wrapper/CM4/lib/Core_unittest_inputs.csv'):
+def Ionosphere_Unit_test(filepath = 'test_values/Core_unittest_inputs.csv'):
     data = []
         
     with open(filepath, mode='r') as file:
@@ -443,7 +481,7 @@ def Ionosphere_Unit_test(filepath = '/Users/coka4389/Library/CloudStorage/OneDri
                     data[-1][val] = float(data[-1][val])
                 data[-1][2] = float(data[-1][2])
                 data[-1][2] = str(data[-1][2])
-    answers = read_answers_ext('CM4/lib/testvalB_iono.csv')
+    answers = read_answers_ext('/Users/coka4389/Library/CloudStorage/OneDrive-UCB-O365/Desktop/CM4_Wrapper/CM4/CM4/lib/test_values/testvalB_iono.csv')
     for i in range(0,len(data)):
         lat = data[i][0]
         lon = data[i][1]
@@ -453,11 +491,11 @@ def Ionosphere_Unit_test(filepath = '/Users/coka4389/Library/CloudStorage/OneDri
         # f107 = np.ones(len(f107))*10
         # dst = np.ones(len(f107))*-40
         print(yyyymmddhhmm, type(yyyymmddhhmm))
-        out_b,out_j = py_mat_cm4_unittest_ext(yyyymmddhhmm,0,lat,lon,dst[i],f107[i],1)
+        out_b,out_j = py_mat_cm4_unittest_ext(yyyymmddhhmm,0,lat,lon,dst[i],f107[i],geodflag=1)
         ionosphere = np.array([-out_b[2,4]-out_b[2,5], -out_b[0,4]-out_b[0,5],out_b[1,4]+out_b[1,5]])
         print(ionosphere)
         if(not np.all(np.isclose(answers[i],ionosphere,rtol = 1e-4))):
-            print('Do matlab and py cm4_Ionosphere dont agree to 5 digits',np.isclose(answers[i],ionosphere,rtol = 1e-4), answers[i], magnetosphere)
+            print('Do matlab and py cm4_Ionosphere dont agree to 5 digits',np.isclose(answers[i],ionosphere,rtol = 1e-4), answers[i], ionosphere)
         else:
             print('Ionosphere unittest passed')
             
@@ -479,6 +517,8 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
 
         tmp = jd2000(year,month,day, hour + minute/60)
         UT = mjd2000_to_ut(tmp)
+        UT = calc_dec_year(year, month, day, hour = hour, minutes = minute)
+
         # print(f"calc UT time", UT)
     else:
         UT = MJD_time
@@ -545,6 +585,7 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,core_nmin = 1, core_nmax = 13, 
     nmax =np.array([core_nmax,crust_nmax])
     pred = np.array([True,True,True,True,True,True])
     cord = False
+    print("this is whats happening right?")
     out_b, out_j = cm4_py310_arr.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
@@ -698,91 +739,91 @@ def run_unit_tests():
 
 # run_unit_tests()
 if __name__ == '__main__':
-    # run_unit_tests()
-    run_input_bound_test()
+    run_unit_tests()
+    # run_input_bound_test()
 
-    ans = parse_bmdl_output("fortran_CM4_test_values.txt")
-    UT = 1964.49738353192675
+    # ans = parse_bmdl_output("fortran_CM4_test_values.txt")
+    # UT = 1964.49738353192675
 
-    Num_elements = 200
+    # Num_elements = 200
     
-    Num_elements = 200
-    lats = list(np.linspace(48.024, 48.024, Num_elements))
-    lons = np.linspace(2.259, 2.259, Num_elements)
-    dyear = np.linspace(2014.202739, 2014.219178, Num_elements)
-    dyear = np.linspace(2009.202739, 2009.219178, Num_elements)
-    dyear = np.linspace(2011.502739, 2010.519178, Num_elements)
+    # Num_elements = 200
+    # lats = list(np.linspace(48.024, 48.024, Num_elements))
+    # lons = np.linspace(2.259, 2.259, Num_elements)
+    # dyear = np.linspace(2014.202739, 2014.219178, Num_elements)
+    # dyear = np.linspace(2009.202739, 2009.219178, Num_elements)
+    # dyear = np.linspace(2011.502739, 2010.519178, Num_elements)
 
-    hours = np.linspace(1,22,Num_elements)  
-    height = np.linspace(0,0,Num_elements)
-    dst = np.linspace(0,30,Num_elements)
+    # hours = np.linspace(1,22,Num_elements)  
+    # height = np.linspace(0,0,Num_elements)
+    # dst = np.linspace(0,30,Num_elements)
     
-    # f107 =[133.07838542 ,133.04515625 ,133.01192708 ,132.96208333 ,132.92885417, 132.895625,   132.426325,   132.390335,   132.354345,   132.30036   ]
-    f1071_val = 10
-    f107 = np.linspace(f1071_val, f1071_val, Num_elements)
+    # # f107 =[133.07838542 ,133.04515625 ,133.01192708 ,132.96208333 ,132.92885417, 132.895625,   132.426325,   132.390335,   132.354345,   132.30036   ]
+    # f1071_val = 10
+    # f107 = np.linspace(f1071_val, f1071_val, Num_elements)
 
-    time1 = time.time()
-    # out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4(height,lats,lons, dst, f107, MJD_time = dyear,geodflag=0)
-    print("runtime", time.time() - time1)
-    iono = []
-    iono_temp = []
-    for i in range(0,Num_elements):
-        out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4(height[i],lats[i],lons[i], dst[i], f107[i], MJD_time = dyear[i],geodflag=0)
-        iono_temp.append(ionoshere)
-        print("inputs", height[i],lats[i],lons[i], dst[i], f107[i],  dyear[i])
+    # time1 = time.time()
+    # # out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4(height,lats,lons, dst, f107, MJD_time = dyear,geodflag=0)
+    # print("runtime", time.time() - time1)
+    # iono = []
+    # iono_temp = []
+    # for i in range(0,Num_elements):
+    #     out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4(height[i],lats[i],lons[i], dst[i], f107[i], MJD_time = dyear[i],geodflag=0)
+    #     iono_temp.append(ionoshere)
+    #     print("inputs", height[i],lats[i],lons[i], dst[i], f107[i],  dyear[i])
 
     
-    # f107 =[133.07838542 ,133.04515625 ,133.01192708 ,132.96208333 ,132.92885417, 132.895625,   132.426325,   132.390335,   132.354345,   132.30036   ]
-    f1072_val = 100
-    f107 = np.linspace(f1072_val, f1072_val, Num_elements)
-    iono_temp = []
+    # # f107 =[133.07838542 ,133.04515625 ,133.01192708 ,132.96208333 ,132.92885417, 132.895625,   132.426325,   132.390335,   132.354345,   132.30036   ]
+    # f1072_val = 100
+    # f107 = np.linspace(f1072_val, f1072_val, Num_elements)
+    # iono_temp = []
 
-    time1 = time.time()
-    # out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4(height,lats,lons, dst, f107, MJD_time = dyear,geodflag=0)
-    print("runtime", time.time() - time1)
-    for i in range(0,Num_elements):
-        out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4(height[i],lats[i],lons[i], dst[i], f107[i], MJD_time = dyear[i],geodflag=0)
-        iono_temp.append(ionoshere)
-        print("inputs", height[i],lats[i],lons[i], dst[i], f107[i],  dyear[i])
+    # time1 = time.time()
+    # # out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4(height,lats,lons, dst, f107, MJD_time = dyear,geodflag=0)
+    # print("runtime", time.time() - time1)
+    # for i in range(0,Num_elements):
+    #     out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4(height[i],lats[i],lons[i], dst[i], f107[i], MJD_time = dyear[i],geodflag=0)
+    #     iono_temp.append(ionoshere)
+    #     print("inputs", height[i],lats[i],lons[i], dst[i], f107[i],  dyear[i])
 
-    iono.append(iono_temp)
+    # iono.append(iono_temp)
 
-    # f107 =[133.07838542 ,133.04515625 ,133.01192708 ,132.96208333 ,132.92885417, 132.895625,   132.426325,   132.390335,   132.354345,   132.30036   ]
-    f107 = np.linspace(137.5, 151.4, Num_elements)
-    iono_temp = []
+    # # f107 =[133.07838542 ,133.04515625 ,133.01192708 ,132.96208333 ,132.92885417, 132.895625,   132.426325,   132.390335,   132.354345,   132.30036   ]
+    # f107 = np.linspace(137.5, 151.4, Num_elements)
+    # iono_temp = []
 
-    time1 = time.time()
-    # out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4(height,lats,lons, dst, f107, MJD_time = dyear,geodflag=0)
-    print("runtime", time.time() - time1)
-    for i in range(0,Num_elements):
-        out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4(height[i],lats[i],lons[i], dst[i], f107[i], MJD_time = dyear[i],geodflag=0)
-        iono_temp.append(ionoshere)
-        print("inputs", height[i],lats[i],lons[i], dst[i], f107[i],  dyear[i])
+    # time1 = time.time()
+    # # out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4(height,lats,lons, dst, f107, MJD_time = dyear,geodflag=0)
+    # print("runtime", time.time() - time1)
+    # for i in range(0,Num_elements):
+    #     out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4(height[i],lats[i],lons[i], dst[i], f107[i], MJD_time = dyear[i],geodflag=0)
+    #     iono_temp.append(ionoshere)
+    #     print("inputs", height[i],lats[i],lons[i], dst[i], f107[i],  dyear[i])
 
-    iono.append(iono_temp)
-    import matplotlib.pyplot as plt
-    print(np.shape(iono))
-    ###########
-    #Plot stuff
-    iono = np.array(iono)
+    # iono.append(iono_temp)
+    # import matplotlib.pyplot as plt
+    # print(np.shape(iono))
+    # ###########
+    # #Plot stuff
+    # iono = np.array(iono)
 
-    fig, axs = plt.subplots(3, 1, sharex=True, figsize=(10, 8))
-    axes = ["Z", "X", "Y"]
-    for component in range(3):
-        ax = axs[component]
-        ax.plot(dyear, iono[0, :, component], label=f"f107 = {f1071_val}")
-        ax.plot(dyear, iono[1, :, component], label=f"f107 = {f1072_val}")
-        ax.plot(dyear, iono[2, :, component], label=f"f107 = \"2014 lin-interp\"")
+    # fig, axs = plt.subplots(3, 1, sharex=True, figsize=(10, 8))
+    # axes = ["Z", "X", "Y"]
+    # for component in range(3):
+    #     ax = axs[component]
+    #     ax.plot(dyear, iono[0, :, component], label=f"f107 = {f1071_val}")
+    #     ax.plot(dyear, iono[1, :, component], label=f"f107 = {f1072_val}")
+    #     ax.plot(dyear, iono[2, :, component], label=f"f107 = \"2014 lin-interp\"")
 
-        ax.set_ylabel(f"component {axes[component]} [nT]")
-        ax.legend(loc="upper right")
-        ax.grid(True)
-    axs[0].set_title(f"CM4 ionosphere output over 6 days from {int(dyear[0])}Mar16-{int(dyear[0])}Mar21")
-    axs[-1].set_xlabel("dyear")
-    plt.tight_layout()
-    plt.show()
+    #     ax.set_ylabel(f"component {axes[component]} [nT]")
+    #     ax.legend(loc="upper right")
+    #     ax.grid(True)
+    # axs[0].set_title(f"CM4 ionosphere output over 6 days from {int(dyear[0])}Mar16-{int(dyear[0])}Mar21")
+    # axs[-1].set_xlabel("dyear")
+    # plt.tight_layout()
+    # plt.show()
     
-    print("runtime", time.time() - time1)
+    # print("runtime", time.time() - time1)
     # alt = 1
     # thet = 44.0152  
     # phi = - 62.7482
@@ -791,9 +832,12 @@ if __name__ == '__main__':
     # py_mat_cm4(alt, thet, phi, dst, f107, MJD_time=UT, geodflag=0)
     
     
-    raise ValueError
-    a = parse_survey_file('CM4/lib/CM4_test_values.txt')
+    # raise ValueError
+    a = parse_survey_file('/Users/coka4389/Downloads/MATLAB_for_Collin_CM4_Testing/out_1.csv')
+
     print(a[0])
+    print(type(a), np.shape(a))
+    raise ValueError
     for i in range (0,2000000,10000):
         print('iteration ', i)
         YYYYMMDDHHMM = create_YYYYMMDDHHMM(a,i)

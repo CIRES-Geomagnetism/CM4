@@ -3717,7 +3717,6 @@ C=======================================================================
       gmdl = 0.0
 
       !call hello()
-      !print *, UT
       do i = 1, N
         call CM4FIELD(PATH, UNIT, LOAD, INDX, GMUT, CORD, PRED, 
      1    CURR, COEF, NHMF, NLMF, UT(i), MUT, thet(i), 
