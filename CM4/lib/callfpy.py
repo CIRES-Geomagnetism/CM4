@@ -144,7 +144,8 @@ def mjd2000_to_ut(t):
     
     # Compute UT in years
     ut = iy + (dof0[im - 1] + id - 1 + i2 + (ih + minute / 60 + sec / 3600) / 24) / (365 + ifleapyr)
-    return (ut - 2000.002739726)/1.00000029 +0.000577188811121232
+    return ut - 2000
+    # return (ut - 2000.002739726)/1.00000029 +0.000577188811121232
 
 # Example usage
 # t = 1964000  # Replace with the actual MJD2000 value
@@ -279,7 +280,8 @@ def py_mat_cm4_unittest_core(ymd_time, alt, lat_geod, lon, dst, f107):
     year, month, day, hour, minute = parse_time(ymd_time)
     tmp = jd2000(year,month,day, hour + minute/60)
     UT = mjd2000_to_ut(tmp)
-    
+
+    print("core UT?")
     #Change geodetic lat/radius into geocentric
     r_geoc ,thet_geoc= geod2geoc(np.deg2rad(lat_geod), alt)
     thet_geoc = np.rad2deg(thet_geoc)
@@ -288,7 +290,6 @@ def py_mat_cm4_unittest_core(ymd_time, alt, lat_geod, lon, dst, f107):
     nmax =np.array([13,45])
     pred = np.array([True,True,True,True,True,True])
     cord = False
-
     out_b, out_j = cm4_py310.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
@@ -302,14 +303,14 @@ def py_mat_cm4_unittest_core(ymd_time, alt, lat_geod, lon, dst, f107):
 def py_mat_cm4_unittest_ext(ymd_time, alt, lat_geod, lon, dst, f107,geodflag = 1):
     #Change yyyymmddhhmmss time to Year decimal time
     year, month, day, hour, minute = parse_time(ymd_time)
-    hour = hour - 1
+    # hour = hour - 3
     print(year, month, day, hour, minute)
 
     tmp = jd2000(year,month,day, hour + minute/60)
     UT = mjd2000_to_ut(tmp)
     tmp = UT
     UT = calc_dec_year(year, month, day, hour = hour, minutes=minute)
-
+    # UT = 1990.3
     # print("through here?", UT, tmp)
 
     # print(UT,1.990326027397260e3)
@@ -425,6 +426,7 @@ def Core_unit_test(filepath = 'test_values/Core_unittest_inputs.csv'):
         lat = data[i][0]
         lon = data[i][1]
         yyyymmddhhmm = data[i][2]
+        print(yyyymmddhhmm)
         out_b,out_j = py_mat_cm4_unittest_core(yyyymmddhhmm,0,lat,lon,7,723)
         core = np.array([-out_b[2,0], -out_b[0,0],out_b[1,0]])
         # print(answers[i], core)
