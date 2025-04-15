@@ -645,7 +645,7 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
     return out_b,out_j, core, magnetosphere, ionoshere
 
-def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,core_nmin = 1, core_nmax = 13, crust_nmin = 14, crust_nmax = 45, geodflag = 1,year = None, month = None, day = None, hour = None, minute = None, MJD_time = None):
+def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,pred = np.array([True,True,True,True,True,True]), core_nmin = 1, core_nmax = 13, crust_nmin = 14, crust_nmax = 45, geodflag = 1,year = None, month = None, day = None, hour = None, minute = None, MJD_time = None):
     if MJD_time is None and year is None:raise ValueError("a time input must be provided")
     #Change yyyymmddhhmmss time to Year decimal time
 
@@ -675,7 +675,7 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,core_nmin = 1, core_nmax = 13, 
     
     nmin = np.array([core_nmin,crust_nmin])
     nmax =np.array([core_nmax,crust_nmax])
-    pred = np.array([True,True,True,True,True,True])
+    # pred = np.array([True,True,True,True,True,True])
     cord = False
     out_b, out_j = cm4_py310_arr.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
@@ -858,7 +858,7 @@ def arr_calc_unittests():
     lat = np.array(lat, dtype='f')
     lon = np.array(lon, dtype='f')
     answers = read_answers()
-    out_b,out_j, core,crust, magnetosphere, ionoshere = py_mat_cm4_arr(np.zeros(len(lat)), np.array(lat,dtype= 'f'), np.array(lon, dtype='f'), np.ones(len(lat)),np.ones(len(lat)), year= year, month= month, day= day, hour= hour, minute= minute)
+    out_b,out_j, core,crust, magnetosphere, ionoshere = py_mat_cm4_arr(np.zeros(len(lat)), np.array(lat,dtype= 'f'), np.array(lon, dtype='f'), np.ones(len(lat)),np.ones(len(lat)), pred=np.array([True, False, False, False, False, False]), year= year, month= month, day= day, hour= hour, minute= minute)
     core = np.transpose(core)
     all_pass = True
     for i in range(0, len(lat)):
@@ -872,13 +872,12 @@ def arr_calc_unittests():
     dst = np.array([-4,-4,-4,-4,-4,-4,-84,-84,-84,-84,-84,-84,-84])
     f107 = np.array([63.2,63.2,63.2,63.2,63.2,63.2,171.3,171.3,171.3,171.3,171.3,171.3,171.3])
     answers = read_answers_ext('test_values/testvalB_iono.csv')
-    out_b,out_j, core,crust, magnetosphere, ionoshere = py_mat_cm4_arr(np.zeros(len(lat)), np.array(lat,dtype= 'f'), np.array(lon, dtype='f'), dst,f107, year= year, month= month, day= day, hour= hour, minute= minute)
+    out_b,out_j, core,crust, magnetosphere, ionoshere = py_mat_cm4_arr(np.zeros(len(lat)), np.array(lat,dtype= 'f'), np.array(lon, dtype='f'), dst,f107,pred=np.array([True, True, True, True, True, True]),  year= year, month= month, day= day, hour= hour, minute= minute)
     ionoshere = np.transpose(ionoshere)
-    core = np.transpose(core)
     all_pass = True
     for i in range(0, len(lat)):
         if(not np.all(np.isclose(answers[i],ionoshere[i],rtol = 1e-4))):
-            print('Do matlab and py cm4_core dont agree to 5 digits',np.isclose(answers[i],ionoshere[i],rtol = 1e-4), answers[i], ionoshere[i])
+            print('Do matlab and py cm4_ionosphere dont agree to 5 digits',np.isclose(answers[i],ionoshere[i],rtol = 1e-4), answers[i], ionoshere[i])
             all_pass = False
     if all_pass: print('ionosphere unittest passed')
     #END IONO UNITTEST
@@ -886,13 +885,12 @@ def arr_calc_unittests():
     dst = np.array([-4,-4,-4,-4,-4,-4,-84,-84,-84,-84,-84,-84,-84])
     f107 = np.array([63.2,63.2,63.2,63.2,63.2,63.2,171.3,171.3,171.3,171.3,171.3,171.3,171.3])
     answers = read_answers_ext('test_values/testvalB_magn.csv')
-    out_b,out_j, core,crust, magnetosphere, ionoshere = py_mat_cm4_arr(np.zeros(len(lat)), np.array(lat,dtype= 'f'), np.array(lon, dtype='f'), dst,f107, year= year, month= month, day= day, hour= hour, minute= minute)
+    out_b,out_j, core,crust, magnetosphere, ionoshere = py_mat_cm4_arr(np.zeros(len(lat)), np.array(lat,dtype= 'f'), np.array(lon, dtype='f'), dst,f107, pred=np.array([True, True, True, True, False, False]), year= year, month= month, day= day, hour= hour, minute= minute)
     magnetosphere = np.transpose(magnetosphere)
-    core = np.transpose(core)
     all_pass = True
     for i in range(0, len(lat)):
         if(not np.all(np.isclose(answers[i],magnetosphere[i],rtol = 1e-4))):
-            print('Do matlab and py cm4_core dont agree to 5 digits',np.isclose(answers[i],ionoshere[i],rtol = 1e-4), answers[i], magnetosphere[i])
+            print('Do matlab and py cm4_core dont agree to 5 digits',np.isclose(answers[i],magnetosphere[i],rtol = 1e-4), answers[i], magnetosphere[i])
             all_pass = False
     if all_pass: print('magnetosphere unittest passed')
 
