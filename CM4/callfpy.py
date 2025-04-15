@@ -135,10 +135,9 @@ def mjd2000_to_ut(t):
     ih = date_time.hour
     minute = date_time.minute
     sec = date_time.second
-    
+    print("in here",iy, im, id, ih)
     # Determine if the year is a leap year
     ifleapyr = (iy % 4 == 0)  # 1 if leap year, 0 otherwise
-    
     # Check if the month is greater than February and it is a leap year
     i2 = (im > 2) and ifleapyr
     
@@ -232,11 +231,11 @@ def parse_time(time_str):
     year = int(time_str[0:4])
     month = int(time_str[4:6])
     day = int(time_str[6:8])
-    if(day == 0):
-        day =1
+    # if(day == 0):
+        # day =1
     hour = int(time_str[8:10])
-    if(hour ==0):
-        hour = 1
+    # if(hour ==0):
+        # hour = 1
     minute = int(time_str[10:12])
     # second = int(time_str[12:14])
     
@@ -278,6 +277,10 @@ def py_mat_cm4_unittest_core(ymd_time, alt, lat_geod, lon, dst, f107):
 
     #Change yyyymmddhhmmss time to Year decimal time
     year, month, day, hour, minute = parse_time(ymd_time)
+    if day == 0:
+        month -= 1
+        day = 30
+        #This won't work for all cases, but is enough for this unittest
     tmp = jd2000(year,month,day, hour + minute/60)
     UT = mjd2000_to_ut(tmp)
 
@@ -298,18 +301,56 @@ def py_mat_cm4_unittest_core(ymd_time, alt, lat_geod, lon, dst, f107):
     out_j = np.array(out_j)
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
     return out_b,out_j
+def calc_dec_year(year: int, month: int, day:int, hour:int = 0, minutes:int=0, seconds:int=0 ) -> float:
+    """
+    Takes year, month, and day and calculates the decimal year from those inputs
+
+    Parameters:
+    year (int): The year fully written for example 2024
+    month (int): The month from 1-12 where is 1 is January and 12 is December
+    day (int): The day of the month from 1-31
+    hour(int): The hour of the day from 0-23
+    minutes (int): The current minutes of the hour 0-59
+    seconds (int): The current seocnds 0-59
+
+    Returns:
+    (float): The decimal year
+
+    """
+    num_days_year = 365
+    if calendar.isleap(year):
+        num_days_year = 366
+    date = dt.datetime(year, month, day)
+    day_of_year = date.timetuple().tm_yday
+    day_frac = ((day_of_year - 1) / num_days_year)
+    hour_frac = (1/24) * (1/num_days_year) * hour
+    min_frac = (1/24) * (1/60) * (1/num_days_year) * minutes
+    sec_frac = (1/24) * (1/60) * (1/60) * (1/num_days_year) * seconds
+    return year + day_frac + hour_frac + min_frac + sec_frac
 
     
 def py_mat_cm4_unittest_ext(ymd_time, alt, lat_geod, lon, dst, f107,geodflag = 1):
     #Change yyyymmddhhmmss time to Year decimal time
     year, month, day, hour, minute = parse_time(ymd_time)
+    if(day == 0):
+        month -=1
+        day = 30
+    
     # hour = hour - 3
-    print(year, month, day, hour, minute)
-
+    # print(year, month, day, hour, minute)
+    print(year,month,day, hour + minute/60)
+    print("Decimal year", calc_dec_year(year, month, day, hour, minute))
     tmp = jd2000(year,month,day, hour + minute/60)
+    print("JD2000",tmp)
+
     UT = mjd2000_to_ut(tmp)
     tmp = UT
-    UT = calc_dec_year(year, month, day, hour = hour, minutes=minute)
+    print(UT)
+    UT = calc_dec_year(year, month, day, hour, minute)
+    # UT = calc_dec_year(year, month, day, hour = hour, minutes=minute)
+    # if UT - 1990 < 1:
+    #     UT = 1990.32602739726
+    
     # UT = 1990.3
     # print("through here?", UT, tmp)
 
@@ -325,11 +366,15 @@ def py_mat_cm4_unittest_ext(ymd_time, alt, lat_geod, lon, dst, f107,geodflag = 1
     else:
         r_geoc = alt
         thet_geoc = lat_geod
+    # UT = np.round(10*UT)/10
+    # thet_geoc = np.round(thet_geoc*10000)/10000
+    # r_geoc = np.round(r_geoc*10000)/10000
+    # lon = np.round(lon*10000)/10000
+    print("r",r_geoc, "t", UT, "theta_geoc", thet_geoc, "lon for good measure",lon)
     nmin = np.array([1,14])
     nmax =np.array([13,45])
     pred = np.array([True,True,True,True,True,True])
     cord = False
-    print(thet_geoc, lon, r_geoc)
     out_b, out_j = cm4_py310.call_cm4(UT,thet_geoc, lon, r_geoc, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
@@ -483,7 +528,7 @@ def Ionosphere_Unit_test(filepath = 'test_values/Core_unittest_inputs.csv'):
                     data[-1][val] = float(data[-1][val])
                 data[-1][2] = float(data[-1][2])
                 data[-1][2] = str(data[-1][2])
-    answers = read_answers_ext('/Users/coka4389/Library/CloudStorage/OneDrive-UCB-O365/Desktop/CM4_Wrapper/CM4/CM4/lib/test_values/testvalB_iono.csv')
+    answers = read_answers_ext('test_values/testvalB_iono.csv')
     for i in range(0,len(data)):
         lat = data[i][0]
         lon = data[i][1]
@@ -512,14 +557,16 @@ def Ionosphere_Unit_test(filepath = 'test_values/Core_unittest_inputs.csv'):
 def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_time = None):
     if MJD_time is None and ymd_time is None:raise ValueError("a time input must be provided")
     #Change yyyymmddhhmmss time to Year decimal time
-
+    print("py_mat_cm4_arr should be used even with scalars")
+    raise ValueError
     if ymd_time is not None:
         year, month, day, hour, minute = parse_time(ymd_time)
         # hour = hour - 1
 
-        tmp = jd2000(year,month,day, hour + minute/60)
-        UT = mjd2000_to_ut(tmp)
-        UT = calc_dec_year(year, month, day, hour = hour, minutes = minute)
+        # tmp = jd2000(year,month,day, hour + minute/60)
+        # UT = mjd2000_to_ut(tmp)
+        # UT = calc_dec_year(year, month, day, hour = hour, minutes = minute)
+        UT = geomaglib.calc_dec_year(year, month, day, hour, minute)
 
         # print(f"calc UT time", UT)
     else:
@@ -565,8 +612,10 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,core_nmin = 1, core_nmax = 13, 
         # year, month, day, hour, minute = parse_time(ymd_time)
         # hour = hour - 1
 
-        tmp = jd2000(year,month,day, hour + minute/60)
-        UT = mjd2000_to_ut(tmp)
+        # tmp = jd2000(year,month,day, hour + minute/60)
+        # UT = mjd2000_to_ut(tmp)
+        UT = geomaglib.calc_dec_year_arr(year, month, day, hour, minute)
+
         # print(f"calc UT time", UT)
     else:
         UT = MJD_time
@@ -583,6 +632,7 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,core_nmin = 1, core_nmax = 13, 
         r_geoc = alt
         thet_geoc = lat_geod
     # print(r_geoc, thet_geoc)
+    
     nmin = np.array([core_nmin,crust_nmin])
     nmax =np.array([core_nmax,crust_nmax])
     pred = np.array([True,True,True,True,True,True])
