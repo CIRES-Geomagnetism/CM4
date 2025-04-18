@@ -1,11 +1,12 @@
+import os
 from datetime import datetime, timedelta
 
 import geomaglib.util
 import numpy as np
 import importlib
 import csv
-import cm4_py310
-import cm4_py310_arr
+from CM4 import cm4field
+from CM4 import cm4field_arr
 # import geomaglib
 # Force reimport of the module
 # importlib.reload(cm4_py310)
@@ -13,6 +14,9 @@ import cm4_py310_arr
 import time
 
 import re
+
+curr_dir = os.path.dirname(__file__)
+COF_PATH = os.path.join(curr_dir, "umdl.CM4")
 
 def parse_bmdl_output(file_name):
     # Initialize an empty list to hold all BMDL values
@@ -175,8 +179,10 @@ def mjd2000_to_year_decimal(t):
     
     return ut
 # import numpy as np
+
+
 cm4_cof_path = np.array([
-    "/Users/coka4389/Downloads/CM4/umdl.CM4",
+    COF_PATH,
     "/Users/coka4389/Library/CloudStorage/OneDrive-UCB-O365/Desktop/CM4_Wrapper/CM4/lib/fake_dst.txt",
     "/Users/coka4389/Library/CloudStorage/OneDrive-UCB-O365/Desktop/CM4_Wrapper/CM4/lib/fake_f107.txt"
 ])
@@ -293,10 +299,10 @@ def py_mat_cm4_unittest_core(ymd_time, alt, lat_geod, lon, dst, f107):
     nmax =np.array([13,45])
     pred = np.array([True,True,True,True,True,True])
     cord = False
-    out_b, out_j = cm4_py310.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
+    out_b, out_j = cm4field.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
-                                      nmax[0],nmax[1], nmin[0],nmin[1])
+                                      nmax[0],nmax[1], nmin[0],nmin[1], COF_PATH)
     out_b = np.array(out_b)
     out_j = np.array(out_j)
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
@@ -375,10 +381,10 @@ def py_mat_cm4_unittest_ext(ymd_time, alt, lat_geod, lon, dst, f107,geodflag = 1
     nmax =np.array([13,45])
     pred = np.array([True,True,True,True,True,True])
     cord = False
-    out_b, out_j = cm4_py310.call_cm4(UT,thet_geoc, lon, r_geoc, dst, f107,
+    out_b, out_j = cm4field.call_cm4(UT,thet_geoc, lon, r_geoc, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
-                                      nmax[0],nmax[1], nmin[0],nmin[1])
+                                      nmax[0],nmax[1], nmin[0],nmin[1], COF_PATH)
     out_b = np.array(out_b)
     out_j = np.array(out_j)
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
@@ -427,10 +433,10 @@ def call_py_cm4(ymd_time, alt, lat_geod, lon, dst, f107, nmin, nmax, geoc_coord_
     else:
         r_geoc, thet_geoc = alt, lat_geod
 
-    out_b, out_j = cm4_py310.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,  
+    out_b, out_j = cm4field.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
                                       pred_flag_arr[0],pred_flag_arr[1],pred_flag_arr[2],pred_flag_arr[3],pred_flag_arr[4],pred_flag_arr[5]
                                       ,geoc_coord_flag,
-                                      nmax[0],nmax[1], nmin[0],nmin[1] )
+                                      nmax[0],nmax[1], nmin[0],nmin[1], COF_PATH)
     out_b = np.array(out_b)
     out_j = np.array(out_j)
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
@@ -558,7 +564,7 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
     if MJD_time is None and ymd_time is None:raise ValueError("a time input must be provided")
     #Change yyyymmddhhmmss time to Year decimal time
     print("py_mat_cm4_arr should be used even with scalars")
-    raise ValueError
+    #raise ValueError
     if ymd_time is not None:
         year, month, day, hour, minute = parse_time(ymd_time)
         # hour = hour - 1
@@ -566,7 +572,7 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
         # tmp = jd2000(year,month,day, hour + minute/60)
         # UT = mjd2000_to_ut(tmp)
         # UT = calc_dec_year(year, month, day, hour = hour, minutes = minute)
-        UT = geomaglib.calc_dec_year(year, month, day, hour, minute)
+        UT = geomaglib.util.calc_dec_year(year, month, day, hour, minute)
 
         # print(f"calc UT time", UT)
     else:
@@ -588,10 +594,10 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
     nmax =np.array([13,45])
     pred = np.array([True,True,True,True,True,True])
     cord = False
-    out_b, out_j = cm4_py310.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
+    out_b, out_j = cm4field.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
-                                      nmax[0],nmax[1], nmin[0],nmin[1])
+                                      nmax[0],nmax[1], nmin[0],nmin[1], COF_PATH)
     out_b = np.array(out_b)
     out_j = np.array(out_j)
     ionoshere = np.array([-out_b[2,4]-out_b[2,5], -out_b[0,4]-out_b[0,5],out_b[1,4]+out_b[1,5]])
@@ -614,7 +620,7 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,core_nmin = 1, core_nmax = 13, 
 
         # tmp = jd2000(year,month,day, hour + minute/60)
         # UT = mjd2000_to_ut(tmp)
-        UT = geomaglib.calc_dec_year_arr(year, month, day, hour, minute)
+        UT = geomaglib.util.calc_dec_year_arr(year, month, day, hour, minute)
 
         # print(f"calc UT time", UT)
     else:
@@ -634,14 +640,16 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,core_nmin = 1, core_nmax = 13, 
     # print(r_geoc, thet_geoc)
     
     nmin = np.array([core_nmin,crust_nmin])
+
     nmax =np.array([core_nmax,crust_nmax])
     pred = np.array([True,True,True,True,True,True])
     cord = False
     print("this is whats happening right?")
-    out_b, out_j = cm4_py310_arr.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
+
+    out_b, out_j = cm4field_arr.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
-                                      nmax[0],nmax[1], nmin[0],nmin[1], len(UT))
+                                      nmax[0],nmax[1], nmin[0],nmin[1], len(UT), COF_PATH)
     out_b = np.array(out_b)
     out_j = np.array(out_j)
     ionoshere = np.array([-out_b[2,4]-out_b[2,5], -out_b[0,4]-out_b[0,5],out_b[1,4]+out_b[1,5]])
@@ -885,13 +893,15 @@ if __name__ == '__main__':
     
     
     # raise ValueError
-    a = parse_survey_file('/Users/coka4389/Downloads/MATLAB_for_Collin_CM4_Testing/out_1.csv')
+
+    a = parse_survey_file('out_1.txt')
 
     print(a[0])
     print(type(a), np.shape(a))
-    raise ValueError
-    for i in range (0,2000000,10000):
-        print('iteration ', i)
+    #raise ValueError
+    for i in range (len(a)):
+        if i % 100 == 0:
+            print('iteration ', i)
         YYYYMMDDHHMM = create_YYYYMMDDHHMM(a,i)
         print(YYYYMMDDHHMM)
         DST = float(a[i]['D_s'])
@@ -901,7 +911,7 @@ if __name__ == '__main__':
         out_b,out_j, core, magnetosphere, ionoshere = py_mat_cm4(0,lat,lon, DST, f107, ymd_time= YYYYMMDDHHMM)
         round_core = float(core[2])
         round_core = np.round(round_core*10)/10
-        if(round_core != float(a[i]["B_core"])):
+        if("B_core" in a[i].keys() and round_core != float(a[i]["B_core"])):
             print("core mismatch",core[2],round_core,a[i]["B_core"])
         if(np.round(10*magnetosphere[2])/10 != float(a[i]["B_magn"])):
             print("magnetosphere mismatch", np.round(10*magnetosphere[2])/10 , a[i]["B_magn"])

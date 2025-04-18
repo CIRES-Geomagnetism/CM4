@@ -5,27 +5,20 @@ description = "Python wrapper of CM4"
 authors = [{name = "Collin Kadlecek", email = "collin.kadlecek@noaa.gov"}]
 maintainers = [{name = "Collin Kadlecek", email = "collin.kadlecek@noaa.gov"}]
 requires-python = ">=3.9"
-classifiers = [
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-]
-dependencies = [
-    "numpy==1.25.2",
-    "geomaglib>=1.2.1",
-    "datetime"
-]
+dependencies = ["numpy", "geomaglib>=1.2.1"]
+
 readme = "README.md"
 
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["scikit-build-core", "numpy", "cmake"]
+build-backend = "scikit_build_core.build"
 
+[tool.scikit-build]
+wheel.packages = ["CM4"]
 
 [project.urls]
 Homepage = "https://github.com/CIRES-Geomagnetism/CM4.git"
 Repositories = "https://github.com/CIRES-Geomagnetism/CM4.git"
 
-[tool.setuptools]
-packages = ["CM4"]
+
+
