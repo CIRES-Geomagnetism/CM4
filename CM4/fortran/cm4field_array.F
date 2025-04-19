@@ -3656,9 +3656,9 @@ C=======================================================================
       integer :: NHMF1,NHMF2, NLMF1,NLMF2
       integer :: NHMF(2), NLMF(2)
       integer, intent(in) :: N
-      real(8), intent(in) :: UT(N)
-      real(8), intent(in) :: alt(N), thet(N), phi(N)
-      real(8), intent(in) :: dst(N), f107(N)
+      real(8), dimension(:), intent(in) :: UT
+      real(8), dimension(:), intent(in) :: alt, thet, phi
+      real(8), dimension(:), intent(in) :: dst, f107
       real(8), dimension(3,7) :: gather_B
       real(8), dimension(3, 7, N), intent(out) :: bmdl
       real(8), dimension(3, 4), intent(out) :: jmdl
@@ -3666,6 +3666,9 @@ C=======================================================================
       integer(4) :: perr, oerr, cerr
       integer :: i, j, k
       character(len=100) :: cof_path
+
+
+
 
 
 

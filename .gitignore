@@ -3,6 +3,7 @@ CM4/__pycache__
 .idea
 CMakeFiles
 buildbuild_lib
+Makefile
 
 py313_env
 py312_env
