@@ -7,7 +7,7 @@ maintainers = [{name = "Collin Kadlecek", email = "collin.kadlecek@noaa.gov"}]
 requires-python = ">=3.9"
 dependencies = ["numpy", "geomaglib>=1.2.1"]
 
-readme = "README.md"
+readme = "readme.md"
 
 [build-system]
 requires = ["scikit-build-core", "numpy", "cmake"]
