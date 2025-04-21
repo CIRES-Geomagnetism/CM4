@@ -307,6 +307,7 @@ def py_mat_cm4_unittest_core(ymd_time, alt, lat_geod, lon, dst, f107):
     out_j = np.array(out_j)
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
     return out_b,out_j
+
 def calc_dec_year(year: int, month: int, day:int, hour:int = 0, minutes:int=0, seconds:int=0 ) -> float:
     """
     Takes year, month, and day and calculates the decimal year from those inputs
@@ -334,6 +335,46 @@ def calc_dec_year(year: int, month: int, day:int, hour:int = 0, minutes:int=0, s
     sec_frac = (1/24) * (1/60) * (1/60) * (1/num_days_year) * seconds
     return year + day_frac + hour_frac + min_frac + sec_frac
 
+def calc_dec_year_array(year: np.ndarray[int], month: np.ndarray[int], day:np.ndarray[int], hour:np.ndarray[int]=None, minute:np.ndarray[int]=None, second:np.ndarray[int]=None ) -> np.ndarray:
+    """
+    Takes the array of year, month, and day and outputs the decimal year from those inputs
+
+    Parameters:
+    year (int): The year fully written for example 2024
+    month (int): The month from 1-12 where is 1 is January and 12 is December
+    day (int): The day of the month from 1-31
+
+    Returns:
+    (float): The decimal year
+    adjusted calc_dec_year to accept vectors by Collin 01/25 
+    """
+    dec_year = []
+    # if(year.size == 1):
+    #     num_days_year = 365
+    #     if calendar.isleap(year):
+    #         num_days_year = 366
+        
+    #     date = dt.datetime(year, month, day)
+    #     day_of_year = date.timetuple().tm_yday
+    #     dec_year.append(year + ((day_of_year - 1) / num_days_year))
+    # else:
+
+    N = year.size
+    if hour is None:
+        hour = [0]*N
+
+    if minute is None:
+        minute = [0]*N
+
+    if second is None:
+        second = [0]*N
+        
+    for i in range(0,year.size):
+
+        decYear = calc_dec_year(year[i], month[i], day[i], hour[i], minute[i], second[i])
+        dec_year.append(decYear)
+
+    return np.array(dec_year)
     
 def py_mat_cm4_unittest_ext(ymd_time, alt, lat_geod, lon, dst, f107,geodflag = 1):
     #Change yyyymmddhhmmss time to Year decimal time
@@ -610,7 +651,7 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
     return out_b,out_j, core, magnetosphere, ionoshere
 
-def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,core_nmin = 1, core_nmax = 13, crust_nmin = 14, crust_nmax = 45, geodflag = 1,year = None, month = None, day = None, hour = None, minute = None, MJD_time = None):
+def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,pred = np.array([True,True,True,True,True,True]), core_nmin = 1, core_nmax = 13, crust_nmin = 14, crust_nmax = 45, geodflag = 1,year = None, month = None, day = None, hour = None, minute = None, MJD_time = None):
     if MJD_time is None and year is None:raise ValueError("a time input must be provided")
     #Change yyyymmddhhmmss time to Year decimal time
 
@@ -620,7 +661,9 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,core_nmin = 1, core_nmax = 13, 
 
         # tmp = jd2000(year,month,day, hour + minute/60)
         # UT = mjd2000_to_ut(tmp)
-        UT = geomaglib.util.calc_dec_year_arr(year, month, day, hour, minute)
+
+        UT = calc_dec_year_array(np.array(year), np.array(month), np.array(day), np.array(hour), np.array(minute))
+
 
         # print(f"calc UT time", UT)
     else:
@@ -633,7 +676,6 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,core_nmin = 1, core_nmax = 13, 
         r_geoc ,thet_geoc= geod2geoc(np.deg2rad(lat_geod), alt)
         thet_geoc = np.rad2deg(thet_geoc)
         r_geoc = r_geoc-6371.2
-        # r_geoc = #6.367857428238093e+03 - 6371.2
     else:
         r_geoc = alt
         thet_geoc = lat_geod
@@ -642,12 +684,11 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,core_nmin = 1, core_nmax = 13, 
     nmin = np.array([core_nmin,crust_nmin])
 
     nmax =np.array([core_nmax,crust_nmax])
-    pred = np.array([True,True,True,True,True,True])
+    # pred = np.array([True,True,True,True,True,True])
     cord = False
-    print("this is whats happening right?")
-
 
     out_b, out_j = cm4field_arr.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
+
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
                                       nmax[0],nmax[1], nmin[0],nmin[1], len(UT), COF_PATH)
@@ -797,10 +838,79 @@ def run_unit_tests():
     Ionosphere_Unit_test()
     Magnetosphere_Unit_test()
     Core_unit_test()
+def read_testval_inputs():
+    filepath = 'test_values/Core_unittest_inputs.csv'
+    data = []
+
+    with open(filepath, mode='r') as file:
+
+        reader = csv.reader(file)
+        for row_index, row in enumerate(reader):
+            if 1 <= row_index <= 14:  # Rows 1 to 14 (inclusive)
+                data.append(row[1:4])  # Columns 1 to 3 (inclusive)
+                for val in range(0,2):
+                    data[-1][val] = float(data[-1][val])
+                data[-1][2] = float(data[-1][2])
+                data[-1][2] = str(data[-1][2])
+    year, month, day, hour, minute = [],[],[],[],[]
+    for i in range(0,len(data)):
+        y, m, d, h, mi = parse_time(data[i][2])
+        year.append(y)
+        if d == 0:
+            d = 30
+            m -=1
+        month.append(m)
+        day.append(d)
+        hour.append(h)
+        minute.append(mi)
+    return np.array(data)[:,0], np.array(data)[:,1], year, month, day, hour, minute
+def arr_calc_unittests():
+    lat, lon, year, month, day, hour, minute = read_testval_inputs()
+    lat = np.array(lat, dtype='f')
+    lon = np.array(lon, dtype='f')
+    answers = read_answers()
+    out_b,out_j, core,crust, magnetosphere, ionoshere = py_mat_cm4_arr(np.zeros(len(lat)), np.array(lat,dtype= 'f'), np.array(lon, dtype='f'), np.ones(len(lat)),np.ones(len(lat)), pred=np.array([True, False, False, False, False, False]), year= year, month= month, day= day, hour= hour, minute= minute)
+    core = np.transpose(core)
+    all_pass = True
+    for i in range(0, len(lat)):
+        if(not np.all(np.isclose(answers[i],core[i],rtol = 1e-4))):
+            print('Do matlab and py cm4_core dont agree to 5 digits',np.isclose(answers[i],core,rtol = 1e-4), answers[i], core[i])
+            all_pass = False
+    
+    if all_pass: print('core unittest passed')
+    #END CORE UNITTEST
+    #BEGIN IONO UNITTEST
+    dst = np.array([-4,-4,-4,-4,-4,-4,-84,-84,-84,-84,-84,-84,-84])
+    f107 = np.array([63.2,63.2,63.2,63.2,63.2,63.2,171.3,171.3,171.3,171.3,171.3,171.3,171.3])
+    answers = read_answers_ext('test_values/testvalB_iono.csv')
+    out_b,out_j, core,crust, magnetosphere, ionoshere = py_mat_cm4_arr(np.zeros(len(lat)), np.array(lat,dtype= 'f'), np.array(lon, dtype='f'), dst,f107,pred=np.array([True, True, True, True, True, True]),  year= year, month= month, day= day, hour= hour, minute= minute)
+    ionoshere = np.transpose(ionoshere)
+    all_pass = True
+    for i in range(0, len(lat)):
+        if(not np.all(np.isclose(answers[i],ionoshere[i],rtol = 1e-4))):
+            print('Do matlab and py cm4_ionosphere dont agree to 5 digits',np.isclose(answers[i],ionoshere[i],rtol = 1e-4), answers[i], ionoshere[i])
+            all_pass = False
+    if all_pass: print('ionosphere unittest passed')
+    #END IONO UNITTEST
+    #BEGIN MAGNETO UNITTEST
+    dst = np.array([-4,-4,-4,-4,-4,-4,-84,-84,-84,-84,-84,-84,-84])
+    f107 = np.array([63.2,63.2,63.2,63.2,63.2,63.2,171.3,171.3,171.3,171.3,171.3,171.3,171.3])
+    answers = read_answers_ext('test_values/testvalB_magn.csv')
+    out_b,out_j, core,crust, magnetosphere, ionoshere = py_mat_cm4_arr(np.zeros(len(lat)), np.array(lat,dtype= 'f'), np.array(lon, dtype='f'), dst,f107, pred=np.array([True, True, True, True, False, False]), year= year, month= month, day= day, hour= hour, minute= minute)
+    magnetosphere = np.transpose(magnetosphere)
+    all_pass = True
+    for i in range(0, len(lat)):
+        if(not np.all(np.isclose(answers[i],magnetosphere[i],rtol = 1e-4))):
+            print('Do matlab and py cm4_core dont agree to 5 digits',np.isclose(answers[i],magnetosphere[i],rtol = 1e-4), answers[i], magnetosphere[i])
+            all_pass = False
+    if all_pass: print('magnetosphere unittest passed')
+
 
 # run_unit_tests()
 if __name__ == '__main__':
-    run_unit_tests()
+    # run_unit_tests()
+    arr_calc_unittests()
+    raise ValueError
     # run_input_bound_test()
 
     # ans = parse_bmdl_output("fortran_CM4_test_values.txt")
