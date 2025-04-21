@@ -4,6 +4,7 @@ import geomaglib.util
 import numpy as np
 import importlib
 import csv
+
 from CM4 import cm4field, cm4field_arr
 # import geomaglib
 # Force reimport of the module
@@ -874,6 +875,7 @@ def arr_calc_unittests():
     out_b,out_j, core,crust, magnetosphere, ionoshere = py_mat_cm4_arr(np.zeros(len(lat)), np.array(lat,dtype= 'f'), np.array(lon, dtype='f'), np.ones(len(lat)),np.ones(len(lat)), pred=np.array([True, False, False, False, False, False]), year= year, month= month, day= day, hour= hour, minute= minute)
     core = np.transpose(core)
     all_pass = True
+    print(core)
     for i in range(0, len(lat)):
         if(not np.all(np.isclose(answers[i],core[i],rtol = 1e-4))):
             print('Do matlab and py cm4_core dont agree to 5 digits',np.isclose(answers[i],core,rtol = 1e-4), answers[i], core[i])

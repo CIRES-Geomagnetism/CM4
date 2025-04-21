@@ -7,7 +7,9 @@ maintainers = [{name = "Collin Kadlecek", email = "collin.kadlecek@noaa.gov"}]
 requires-python = ">=3.9"
 dependencies = ["numpy", "geomaglib>=1.2.1"]
 
+
 readme = "readme.md"
+
 
 [build-system]
 requires = ["scikit-build-core", "numpy", "cmake"]
@@ -22,6 +24,9 @@ cmake.verbose = true
 [project.urls]
 Homepage = "https://github.com/CIRES-Geomagnetism/CM4.git"
 Repositories = "https://github.com/CIRES-Geomagnetism/CM4.git"
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> fe98494 (The arr_calc_unittests() was passed)
