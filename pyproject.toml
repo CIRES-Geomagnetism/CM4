@@ -10,17 +10,11 @@ dependencies = ["numpy", "geomaglib>=1.2.1"]
 readme = "readme.md"
 
 [build-system]
-requires = ["scikit-build-core", "numpy", "cmake"]
-build-backend = "scikit_build_core.build"
-
-[tool.scikit-build]
-build-dir = "build"
-wheel.packages = ["CM4"]
-cmake.minimum-version = "3.18"
-cmake.verbose = true
+requires = ["meson-python"]
+build-backend = "mesonpy"
 
 [project.urls]
-Homepage = "https://github.com/CIRES-Geomagnetism/CM4.git"
+Homepage = "https://github.pip install -vvv .com/CIRES-Geomagnetism/CM4.git"
 Repositories = "https://github.com/CIRES-Geomagnetism/CM4.git"
 
 

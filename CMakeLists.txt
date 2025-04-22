@@ -4,45 +4,34 @@ project(python_CM4 LANGUAGES Fortran)
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
 
-# Ensure f2py is available and use it for Fortran to Python wrapping
-#find_program(F2PY_EXECUTABLE NAMES f2py3 f2py)
-
+set(CMAKE_BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build_lib)
+file(MAKE_DIRECTORY ${CMAKE_BUILD_DIR})
 
 # Get the Python extension suffix (e.g., .cpython-313-darwin.so)
 execute_process(
-  COMMAND ${Python3_EXECUTABLE} -c "import sysconfig; print(sysconfig.get_config_var('EXT_SUFFIX'))"
+  COMMAND ${Python_EXECUTABLE} -c "import sysconfig; print(sysconfig.get_config_var('EXT_SUFFIX'))"
   OUTPUT_VARIABLE PYTHON_EXT_SUFFIX
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-# Define build directory for the .so file
-set(CMAKE_BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build_lib)
-file(MAKE_DIRECTORY ${CMAKE_BUILD_DIR})
 
 
 # === Build cm4field ===
 
 
-# Build shared library from your Fortran source
-add_library(cm4field MODULE CM4/fortran/cm4field_.F)
+# Output file tracking
+set(F2PY_STAMP "${CMAKE_CURRENT_BINARY_DIR}/cm4field_build.stamp")
 
-
-set_target_properties(cm4field PROPERTIES
-    PREFIX ""
-    OUTPUT_NAME "cm4field_${PYTHON_EXT_SUFFIX}"
+# Add custom command that calls the Python script
+add_custom_command(
+  OUTPUT ${F2PY_STAMP}
+  COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/build_f2py_cm4.py
+  COMMAND ${CMAKE_COMMAND} -E touch ${F2PY_STAMP}
+  COMMENT "Building cm4field Fortran module using f2py"
+  VERBATIM
 )
 
-
-
-
-# === Build cm4field_arr ===
-# Build shared library from your Fortran source
-add_library(cm4field_arr MODULE CM4/fortran/cm4field_array.F)
-
-
-set_target_properties(cm4field_arr PROPERTIES
-    PREFIX ""
-    OUTPUT_NAME "cm4field_arr${PYTHON_EXT_SUFFIX}"
-)
+# Make a target from the command
+add_custom_target(build_f2py_module ALL DEPENDS ${F2PY_STAMP})
 
 # === Get site-packages path ===
 execute_process(
