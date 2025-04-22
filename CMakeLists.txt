@@ -5,7 +5,7 @@ find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 
 
 # Ensure f2py is available and use it for Fortran to Python wrapping
-find_program(F2PY_EXECUTABLE NAMES f2py3 f2py)
+#find_program(F2PY_EXECUTABLE NAMES f2py3 f2py)
 
 
 # Get the Python extension suffix (e.g., .cpython-313-darwin.so)
@@ -20,38 +20,28 @@ file(MAKE_DIRECTORY ${CMAKE_BUILD_DIR})
 
 
 # === Build cm4field ===
-# Build Fortran code into a shared object
-add_custom_command(
-  OUTPUT ${CMAKE_BUILD_DIR}/cm4field${PYTHON_EXT_SUFFIX}
-  COMMAND ${F2PY_EXECUTABLE} -c -m cm4field CM4/fortran/cm4field_.F
-  COMMAND ${CMAKE_COMMAND} -E rename
-          cm4field${PYTHON_EXT_SUFFIX}
-          ${CMAKE_BUILD_DIR}/cm4field${PYTHON_EXT_SUFFIX}
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  COMMENT "Building cm4field Fortran extension"
+
+
+# Build shared library from your Fortran source
+add_library(cm4field MODULE CM4/fortran/cm4field_.F)
+
+
+set_target_properties(cm4field PROPERTIES
+    PREFIX ""
+    OUTPUT_NAME "cm4field_${PYTHON_EXT_SUFFIX}"
 )
 
-
-
-add_custom_target(build_cm4field ALL
-  DEPENDS ${CMAKE_BUILD_DIR}/cm4field${PYTHON_EXT_SUFFIX}
-)
 
 
 
 # === Build cm4field_arr ===
-add_custom_command(
-  OUTPUT ${CMAKE_BUILD_DIR}/cm4field_arr${PYTHON_EXT_SUFFIX}
-  COMMAND ${F2PY_EXECUTABLE} -c -m cm4field_arr CM4/fortran/cm4field_array.F
-  COMMAND ${CMAKE_COMMAND} -E rename
-          cm4field_arr${PYTHON_EXT_SUFFIX}
-          ${CMAKE_BUILD_DIR}/cm4field_arr${PYTHON_EXT_SUFFIX}
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  COMMENT "Building cm4field_array Fortran extension"
-)
+# Build shared library from your Fortran source
+add_library(cm4field_arr MODULE CM4/fortran/cm4field_array.F)
 
-add_custom_target(build_cm4field_arr ALL
-  DEPENDS ${CMAKE_BUILD_DIR}/cm4field_arr${PYTHON_EXT_SUFFIX}
+
+set_target_properties(cm4field_arr PROPERTIES
+    PREFIX ""
+    OUTPUT_NAME "cm4field_arr${PYTHON_EXT_SUFFIX}"
 )
 
 # === Get site-packages path ===
