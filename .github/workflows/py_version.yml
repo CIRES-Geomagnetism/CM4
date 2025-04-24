@@ -25,7 +25,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install meson
         pip install .
-        cp CM4/build_lib/*.so CM4
+        cp build_lib/*.so CM4
 
     - name: Run smoke test
       run: |
