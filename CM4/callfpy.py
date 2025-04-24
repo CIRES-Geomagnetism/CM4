@@ -4,7 +4,8 @@ import geomaglib.util
 import numpy as np
 import importlib
 import csv
-from CM4 import cm4field, cm4field_arr
+#from CM4 import cm4field, cm4field_arr
+from CM4 import cm4field
 # import geomaglib
 # Force reimport of the module
 # importlib.reload(cm4_py310)
@@ -602,7 +603,7 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
     if MJD_time is None and ymd_time is None:raise ValueError("a time input must be provided")
     #Change yyyymmddhhmmss time to Year decimal time
     print("py_mat_cm4_arr should be used even with scalars")
-    raise ValueError
+    #raise ValueError
     if ymd_time is not None:
         year, month, day, hour, minute = parse_time(ymd_time)
         # hour = hour - 1
@@ -632,6 +633,7 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
     nmax =np.array([13,45])
     pred = np.array([True,True,True,True,True,True])
     cord = False
+
     out_b, out_j = cm4field.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,

@@ -3639,7 +3639,8 @@ C=======================================================================
 
       subroutine call_cm4(UT,thet, phi, alt, dst,f107,
      1 bmdl,jmdl,pred1,pred2,pred3,pred4,pred5,pred6,
-     2 CORD, NHMF1,NHMF2, NLMF1,NLMF2, cof_path)
+     2 CORD, NHMF1,NHMF2, NLMF1,NLMF2)
+
       implicit none
 
       ! Declare variables
@@ -3662,10 +3663,10 @@ C=======================================================================
       real(8), dimension(3, 7) :: gmdl
       integer(4) :: perr, oerr, cerr
       integer :: i
-      character(len=100) :: cof_path
+      !character(len=*) :: cof_path
 
       ! Assigning values
-      PATH(1) = cof_path
+      PATH(1) = "/Users/lily/Projects/CM4/CM4/undl.CM4"
       !PATH(2) = "strings are weird"
       !PATH(3) = "weird1"
 
@@ -3682,21 +3683,21 @@ C=======================================================================
       !MUT = 51544.50847222
       !CORD = .true.!.false.!.true.
       !PRED = [.true.,.true.,.true., .true., .true., .true.]
-      
+
       PRED = [pred1,pred2,pred3,pred4,pred5,pred6]
-      
+
 
       CURR = .true.
       COEF = .false.
 
       NHMF = [13, 45]
       NLMF = [1, 14]
-      NHMF = [NHMF1, NHMF2] 
+      NHMF = [NHMF1, NHMF2]
       NLMF = [NLMF1, NLMF2]
 
       ! Initialize altitude
       ! Set all elements to this value
-      
+
       ! Initialize time in year decimal
       !UT = 1964.49738353192675!2000  ! Modified Julian Date 51544.50847222
       !1.96407E+11
@@ -3716,8 +3717,8 @@ C=======================================================================
       gmdl = 0.0
 
       !call hello()
-      call CM4FIELD(PATH, UNIT, LOAD, INDX, GMUT, CORD, PRED, 
-     1                CURR, COEF, NHMF, NLMF, UT, MUT, thet, phi, alt, 
+      call CM4FIELD(PATH, UNIT, LOAD, INDX, GMUT, CORD, PRED,
+     1                CURR, COEF, NHMF, NLMF, UT, MUT, thet, phi, alt,
      2                dst, f107, bmdl, jmdl, gmdl, perr, oerr, cerr)
       !print *, CHAR(10)
       !print *, jmdl
