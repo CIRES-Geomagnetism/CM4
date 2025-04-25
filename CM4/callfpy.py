@@ -648,9 +648,12 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
     return out_b,out_j, core, magnetosphere, ionoshere
 
-def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,pred = np.array([True,True,True,True,True,True]), core_nmin = 1, core_nmax = 13, crust_nmin = 14, crust_nmax = 45, geodflag = 1,year = None, month = None, day = None, hour = None, minute = None, MJD_time = None):
+def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,pred = None, core_nmin = 1, core_nmax = 13, crust_nmin = 14, crust_nmax = 45, geodflag = 1,year = None, month = None, day = None, hour = None, minute = None, MJD_time = None):
     if MJD_time is None and year is None:raise ValueError("a time input must be provided")
     #Change yyyymmddhhmmss time to Year decimal time
+
+    if pred is None:
+        pred = np.array([True, True, True, True, True, True])
 
     if year is not None:
         # year, month, day, hour, minute = parse_time(ymd_time)
