@@ -655,6 +655,13 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,pred = None, core_nmin = 1, cor
     if pred is None:
         pred = np.array([True, True, True, True, True, True])
 
+    if isinstance(alt, list):
+        alt = np.array(alt)
+    if isinstance(lat_geod, list):
+        lat_geod = np.array(lat_geod)
+    if isinstance(lon, list):
+        lon = np.array(lon)
+
     if year is not None:
         # year, month, day, hour, minute = parse_time(ymd_time)
         # hour = hour - 1

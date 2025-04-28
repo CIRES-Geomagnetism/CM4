@@ -59,7 +59,7 @@ if __name__ == '__main__':
           """)
 
 
-    out_b,out_j, core,crust, magnetosphere, ionoshere = py_mat_cm4_arr(height,co_lats,lons, dst, f107, crust_nmax= 65, MJD_time = dyear,geodflag=0)
+    out_b,out_j, core,crust, magnetosphere, ionoshere = py_mat_cm4_arr(height, co_lats, lons, dst, f107, crust_nmax= 65, MJD_time = dyear,geodflag=0)
     #out_b, out_j, core, magnetosphere, ionoshere = py_mat_cm4(height[0], co_lats[0], lons[0], dst[0], f107[0],
      #                                                                     MJD_time = dyear[0])
     print(out_b)
