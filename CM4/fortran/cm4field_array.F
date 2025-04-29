@@ -3643,7 +3643,7 @@ C=======================================================================
       implicit none
 
       ! Declare variables
-      character(len=256) :: PATH(3)
+      character(len=1024) :: PATH(3)
       integer :: UNIT(3)
       logical :: LOAD(3)
       logical :: INDX(2)
