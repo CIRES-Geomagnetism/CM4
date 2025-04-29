@@ -3665,7 +3665,7 @@ C=======================================================================
       real(8), dimension(3, 7) :: gmdl
       integer(4) :: perr, oerr, cerr
       integer :: i, j, k
-      character(len=100) :: cof_path
+      character(len=1024) :: cof_path
 
 
 
