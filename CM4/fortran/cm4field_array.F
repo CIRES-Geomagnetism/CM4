@@ -3639,7 +3639,7 @@ C=======================================================================
 
       subroutine call_cm4(UT,thet, phi, alt, dst,f107,
      1 bmdl,jmdl,pred1,pred2,pred3,pred4,pred5,pred6,
-     2 CORD, NHMF1,NHMF2, NLMF1,NLMF2, N)
+     2 CORD, NHMF1,NHMF2, NLMF1,NLMF2, N, cof_path)
       implicit none
 
       ! Declare variables
@@ -3656,18 +3656,24 @@ C=======================================================================
       integer :: NHMF1,NHMF2, NLMF1,NLMF2
       integer :: NHMF(2), NLMF(2)
       integer, intent(in) :: N
-      real(8), intent(in) :: UT(N)
-      real(8), intent(in) :: alt(N), thet(N), phi(N)
-      real(8), intent(in) :: dst(N), f107(N)
+      real(8), dimension(:), intent(in) :: UT
+      real(8), dimension(:), intent(in) :: alt, thet, phi
+      real(8), dimension(:), intent(in) :: dst, f107
       real(8), dimension(3,7) :: gather_B
       real(8), dimension(3, 7, N), intent(out) :: bmdl
       real(8), dimension(3, 4), intent(out) :: jmdl
       real(8), dimension(3, 7) :: gmdl
       integer(4) :: perr, oerr, cerr
       integer :: i, j, k
+      character(len=100) :: cof_path
+
+
+
+
+
 
       ! Assigning values
-      PATH(1) = "/Users/coka4389/Downloads/CM4/umdl.CM4"
+      PATH(1) = cof_path
       !PATH(2) = "strings are weird"
       !PATH(3) = "weird1"
 

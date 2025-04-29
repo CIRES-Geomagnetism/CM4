@@ -3639,7 +3639,7 @@ C=======================================================================
 
       subroutine call_cm4(UT,thet, phi, alt, dst,f107,
      1 bmdl,jmdl,pred1,pred2,pred3,pred4,pred5,pred6,
-     2 CORD, NHMF1,NHMF2, NLMF1,NLMF2)
+     2 CORD, NHMF1,NHMF2, NLMF1,NLMF2, cof_path)
       implicit none
 
       ! Declare variables
@@ -3662,9 +3662,10 @@ C=======================================================================
       real(8), dimension(3, 7) :: gmdl
       integer(4) :: perr, oerr, cerr
       integer :: i
+      character(len=100) :: cof_path
 
       ! Assigning values
-      PATH(1) = "umdl.CM4"
+      PATH(1) = cof_path
       !PATH(2) = "strings are weird"
       !PATH(3) = "weird1"
 
