@@ -2,7 +2,7 @@ name: test_pyversion ci/cd
 
 on:
   push:
-    branches: ["*"]
+    branches: ["cmake_3.11"]
 
 jobs:
   test:
@@ -23,7 +23,6 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install meson
         pip install .
         cp build_lib/*.so CM4
 
