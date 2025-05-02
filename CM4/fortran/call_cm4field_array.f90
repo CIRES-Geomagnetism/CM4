@@ -12,21 +12,24 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       logical :: LOAD(3)
       logical :: INDX(2)
       logical :: GMUT
-      real(c_double), dimension(:), intent(in) :: UT
+
       real(8) :: MUT
       logical(c_bool), intent(in) :: pred1,pred2,pred3,pred4,pred5,pred6
       logical(c_bool), intent(in) :: CORD
       logical :: PRED(6)
       logical :: CURR, COEF
       integer(c_int), intent(in) :: NHMF1,NHMF2, NLMF1,NLMF2
+      integer(c_int), intent(in) :: N
       integer :: NHMF(2), NLMF(2)
-      real(c_double), dimension(:), intent(in) :: alt, thet, phi
-      real(c_double), dimension(:), intent(in) :: dst, f107
-      real(c_double), dimension(3, 7), intent(out) :: bmdl
+      real(c_double), dimension(*), intent(in) :: UT
+      real(c_double), dimension(*), intent(in) :: alt, thet, phi
+      real(c_double), dimension(*), intent(in) :: dst, f107
+      real(c_double), dimension(3, 7, N), intent(out) :: bmdl
       real(c_double), dimension(3, 4), intent(out) :: jmdl
       real(8), dimension(3, 7) :: gmdl
+      real(8), dimension(3, 7) :: gather_B
       integer(4) :: perr, oerr, cerr
-      integer :: i
+      integer :: i, j, k
       character(kind=c_char), intent(in) :: cof_path(*)
 
 
@@ -40,7 +43,7 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       i = 1
 
       ! Trim and print it just to verify
-      print *, "cof_path = ", fstr
+      print *, "cof path = ", fstr
 
 
       ! Assigning values
@@ -69,6 +72,8 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       print *, "NLMF2: ", NLMF2
       print *, "NHMF1: ", NHMF1
       print *, "NHMF2: ", NHMF2
+
+
 
 
       PRED = [pred1,pred2,pred3,pred4,pred5,pred6]
@@ -123,4 +128,4 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
 
 
 
-      end subroutine call_cm4
+end subroutine call_cm4_arr
