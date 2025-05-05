@@ -1,18 +1,16 @@
 #include <Python.h>
 
-extern void call_cm4(double UT,double thet, double phi, double alt,
-     double dst, double f107, int pred1, int pred2, int pred3, int pred4, int pred5, int pred6,
-     int CORD, int NHMF1, int NHMF2, int NLMF1, int NLMF2, char* cof_path);
-
 // C wrapper for the Fortran function
 // This function is called when the Python function is invoked.
 // It extracts arguments from Python, calls the Fortran function, and returns the result back to Python.
+
 static PyObject* py_call_cm4(PyObject* self, PyObject* args) {
 
     double ut, thet, phi, alt, dst, f107;
     int pred1, pred2, pred3, pred4, pred5, pred6;
     int cord, nhmf1, nhmf2, nlmf1, nlmf2;
     char* cof_path;
+    double bmdl[3][7]; // Assuming bmdl is a 3x7 array
 
 
     // Parse the arguments from Python
@@ -23,9 +21,9 @@ static PyObject* py_call_cm4(PyObject* self, PyObject* args) {
     }
 
     // Call the Fortran function
-    call_cm4(&ut, &thet, &phi, &alt, &dst, &f107,
+    call_cm4_point(&ut, &thet, &phi, &alt, &dst, &f107,
           &pred1, &pred2, &pred3, &pred4, &pred5, &pred6,
-          &cord, &nhmf1, &nhmf2, &nlmf1, &nlmf2, &cof_path);
+          &cord, &nhmf1, &nhmf2, &nlmf1, &nlmf2, &cof_path, (double*)bmdl);
 
     // Return the result to Python
     //return PyLong_FromLong(result);
