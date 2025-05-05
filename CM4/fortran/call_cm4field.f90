@@ -54,8 +54,7 @@ subroutine call_cm4(UT,thet, phi, alt, dst,f107, &
       if (i <= 256) fstr(i:) = ' '  ! Pad rest with spaces
       i = 1
 
-      ! Trim and print it just to verify
-      print *, "cof_path = ", fstr
+
 
 
       ! Assigning values
@@ -77,18 +76,10 @@ subroutine call_cm4(UT,thet, phi, alt, dst,f107, &
       !CORD = .true.!.false.!.true.
       !PRED = [.true.,.true.,.true., .true., .true., .true.]
 
-      print *, "Finish to save parameters"
-      print *, "print CORD: ", CORD
-      print *, "print pred1: ", pred1
-      print *, "NLMF1: ", NLMF1
-      print *, "NLMF2: ", NLMF2
-      print *, "NHMF1: ", NHMF1
-      print *, "NHMF2: ", NHMF2
 
 
       PRED = [pred1,pred2,pred3,pred4,pred5,pred6]
 
-      print *, "Finish to save PRED"
 
 
       CURR = .true.
@@ -101,7 +92,7 @@ subroutine call_cm4(UT,thet, phi, alt, dst,f107, &
       NHMF = [NHMF1, NHMF2]
       NLMF = [NLMF1, NLMF2]
 
-       print *, "Finish to save NHMF"
+
 
       ! Initialize altitude
       ! Set all elements to this value

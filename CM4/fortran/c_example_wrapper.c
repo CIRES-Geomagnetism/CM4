@@ -29,13 +29,12 @@ int main(){
     bool pred6 = true;
     char cof_path[256] = "umdl.CM4";
 
-    UT = 1990;
-    thet = 25.5;
-    phi = 30;
-    alt = 0;
-    dst = 5.5;
-    f107 = 125;
-    cord = false;
+    UT = 2004.124730;
+    thet = -49.170991;
+    phi = 30.352230;
+    alt = 17.811957;
+    dst = -36.466667;
+    f107 = 109.743210;
 
     int N = 10;
     double UT_arr[N];
@@ -58,34 +57,33 @@ int main(){
 
     int NHMF1 = 13, NHMF2 = 45, NLMF1 = 1, NLMF2 = 14;
 
-    double bmdl[3][7][N], jmdl[3][4];
+    double bmdl[3][7], jmdl[3][4];
 
-
-
-    double a = 5.0, b = 7.0, res;
-
-
-    //printf("pred[0]: %d", pred[0]);
 
     /*call_cm4_org(&UT, &thet , &phi, &alt, &dst, &f107,
                                       &pred1, &pred2, &pred3,&pred4, &pred5, &pred6,
                                       &cord,
-                                      &NHMF1,&NHMF2, &NLMF1,&NLMF2, (double*)bmdl, (double*)jmdl);
+                                      &NHMF1,&NHMF2, &NLMF1,&NLMF2, (double*)bmdl, (double*)jmdl);*/
+
 
     call_cm4(&UT, &thet , &phi, &alt, &dst, &f107,
                                       &pred1, &pred2, &pred3,&pred4, &pred5, &pred6
                                       ,&cord,
-                                      &NHMF1,&NHMF2, &NLMF1,&NLMF2, cof_path, (double*)bmdl, (double*)jmdl);*/
+                                      &NHMF1,&NHMF2, &NLMF1,&NLMF2, cof_path, (double*)bmdl, (double*)jmdl);
 
-    call_cm4_arr(UT_arr, thet_arr , phi_arr, alt_arr, dst_arr, f107_arr,
+    /*call_cm4_arr(UT_arr, thet_arr , phi_arr, alt_arr, dst_arr, f107_arr,
                                       &pred1, &pred2, &pred3,&pred4, &pred5, &pred6
                                       ,&cord,
-                                      &NHMF1,&NHMF2, &NLMF1,&NLMF2, &N, cof_path, (double*)bmdl, (double*)jmdl);
+                                      &NHMF1,&NHMF2, &NLMF1,&NLMF2, &N, cof_path, (double*)bmdl, (double*)jmdl);*/
 
 
     // Print results
-    printf("bmdl[0][1][0] = %f\n", bmdl[0][1][0]);
-    printf("jmdl[0][1] = %f\n", jmdl[0][0]);
+    printf("bmdl[0][0] = %f\n", bmdl[0][0]);
+    printf("bmdl[0][1] = %f\n", bmdl[0][1]);
+    printf("bmdl[0][2] = %f\n", bmdl[0][2]);
+    printf("bmdl[0][3] = %f\n", bmdl[0][3]);
+    printf("bmdl[0][4] = %f\n", bmdl[0][4]);
+    printf("bmdl[0][5] = %f\n", bmdl[0][5]);
 
 
 
