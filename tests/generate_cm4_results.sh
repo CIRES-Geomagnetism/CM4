@@ -3,7 +3,7 @@
 
 set -e
 
-exe_dir="tests"
+exe_dir="/Users/lily/Projects/CM4/CM4/fortran"
 out_exe="cm4_results"
 while getopts "d:h" opt; do
   case $opt in
@@ -21,7 +21,7 @@ if [ -f ${out_exe} ]; then
 fi
 
 
-gfortran -c ${exe_dir}/call_cm4field.f90 ${exe_dir}/cm4field_.F
+#gfortran -c ${exe_dir}/call_cm4field.f90 ${exe_dir}/cm4field_.F
 
-gfortran create_cm4_results.c call_cm4field.o cm4field_.o  -o $out_exe
+gfortran create_cm4_results.c ${exe_dir}/call_cm4field.f90 ${exe_dir}/cm4field_.F  -o $out_exe
 ./${out_exe}

@@ -24,8 +24,6 @@ void call_cm4_point(double UT, double thet, double phi, double alt,
                                       ,&cord,
                                       &NHMF1,&NHMF2, &NLMF1,&NLMF2, cof_path, (double*)bmdl, (double*)jmdl);
 
-    
-    
-    return 0;
+
 
 }

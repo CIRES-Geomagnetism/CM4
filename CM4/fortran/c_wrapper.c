@@ -1,8 +1,40 @@
 #include <Python.h>
+#include <ccm4.h>
 
 // C wrapper for the Fortran function
 // This function is called when the Python function is invoked.
 // It extracts arguments from Python, calls the Fortran function, and returns the result back to Python.
+
+PyObject* save_2d_array(int rows, int cols, double matrix[][]){
+    // Create a new Python list
+    PyObject* py_list = PyList_New(rows);
+    if (!py_list) {
+        return NULL; // Memory allocation failed
+    }
+
+    // Fill the list with numpy arrays
+    for (int i = 0; i < rows; i++) {
+        // Create a new numpy array for each row
+        PyObject* py_row = PyList_New(cols);
+        if (!py_row) {
+            Py_DECREF(py_list); // Clean up previously allocated memory
+            return NULL; // Memory allocation failed
+        }
+
+        for (int j = 0; j < cols; j++) {
+            PyObject* py_value = PyFloat_FromDouble(matrix[i][j]);
+            if (!py_value) {
+                Py_DECREF(py_row);
+                Py_DECREF(py_list);
+                return NULL; // Memory allocation failed
+            }
+            PyList_SetItem(py_row, j, py_value); // Steal reference
+        }
+        PyList_SetItem(py_list, i, py_row); // Steal reference
+    }
+
+    return py_list;
+}
 
 static PyObject* py_call_cm4(PyObject* self, PyObject* args) {
 
