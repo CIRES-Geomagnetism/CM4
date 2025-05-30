@@ -369,7 +369,7 @@ def calc_dec_year_array(year: np.ndarray[int], month: np.ndarray[int], day:np.nd
         
     for i in range(0,year.size):
 
-        decYear = calc_dec_year(year[i], month[i], day[i], hour[i], minute[i], second[i])
+        decYear = geomaglib.util.calc_dec_year(year[i], month[i], day[i], hour[i], minute[i], second[i])
         dec_year.append(decYear)
 
     return np.array(dec_year)
@@ -669,7 +669,7 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,pred = None, core_nmin = 1, cor
 
         # tmp = jd2000(year,month,day, hour + minute/60)
         # UT = mjd2000_to_ut(tmp)
-        UT = calc_dec_year_array(np.array(year), np.array(month), np.array(day), np.array(hour), np.array(minute))
+        UT = geomaglib.util.calc_dec_year_array(np.array(year), np.array(month), np.array(day), np.array(hour), np.array(minute))
 
         # print(f"calc UT time", UT)
     else:

@@ -58,6 +58,7 @@ int main(){
     int NHMF1 = 13, NHMF2 = 45, NLMF1 = 1, NLMF2 = 14;
 
     double bmdl[3][7], jmdl[3][4];
+    double bmdl_arr[3][7][N];
 
 
     /*call_cm4_org(&UT, &thet , &phi, &alt, &dst, &f107,
@@ -66,24 +67,32 @@ int main(){
                                       &NHMF1,&NHMF2, &NLMF1,&NLMF2, (double*)bmdl, (double*)jmdl);*/
 
 
-    call_cm4(&UT, &thet , &phi, &alt, &dst, &f107,
+    /*call_cm4(&UT, &thet , &phi, &alt, &dst, &f107,
                                       &pred1, &pred2, &pred3,&pred4, &pred5, &pred6
                                       ,&cord,
-                                      &NHMF1,&NHMF2, &NLMF1,&NLMF2, cof_path, (double*)bmdl, (double*)jmdl);
+                                      &NHMF1,&NHMF2, &NLMF1,&NLMF2, cof_path, (double*)bmdl, (double*)jmdl);*/
 
-    /*call_cm4_arr(UT_arr, thet_arr , phi_arr, alt_arr, dst_arr, f107_arr,
+    call_cm4_arr(UT_arr, thet_arr , phi_arr, alt_arr, dst_arr, f107_arr,
                                       &pred1, &pred2, &pred3,&pred4, &pred5, &pred6
                                       ,&cord,
-                                      &NHMF1,&NHMF2, &NLMF1,&NLMF2, &N, cof_path, (double*)bmdl, (double*)jmdl);*/
+                                      &NHMF1,&NHMF2, &NLMF1,&NLMF2, &N, cof_path, (double*)bmdl_arr, (double*)jmdl);
 
 
     // Print results
-    printf("bmdl[0][0] = %f\n", bmdl[0][0]);
+    /*printf("bmdl[0][0] = %f\n", bmdl[0][0]);
     printf("bmdl[0][1] = %f\n", bmdl[0][1]);
     printf("bmdl[0][2] = %f\n", bmdl[0][2]);
     printf("bmdl[0][3] = %f\n", bmdl[0][3]);
     printf("bmdl[0][4] = %f\n", bmdl[0][4]);
-    printf("bmdl[0][5] = %f\n", bmdl[0][5]);
+    printf("bmdl[0][5] = %f\n", bmdl[0][5]);*/
+
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 7; j++) {
+            for (int k =0; k < N; k++) {
+            printf("bmdl_arr[%d][%d][%d] = %f\n", i, j, k, bmdl_arr[i][j][k]);
+            }
+        }
+    }
 
 
 

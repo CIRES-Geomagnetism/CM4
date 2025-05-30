@@ -1,3 +1,18 @@
+function c_null_to_f_string(cstr) result(fstr)
+  use iso_c_binding
+  implicit none
+  character(kind=c_char), dimension(:) :: cstr
+  character(len=256) :: fstr
+  integer :: i
+
+  i = 1
+  do while (i <= size(cstr) .and. cstr(i) /= c_null_char)
+    fstr(i:i) = cstr(i)
+    i = i + 1
+  end do
+  fstr(i:) = ' '
+end function
+
 subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
      pred1,pred2,pred3,pred4,pred5,pred6, &
      CORD, NHMF1,NHMF2, NLMF1,NLMF2, N, cof_path, bmdl,jmdl) bind(C, name="call_cm4_arr")
@@ -114,14 +129,20 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       jmdl = 0.0
       gmdl = 0.0
 
-      do i = 1, N
-        call CM4FIELD(PATH, UNIT, LOAD, INDX, GMUT, CORD, PRED, &
+
+      print *, "UT(N): ", UT(N)
+      do i = 1, 10
+
+            call CM4FIELD(PATH, UNIT, LOAD, INDX, GMUT, CORD, PRED, &
          CURR, COEF, NHMF, NLMF, UT(i), MUT, thet(i), &
-         phi(i), alt(i), dst(i), f107(i), &
+         phi(i), alt(i), dst(i), f107(i),&
          gather_B, jmdl, gmdl, perr, oerr, cerr)
         do j = 1, 3
+
           do k = 1, 7
+
             bmdl(j, k, i) = gather_B(j, k)
+            print *, "bmdl(", j, ",", k, ",", i, ") = ", bmdl(j, k, i)
           end do
         end do
       end do

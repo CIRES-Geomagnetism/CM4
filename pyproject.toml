@@ -24,9 +24,3 @@ cmake.verbose = true
 [project.urls]
 Homepage = "https://github.com/CIRES-Geomagnetism/CM4.git"
 Repositories = "https://github.com/CIRES-Geomagnetism/CM4.git"
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> fe98494 (The arr_calc_unittests() was passed)
