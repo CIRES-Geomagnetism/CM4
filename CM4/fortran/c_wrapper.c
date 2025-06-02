@@ -36,6 +36,61 @@ PyObject* save_2d_array(int rows, int cols, double matrix[][]){
     return py_list;
 }
 
+double* pyooject_to_darray(PyObject* obj){
+
+    if (!PyList_Check(obj)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a list");
+        return NULL;
+    }
+
+    Py_ssize_t len = PySequence_Length(obj);
+
+    double* array = (double*)malloc(len * sizeof(double));
+
+    for(Py_ssize_t i = 0; i < len; i++) {
+        PyObject* item = PySequence_GetItem(obj, i);
+        if (!PyFloat_Check(item)){
+            Py_DECREF(item);
+            free(array);
+            PyErr_SetString(PyExc_TypeError, "Expected a float in the list");
+            return NULL;
+        }
+        array[i] = PyFloat_AsDouble(item);
+        Py_DECREF(item);
+    }
+
+    return array;
+
+}
+static PyObject* py_call_cm4_arr(PyObject* self, PyObject* args) {
+
+    PyObject *ut_obj, *thet_obj, *phi_obj, *alt_obj, *dst_obj, *f107_obj;
+    int pred1, pred2, pred3, pred4, pred5, pred6;
+    int cord, nhmf1, nhmf2, nlmf1, nlmf2;
+    char* cof_path;
+    double bmdl[3][7]; // Assuming bmdl is a 3x7 array
+
+    // Parse the arguments from Python
+    if (!PyArg_ParseTuple(args, "OOOOOOiiiiiiiiic",
+          &ut_obj, &thet_obj, &phi_obj, &alt_obj, &dst_obj, &f107_obj,
+          &pred1, &pred2, &pred3, &pred4, &pred5, &pred6,
+          &cord, &nhmf1, &nhmf2, &nlmf1, &nlmf2, &cof_path)) {
+        return NULL;
+    }
+
+    // Convert Python lists to C arrays
+    double *ut = pyooject_to_darray(ut_obj);
+    double *thet = pyooject_to_darray(thet_obj);
+    double *phi = pyooject_to_darray(phi_obj);
+    double *alt = pyooject_to_darray(alt_obj);
+    double *dst = pyooject_to_darray(dst_obj);
+    double *f107 = pyooject_to_darray(f107_obj);
+
+
+
+
+
+}
 static PyObject* py_call_cm4(PyObject* self, PyObject* args) {
 
     double ut, thet, phi, alt, dst, f107;
@@ -63,16 +118,16 @@ static PyObject* py_call_cm4(PyObject* self, PyObject* args) {
 
 // Method table that maps Python methods to C functions
 // This array defines all the functions that will be exposed from C to Python.
-// Each entry in this array contains the name of the Python function (compute"), a pointer to the corresponding C function (py_call_cm4)
+// Each entry in this array contains the name of the Python function ("py_mat_cm4_arr"), a pointer to the corresponding C function (py_call_cm4)
 static PyMethodDef methods[] = {
-    {"compute", py_call_cm4, METH_VARARGS, "Get the magnetic elements from CM4"},
+    {"py_mat_cm4_arr", py_call_cm4_arr, METH_VARARGS, "Get the magnetic elements from CM4"},
     {NULL, NULL, 0, NULL}
 };
 
 // Module definition
 static struct PyModuleDef c_cm4 = {
     PyModuleDef_HEAD_INIT,
-    "python_cm4",   // Module name
+    "python_CM4",   // Module name
     "Get the magnetic elements from CM4 in core, crustal, ionosphere or magnetoshpere field.",  // Docstring
     -1,  // Size of the module state (-1 means module is global)
     methods  // Method table
@@ -83,7 +138,7 @@ static struct PyModuleDef c_cm4 = {
 
 // PyMODINIT_FUNC PyInit_c_cm4(void): This is the function signature for the initialization function.
 // The function uses PyModule_Create() to create and initialize the module,
-// linking the methods[] array to define the methods available in the module (like compute).
+// linking the methods[] array to define the methods available in the module (like py_mat_cm4_arr).
 PyMODINIT_FUNC PyInit_c_cm4(void) {
     return PyModule_Create(&c_cm4);
 }
