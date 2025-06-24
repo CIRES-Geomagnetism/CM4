@@ -1,6 +1,5 @@
 .DS_Store
-CM4/__pycache__
-
+dist
 .idea
 CMakeFiles
 buildbuild_lib
@@ -8,13 +7,18 @@ build
 build_lib
 Makefile
 
+py311_env
 py313_env
 py312_env
 
+CM4/__pycache__
 CM4/.DS_Store
 CM4/fortran/.DS_Store
 CM4/fortran/c_example
 CM4/fortran/*.o
 CM4/fortran/fortran_mod.f90
-
 CM4/*.so
+CM4/out_1.txt
+
+tests/cm4_results
+tests/test_values/*.csv

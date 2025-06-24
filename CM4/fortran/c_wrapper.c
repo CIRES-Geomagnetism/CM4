@@ -1,11 +1,11 @@
 #include <Python.h>
-#include <ccm4.h>
+#include "ccm4.h"
 
 // C wrapper for the Fortran function
 // This function is called when the Python function is invoked.
 // It extracts arguments from Python, calls the Fortran function, and returns the result back to Python.
 
-PyObject* save_2d_array(int rows, int cols, double matrix[][]){
+PyObject* save_3d_array(int rows, int cols, int arr_len, double*** matrix){
     // Create a new Python list
     PyObject* py_list = PyList_New(rows);
     if (!py_list) {
@@ -22,13 +22,26 @@ PyObject* save_2d_array(int rows, int cols, double matrix[][]){
         }
 
         for (int j = 0; j < cols; j++) {
-            PyObject* py_value = PyFloat_FromDouble(matrix[i][j]);
-            if (!py_value) {
+            PyObject* py_col = PyList_New(arr_len);
+            if (!py_col) {
                 Py_DECREF(py_row);
                 Py_DECREF(py_list);
                 return NULL; // Memory allocation failed
             }
-            PyList_SetItem(py_row, j, py_value); // Steal reference
+
+            for (int k = 0; k < arr_len; k++) {
+                PyObject* py_value = PyFloat_FromDouble(matrix[i][j][k]);
+                if (!py_value) {
+                    Py_DECREF(py_col);
+                    Py_DECREF(py_row);
+                    Py_DECREF(py_list);
+                    return NULL; // Memory allocation failed
+                }
+
+                PyList_SetItem(py_col, k, py_value); // Steal reference
+            }
+
+            PyList_SetItem(py_row, j, py_col); // Steal reference
         }
         PyList_SetItem(py_list, i, py_row); // Steal reference
     }
@@ -66,9 +79,12 @@ static PyObject* py_call_cm4_arr(PyObject* self, PyObject* args) {
 
     PyObject *ut_obj, *thet_obj, *phi_obj, *alt_obj, *dst_obj, *f107_obj;
     int pred1, pred2, pred3, pred4, pred5, pred6;
-    int cord, nhmf1, nhmf2, nlmf1, nlmf2;
+    int cord;
     char* cof_path;
-    double bmdl[3][7]; // Assuming bmdl is a 3x7 array
+
+    int nhmf1 = 13, nhmf2 = 45, nlmf1 = 1, nlmf2 = 14;
+
+
 
     // Parse the arguments from Python
     if (!PyArg_ParseTuple(args, "OOOOOOiiiiiiiiic",
@@ -86,18 +102,41 @@ static PyObject* py_call_cm4_arr(PyObject* self, PyObject* args) {
     double *dst = pyooject_to_darray(dst_obj);
     double *f107 = pyooject_to_darray(f107_obj);
 
+    Py_ssize_t len = PySequence_Length(ut_obj);
+
+    if (len != PySequence_Length(thet_obj) || len != PySequence_Length(phi_obj) ||
+        len != PySequence_Length(alt_obj) || len != PySequence_Length(dst_obj) ||
+        len != PySequence_Length(f107_obj)) {
+        free(ut);
+        free(thet);
+        free(phi);
+        free(alt);
+        free(dst);
+        free(f107);
+        PyErr_SetString(PyExc_ValueError, "All input lists must have the same length");
+        return NULL;
+    }
+    double bmdl[3][7][len]; // Assuming bmdl is a 3x7 array
+    double jmdl[3][4]; // Assuming jmdl is a 3x4 array
 
 
+    call_cm4_arr(ut, thet , phi, alt, dst, f107,
+                                      &pred1, &pred2, &pred3,&pred4, &pred5, &pred6
+                                      ,&cord,
+                                      &nhmf1, &nhmf2, &nlmf1, &nlmf2, &len, cof_path, (double*)bmdl, (double*)jmdl);
 
+    PyObject* results = save_3d_array(3, 7, len, bmdl);
 
+    return results;
 }
-static PyObject* py_call_cm4(PyObject* self, PyObject* args) {
+/*static PyObject* py_call_cm4(PyObject* self, PyObject* args) {
 
     double ut, thet, phi, alt, dst, f107;
     int pred1, pred2, pred3, pred4, pred5, pred6;
     int cord, nhmf1, nhmf2, nlmf1, nlmf2;
     char* cof_path;
     double bmdl[3][7]; // Assuming bmdl is a 3x7 array
+    double jmdl[3][7];
 
 
     // Parse the arguments from Python
@@ -108,13 +147,13 @@ static PyObject* py_call_cm4(PyObject* self, PyObject* args) {
     }
 
     // Call the Fortran function
-    call_cm4_point(&ut, &thet, &phi, &alt, &dst, &f107,
+    call_cm4(&ut, &thet, &phi, &alt, &dst, &f107,
           &pred1, &pred2, &pred3, &pred4, &pred5, &pred6,
-          &cord, &nhmf1, &nhmf2, &nlmf1, &nlmf2, &cof_path, (double*)bmdl);
+          &cord, &nhmf1, &nhmf2, &nlmf1, &nlmf2, &cof_path, (double*)bmdl, (double*)jmdl);
 
     // Return the result to Python
     //return PyLong_FromLong(result);
-}
+}*/
 
 // Method table that maps Python methods to C functions
 // This array defines all the functions that will be exposed from C to Python.

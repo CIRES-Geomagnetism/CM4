@@ -12,7 +12,7 @@ readme = "readme.md"
 
 
 [build-system]
-requires = ["scikit-build-core", "numpy", "cmake"]
+requires = ["scikit-build-core", "cmake"]
 build-backend = "scikit_build_core.build"
 
 [tool.scikit-build]
