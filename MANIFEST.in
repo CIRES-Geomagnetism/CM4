@@ -1,3 +1,5 @@
-include CM4/fortran/cm4filed_.F
-include CM4/fortran/cm4filed_array.F
+include CM4/cm4filed_.F
+include CM4/call_cm4field_array.f90
+include CM4/c_wrapper.c
+include CM4/ccm4.c
 include CM4/umdl.CM4

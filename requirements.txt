@@ -1,2 +1,1 @@
-geomaglib==1.2.1
-numpy==1.25.2
+build
