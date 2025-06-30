@@ -130,9 +130,9 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       gmdl = 0.0
 
 
+      print *, "len: ", N
       print *, "UT(N): ", UT(N)
-      do i = 1, 10
-
+      do i = 1, N
             call CM4FIELD(PATH, UNIT, LOAD, INDX, GMUT, CORD, PRED, &
          CURR, COEF, NHMF, NLMF, UT(i), MUT, thet(i), &
          phi(i), alt(i), dst(i), f107(i),&

@@ -5,7 +5,7 @@ import numpy as np
 import importlib
 import csv
 
-from CM4 import cm4field, cm4field_arr
+from cm4 import cm4field_arr
 # import geomaglib
 # Force reimport of the module
 # importlib.reload(cm4_py310)
@@ -16,6 +16,7 @@ import re
 
 curr_dir = os.path.dirname(__file__)
 COF_PATH = os.path.join(curr_dir, "umdl.CM4")
+
 
 
 def parse_bmdl_output(file_name):
@@ -649,12 +650,19 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
     return out_b,out_j, core, magnetosphere, ionoshere
 
-def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,pred = None, core_nmin = 1, core_nmax = 13, crust_nmin = 14, crust_nmax = 45, geodflag = 1,year = None, month = None, day = None, hour = None, minute = None, MJD_time = None):
+def py_mat_cm4_arr(alt: list[float], lat_geod: list[float], lon: list[float], dst: list[float], f107: list[float],pred: list[bool] = None, core_nmin: int = 1, core_nmax: int = 13, crust_nmin: int = 14, crust_nmax: int = 45, geodflag: int = 1,
+                   year: int = None, month: int = None, day: int = None, hour: int = None, minute: int = None, MJD_time: float = None) -> tuple[list, list, list, list, list]:
     if MJD_time is None and year is None:raise ValueError("a time input must be provided")
     #Change yyyymmddhhmmss time to Year decimal time
 
+    N = len(alt)
+
+    if (len(lat_geod) != N or len(lon) != N or len(dst) != N or len(f107) != N):
+        raise ValueError("alt, lat_geod, lon, dst, and f107 must all be the same length")
+
+
     if pred is None:
-        pred = np.array([True, True, True, True, True, True])
+        pred = [True, True, True, True, True, True]
 
     if isinstance(alt, list):
         alt = np.array(alt)
@@ -687,16 +695,17 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,pred = None, core_nmin = 1, cor
         thet_geoc = lat_geod
     # print(r_geoc, thet_geoc)
     
-    nmin = np.array([core_nmin,crust_nmin])
-    nmax =np.array([core_nmax,crust_nmax])
+    nmin = [core_nmin,crust_nmin]
+    nmax = [core_nmax,crust_nmax]
     # pred = np.array([True,True,True,True,True,True])
-    cord = False
-    out_b, out_j = cm4field_arr.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
+    cord = 0
+
+    out_b = cm4field_arr.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
-                                      nmax[0],nmax[1], nmin[0],nmin[1], len(UT), COF_PATH)
-    out_b = np.array(out_b)
-    out_j = np.array(out_j)
+                                      nmax[0],nmax[1], nmin[0],nmin[1], N, COF_PATH)
+
+
     ionoshere = np.array([-out_b[2,4]-out_b[2,5], -out_b[0,4]-out_b[0,5],out_b[1,4]+out_b[1,5]])
     magnetosphere = np.array([-out_b[2,2]-out_b[2,3], -out_b[0,2]-out_b[0,3],out_b[1,2]+out_b[1,3]])
     core = np.array([-out_b[2,0], -out_b[0,0],out_b[1,0]])
@@ -706,7 +715,7 @@ def py_mat_cm4_arr(alt, lat_geod, lon, dst, f107,pred = None, core_nmin = 1, cor
     # print('ionoshere', ionoshere)
     # print('raw', out_b, np.shape(out_b))
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
-    return out_b,out_j, core,crust, magnetosphere, ionoshere
+    return out_b, core,crust, magnetosphere, ionoshere
 def parse_survey_file(filename):
     with open(filename, 'r') as file:
         # Read the first line as headers
