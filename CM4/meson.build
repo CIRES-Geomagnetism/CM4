@@ -7,6 +7,12 @@ numpy_include = run_command(
   'import numpy; print(numpy.get_include())'
 ).stdout().strip()
 
+numpy_err = run_command(
+  python,
+  '-c',
+  'import numpy; print(numpy.get_include())'
+).stderr().strip()
+
 #np_include_mac_dir = join_paths(python.get_install_dir(), 'numpy', '_core', 'include')
 
 numpy_dep = declare_dependency(
@@ -17,6 +23,7 @@ numpy_dep = declare_dependency(
 message('This is a debug message')
 message('Python install dir: ' + python.get_install_dir())
 message('NumPy include path stdout: ' + numpy_include)
+message('NumPy include path stderr: ' + numpy_err)
 
 # Build the Python extension module
 
