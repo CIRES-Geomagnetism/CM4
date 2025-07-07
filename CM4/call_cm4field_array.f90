@@ -57,8 +57,7 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       if (i <= 256) fstr(i:) = ' '  ! Pad rest with spaces
       i = 1
 
-      ! Trim and print it just to verify
-      print *, "cof path = ", fstr
+
 
 
       ! Assigning values
@@ -80,21 +79,7 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       !CORD = .true.!.false.!.true.
       !PRED = [.true.,.true.,.true., .true., .true., .true.]
 
-      print *, "Finish to save parameters"
-      print *, "print CORD: ", CORD
-      print *, "print pred1: ", pred1
-      print *, "NLMF1: ", NLMF1
-      print *, "NLMF2: ", NLMF2
-      print *, "NHMF1: ", NHMF1
-      print *, "NHMF2: ", NHMF2
-
-
-
-
       PRED = [pred1,pred2,pred3,pred4,pred5,pred6]
-
-      print *, "Finish to save PRED"
-
 
       CURR = .true.
       COEF = .false.
@@ -106,7 +91,7 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       NHMF = [NHMF1, NHMF2]
       NLMF = [NLMF1, NLMF2]
 
-       print *, "Finish to save NHMF"
+
 
       ! Initialize altitude
       ! Set all elements to this value
@@ -129,24 +114,23 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       jmdl = 0.0
       gmdl = 0.0
 
-
-      print *, "len: ", N
-      print *, "UT(N): ", UT(N)
       do i = 1, N
             call CM4FIELD(PATH, UNIT, LOAD, INDX, GMUT, CORD, PRED, &
          CURR, COEF, NHMF, NLMF, UT(i), MUT, thet(i), &
          phi(i), alt(i), dst(i), f107(i),&
          gather_B, jmdl, gmdl, perr, oerr, cerr)
+
         do j = 1, 3
 
           do k = 1, 7
 
             bmdl(j, k, i) = gather_B(j, k)
-            print *, "bmdl(", j, ",", k, ",", i, ") = ", bmdl(j, k, i)
+            !print *, "bmdl(", j, ",", k, ",", i, ") = ", bmdl(j, k, i)
+
           end do
         end do
       end do
 
 
-
 end subroutine call_cm4_arr
+

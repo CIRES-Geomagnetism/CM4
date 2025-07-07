@@ -9,6 +9,21 @@
 // This function is called when the Python function is invoked.
 // It extracts arguments from Python, calls the Fortran function, and returns the result back to Python.
 
+void fortran_to_c_order(double* f_array, double* c_array, int row, int col, int depth) {
+    // Convert a 3D Fortran array to a C-style 3D array
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            for (int k = 0; k < depth; k++) {
+                int f_index = i + j * row + k * row * col; // Fortran order: (i, j, k)
+                int c_index = k + j * depth + i * depth * col; // C order: (k, j, i)
+
+                c_array[c_index] = f_array[f_index];
+            }
+        }
+    }
+}
+
+
 PyObject* save_3d_array(int rows, int cols, int arr_len, double*** matrix){
     // Create a new Python list
     PyObject* py_list = PyList_New(rows);
@@ -130,18 +145,18 @@ static PyObject* py_call_cm4_arr(PyObject* self, PyObject* args) {
     double* f107 = pyobject_to_nparray(py_f107_obj);
     double bmdl[3][7][len]; // Assuming bmdl is a 3x7 array
     double jmdl[3][4]; // Assuming jmdl is a 3x4 array
+    double c_bmdl[3][7][len];
      // Declare numpy array for the results
 
-    printf("Get len: %d\n", len);
-    for(Py_ssize_t i = 0; i < len; i++) {
-        printf("Ut at %d: %f\n", i, ut[i]);
-    }
 
 
     call_cm4_arr(ut, thet , phi, alt, dst, f107,
                                       &pred1, &pred2, &pred3,&pred4, &pred5, &pred6
                                       ,&cord,
                                       &nhmf1, &nhmf2, &nlmf1, &nlmf2, &len, cof_path, (double*)bmdl, (double*)jmdl);
+
+    // Convert Fortran order to C order
+    fortran_to_c_order((double*) bmdl, (double*) c_bmdl, 3, 7, len);
 
 
 
@@ -151,7 +166,7 @@ static PyObject* py_call_cm4_arr(PyObject* self, PyObject* args) {
 
 
     // Copy C data into the NumPy array
-    memcpy(PyArray_DATA((PyArrayObject*) results), bmdl, sizeof(bmdl));
+    memcpy(PyArray_DATA((PyArrayObject*) results), c_bmdl, sizeof(c_bmdl));
 
     Py_DECREF(py_ut_obj);
     Py_DECREF(py_thet_obj);

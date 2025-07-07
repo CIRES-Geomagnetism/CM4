@@ -651,7 +651,7 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
     return out_b,out_j, core, magnetosphere, ionoshere
 
 def py_mat_cm4_arr(alt: list[float], lat_geod: list[float], lon: list[float], dst: list[float], f107: list[float],pred: list[bool] = None, core_nmin: int = 1, core_nmax: int = 13, crust_nmin: int = 14, crust_nmax: int = 45, geodflag: int = 1,
-                   year: int = None, month: int = None, day: int = None, hour: int = None, minute: int = None, MJD_time: float = None) -> tuple[list, list, list, list, list]:
+                   year: int = None, month: int = None, day: int = None, hour: int = None, minute: int = None, MJD_time: list[float] = None) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     if MJD_time is None and year is None:raise ValueError("a time input must be provided")
     #Change yyyymmddhhmmss time to Year decimal time
 
@@ -685,25 +685,33 @@ def py_mat_cm4_arr(alt: list[float], lat_geod: list[float], lon: list[float], ds
 
     # print(UT,1.990326027397260e3)
     # UT = 1.990326027397260e3
+    cord = 0
     #Change geodetic lat/radius into geocentric
+
     if(geodflag):
-        r_geoc ,thet_geoc= geod2geoc(np.deg2rad(lat_geod), alt)
-        thet_geoc = np.rad2deg(thet_geoc)
-        r_geoc = r_geoc-6371.2
-    else:
-        r_geoc = alt
-        thet_geoc = lat_geod
+        cord = 1
+
+        #r_geoc ,thet_geoc= geod2geoc(np.deg2rad(lat_geod), alt)
+        #thet_geoc = np.rad2deg(thet_geoc)
+        #r_geoc = r_geoc-6371.2
+
+    #else:
+    #    r_geoc = alt
+    #    thet_geoc = lat_geod
     # print(r_geoc, thet_geoc)
     
     nmin = [core_nmin,crust_nmin]
     nmax = [core_nmax,crust_nmax]
     # pred = np.array([True,True,True,True,True,True])
-    cord = 0
 
-    out_b = cm4field_arr.call_cm4(UT, thet_geoc , lon, r_geoc, dst, f107,
+
+
+
+    out_b = cm4field_arr.call_cm4(UT, lat_geod , lon, alt, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
                                       nmax[0],nmax[1], nmin[0],nmin[1], N, COF_PATH)
+
 
 
     ionoshere = np.array([-out_b[2,4]-out_b[2,5], -out_b[0,4]-out_b[0,5],out_b[1,4]+out_b[1,5]])
