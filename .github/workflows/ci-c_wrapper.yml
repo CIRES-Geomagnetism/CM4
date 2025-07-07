@@ -29,7 +29,7 @@ jobs:
 
     - name: Run scientific test
       run: |
-            python tests/test_scientific.py
+            python tests/scientific_accuracy_test.py
             zip -r results.zip tests/results.zip
 
     - name: Run upload aartifact
