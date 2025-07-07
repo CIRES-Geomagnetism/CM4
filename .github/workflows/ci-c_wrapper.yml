@@ -30,7 +30,7 @@ jobs:
     - name: Run scientific test
       run: |
             python tests/scientific_accuracy_test.py
-            zip -r results.zip tests/results.zip
+            zip -r results.zip tests/results
 
     - name: Run upload aartifact
       uses: actions/upload-artifact@v4
