@@ -45,20 +45,20 @@ void write_outputs(double* date, double* lat, double* lon, double* alt, double* 
 
         double bx, by, bz;
         if (key == 's'){
-            bz = -bmdl[2][1][i];
-            bx = -bmdl[0][1][i];
+            bz = bmdl[2][1][i];
+            bx = bmdl[0][1][i];
             by = bmdl[1][1][i];
         }else if (key == 'r'){
-            bz = -bmdl[2][0][i];
-            bx = -bmdl[0][0][i];
+            bz = bmdl[2][0][i];
+            bx = bmdl[0][0][i];
             by = bmdl[1][0][i];
         }else if (key == 'i'){
-            bz = -bmdl[2][4][i] - bmdl[2][5][i];
-            bx = -bmdl[0][4][i] - bmdl[0][5][i];
+            bz = bmdl[2][4][i] + bmdl[2][5][i];
+            bx = bmdl[0][4][i] + bmdl[0][5][i];
             by = bmdl[1][4][i] + bmdl[1][5][i];
         }else if (key == 'm'){
-            bz = -bmdl[2][2][i] - bmdl[2][3][i];
-            bx = -bmdl[0][2][i] - bmdl[0][3][i];
+            bz = bmdl[2][2][i] + bmdl[2][3][i];
+            bx = bmdl[0][2][i] + bmdl[0][3][i];
             by = bmdl[1][2][i] + bmdl[1][3][i];
         }
 

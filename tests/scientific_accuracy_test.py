@@ -77,13 +77,13 @@ def compare_fortran_results(inputs: dict, outpus:dict, field: str, stat_results_
 
 
     if field == "core":
-        res = {"Bx": core[1], "By": core[2], "Bz": core[0]}
+        res = {"Bx": -core[1], "By": core[2], "Bz": -core[0]}
     elif field == "crust":
-        res = {"Bx": crust[1], "By": crust[2], "Bz": crust[0]}
+        res = {"Bx": -crust[1], "By": crust[2], "Bz": -crust[0]}
     elif field == "magneto":
-        res = {"Bx": magnetosphere[1], "By": magnetosphere[2], "Bz": magnetosphere[0]}
+        res = {"Bx": -magnetosphere[1], "By": magnetosphere[2], "Bz": -magnetosphere[0]}
     elif field == "iono":
-        res = {"Bx": ionosphere[1], "By": ionosphere[2], "Bz": ionosphere[0]}
+        res = {"Bx": -ionosphere[1], "By": ionosphere[2], "Bz": -ionosphere[0]}
     else:
         raise ValueError("Invalid field specified. Choose from 'core', 'crust', 'magnetosphere', or 'ionosphere'.")
 
