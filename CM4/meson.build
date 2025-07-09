@@ -32,10 +32,12 @@ pyext = python.extension_module(
   'cm4field_arr',
   ['ccm4.c', 'c_wrapper.c', 'call_cm4field_array.f90', 'cm4field_.F'],
   dependencies: [numpy_dep],
-  install_dir: join_paths(python.get_install_dir(), 'cm4'),
-  #include_directories: [numpy_includes],
+  install_dir: python.get_install_dir(pure: false),
   install: true
 )
+
+#install_dir: join_paths(python.get_install_dir(), 'cm4'),
+  #include_directories: [numpy_includes],
 
 # Install additional pure Python files
 python.install_sources(
