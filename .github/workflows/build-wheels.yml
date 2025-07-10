@@ -53,3 +53,29 @@ jobs:
         with:
           name: windows-wheels
           path: wheelhouse/*.whl
+
+  test_artifacts:
+    name: Test Artifacts
+    runs-on: windows-latest
+    needs: build-windows-wheel
+
+    steps:
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: "3.13"
+
+        - name: Create virtual environment
+          run: python -m venv venv
+
+        - name: Install the wheel
+          run: |
+            .\venv\Scripts\Activate.ps1
+            python -m pip install --upgrade pip
+            pip install wheelhouse/cm4-0.1.1-cp313-cp313-win_amd64.whl
+
+        - name: Run smoke test
+          run: |
+            .\venv\Scripts\Activate.ps1
+            python -c "import cm4; print(cm4.__version__)"
+            python example.py
