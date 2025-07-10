@@ -73,11 +73,7 @@ if __name__ == '__main__':
     #out_b, out_j, core, magnetosphere, ionoshere = py_mat_cm4(height[0], co_lats[0], lons[0], dst[0], f107[0],
      #                                                                     MJD_time = dyear[0])
 
-    for i in range(len(out_b)):
-        for j in range(len(out_b[0])):
-            for k in range(len(out_b[0][0])):
 
-                print(f"out_b[{i}][{j}][{k}] = {out_b[i][j][k]}")
 
     print(core)
     

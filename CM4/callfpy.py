@@ -6,6 +6,7 @@ import importlib
 import csv
 
 from cm4 import cm4field_arr
+
 # import geomaglib
 # Force reimport of the module
 # importlib.reload(cm4_py310)

@@ -1,4 +1,4 @@
-project('python_cm4', 'c', 'fortran', version: '0.1.1')
+project('python_cm4', 'c', 'fortran', version: '1.0.0')
 
 python = import('python').find_installation()
 

@@ -83,6 +83,7 @@ jobs:
             .\venv\Scripts\Activate.ps1
             python -m pip install --upgrade pip
             pip install (Get-Item wheelhouse\*.whl)
+            unzip -l (Get-Item wheelhouse\*.whl).FullName
 
         - name: Run smoke test
           shell: pwsh
