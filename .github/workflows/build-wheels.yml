@@ -60,6 +60,9 @@ jobs:
     needs: build-windows-wheel
 
     steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
         - name: Set up Python
           uses: actions/setup-python@v5
           with:
@@ -86,5 +89,7 @@ jobs:
           run: |
             cd $env:GITHUB_WORKSPACE
             .\venv\Scripts\Activate.ps1
+            pwd
+            ls
             python -c "import cm4; print(cm4.__version__)"
             python example.py
