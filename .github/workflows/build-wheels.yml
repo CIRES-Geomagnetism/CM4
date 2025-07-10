@@ -65,14 +65,14 @@ jobs:
           with:
             python-version: "3.13"
 
-        - name: Create and activate virtual environment
-          run: python -m venv venv
-
         - name: Download Artifacts
           uses: actions/download-artifact@v4
           with:
             name: windows-wheels
             path: wheelhouse
+
+        - name: Create virtual environment
+          run: python -m venv venv
 
         - name: Install the wheel
           shell: pwsh
@@ -84,6 +84,7 @@ jobs:
         - name: Run smoke test
           shell: pwsh
           run: |
+            cd $env:GITHUB_WORKSPACE
             .\venv\Scripts\Activate.ps1
             python -c "import cm4; print(cm4.__version__)"
             python example.py
