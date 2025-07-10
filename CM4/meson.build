@@ -1,4 +1,4 @@
-python = import('python').find_installation('python3')
+python = import('python').find_installation(pure: false)
 message('Found Python: ' + python.path())
 
 numpy_include = run_command(
@@ -32,7 +32,7 @@ pyext = python.extension_module(
   'cm4field_arr',
   ['ccm4.c', 'c_wrapper.c', 'call_cm4field_array.f90', 'cm4field_.F'],
   dependencies: [numpy_dep],
-  install_dir: python.get_install_dir(pure: false),
+  install_dir: join_paths(python.get_install_dir(), 'cm4'),
   install: true
 )
 
