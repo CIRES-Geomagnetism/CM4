@@ -65,16 +65,24 @@ jobs:
           with:
             python-version: "3.13"
 
-        - name: Create virtual environment
+        - name: Create and activate virtual environment
           run: python -m venv venv
 
+        - name: Download Artifacts
+          uses: actions/download-artifact@v4
+          with:
+            name: windows-wheels
+            path: wheelhouse
+
         - name: Install the wheel
+          shell: pwsh
           run: |
             .\venv\Scripts\Activate.ps1
             python -m pip install --upgrade pip
-            pip install wheelhouse\cm4-0.1.1-cp313-cp313-win_amd64.whl
+            pip install (Get-Item wheelhouse\*.whl)
 
         - name: Run smoke test
+          shell: pwsh
           run: |
             .\venv\Scripts\Activate.ps1
             python -c "import cm4; print(cm4.__version__)"
