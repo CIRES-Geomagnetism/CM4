@@ -57,8 +57,8 @@ jobs:
       - name: Repack cleaned wheel
         shell: pwsh
         run: |
-          $wheel = Get-ChildItem dist/*.whl | Select-Object -ExpandProperty Name
-          Compress-Archive -Path wheel_tmp\* -DestinationPath "cleaned/$wheel"
+          $wheel = Get-ChildItem wheelhouse\*.whl | Select-Object -ExpandProperty Name
+          Compress-Archive -Path wheel_tmp\* -DestinationPath "cleaned\$wheel"
 
       - name: Run delvewheel repair
         shell: bash
