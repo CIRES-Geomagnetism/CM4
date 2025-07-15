@@ -57,13 +57,14 @@ jobs:
       - name: Repack cleaned wheel
         shell: pwsh
         run: |
-          Compress-Archive -Path wheel_tmp\* -DestinationPath cm4-cleaned.whl
+          $wheel = Get-ChildItem dist/*.whl | Select-Object -ExpandProperty Name
+          Compress-Archive -Path wheel_tmp\* -DestinationPath "cleaned/$wheel"
 
       - name: Run delvewheel repair
         shell: bash
         run: |
-          delvewheel repair cm4-cleaned.whl --no-mangle cm4.cm4field_arr --wheel-dir repaired_wheelhouse
-          cp repaired_wheelhouse/*.whl wheelhouse/
+          delvewheel repair cleaned/*.whl --no-mangle cm4.cm4field_arr --wheel-dir wheelhouse
+          
           
 
       - name: Upload wheels
