@@ -51,8 +51,8 @@ jobs:
       - name: Clean wheel and remove *.dll.a
         shell: bash
         run: |
-          unzip wheelhouse\*.whl -d wheel_tmp
-          rm -f wheel_tmp\cm4\*.dll.a
+          unzip wheelhouse/*.whl -d wheel_tmp
+          rm -f wheel_tmp/cm4/*.dll.a
 
       - name: Repack cleaned wheel
         shell: pwsh
