@@ -27,6 +27,11 @@ message('NumPy include path stderr: ' + numpy_err)
 
 # Build the Python extension module
 
+install_data(
+  ['__init__.py','callfpy.py', 'umdl.CM4'],
+  install_dir: join_paths(python.get_install_dir(), 'cm4'),
+)
+
 
 pyext = python.extension_module(
   'cm4field_arr',
@@ -36,11 +41,10 @@ pyext = python.extension_module(
   install: true
 )
 
-#install_dir: join_paths(python.get_install_dir(), 'cm4'),
-  #include_directories: [numpy_includes],
+
 
 # Install additional pure Python files
-python.install_sources(
-  ['__init__.py','callfpy.py', 'umdl.CM4'],
-  subdir: 'cm4'   # Places this into site-packages/CM4/
-)
+#python.install_sources(
+#  ['__init__.py','callfpy.py', 'umdl.CM4'],
+#  subdir: 'cm4'   # Places this into site-packages/CM4/
+#)
