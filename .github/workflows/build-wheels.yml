@@ -57,6 +57,7 @@ jobs:
       - name: Repack cleaned wheel
         shell: pwsh
         run: |
+          mkdir -p cleaned
           $wheel = Get-ChildItem wheelhouse\*.whl | Select-Object -ExpandProperty Name
           Compress-Archive -Path wheel_tmp\* -DestinationPath "cleaned\$wheel"
 
