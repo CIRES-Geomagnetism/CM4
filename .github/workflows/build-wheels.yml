@@ -49,13 +49,11 @@ jobs:
           CXX: g++
 
       - name: Clean wheel and remove *.dll.a
-        shell: bash
+        shell: pwsh
         run: |
-          unzip wheelhouse/*.whl -d wheel_tmp
-          rm -f wheel_tmp/cm4/*.dll.a
-          cd wheel_tmp
-          zip -r ../cm4-cleaned.whl *
-          cd ..
+          unzip wheelhouse\*.whl -d wheel_tmp
+          rm -f wheel_tmp\cm4\*.dll.a
+          Compress-Archive -Path wheel_tmp\* -DestinationPath cm4-cleaned.whl
 
       - name: Run delvewheel repair
         shell: bash
