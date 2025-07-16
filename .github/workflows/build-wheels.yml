@@ -54,10 +54,10 @@ jobs:
           $wheels = Get-ChildItem -Path "wheelhouse" -File
           
           foreach ($wheel in $wheels){
-              mkdir -p "wheel_tmp"
-              Expand-Archive -Path $wheel.FullName -DestinationPath "wheel_tmp" -Force
-              Remove-Item -Path "wheel_tmp\cm4\*.dll.a" -Force
-              Compress-Archive -Path wheel_tmp\* -DestinationPath "cleaned\$($wheel.Name)" -Force
+              $name = [IO.Path]::GetFileNameWithoutExtension($wheel.Name)
+              Expand-Archive -Path $wheel.FullName -DestinationPath "tmp_${name}" -Force
+              Remove-Item -Path "tmp_${name}\cm4\*.dll.a" -Force
+              Compress-Archive -Path "tmp_${name}\*" -DestinationPath "cleaned\$($wheel.Name)" -Force
           }
          
 
