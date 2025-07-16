@@ -42,30 +42,31 @@ jobs:
         shell: bash
         run: cibuildwheel --platform windows --output-dir wheelhouse
         env:
-          CIBW_BUILD: "cp313-*"
           CIBW_ARCHS: "AMD64"
           FC: gfortran
           CC: gcc
           CXX: g++
 
-      - name: Clean wheel and remove *.dll.a
-        shell: bash
-        run: |
-          unzip wheelhouse/*.whl -d wheel_tmp
-          rm -f wheel_tmp/cm4/*.dll.a
-
       - name: Repack cleaned wheel
         shell: pwsh
         run: |
           mkdir -p cleaned
-          $wheel = Get-ChildItem wheelhouse\*.whl | Select-Object -ExpandProperty Name
-          Compress-Archive -Path wheel_tmp\* -DestinationPath "cleaned\$wheel"
+          $wheels = Get-ChildItem -Psth "wheelhouse" -File
+          
+          foreach ($wheel in $wheels){
+              mkdir -p "wheel_tmp"
+              Expand-Archive -Path $wheel.FullName -DestinationPath "wheel_tmp" -Force
+              Remove-Item -Path "wheel_tmp\cm4\*.dll.a" -Force
+              Compress-Archive -Path wheel_tmp\* -DestinationPath "cleaned\$wheel.Name"
+          }
+         
 
       - name: Run delvewheel repair
         shell: bash
         run: |
-          delvewheel repair cleaned/*.whl --no-mangle cm4.cm4field_arr --wheel-dir wheelhouse
-          
+          for file in cleaned/*.whl; do
+            delvewheel repair "$file" --no-mangle cm4.cm4field_arr --wheel-dir wheelhouse
+          done
           
 
       - name: Upload wheels
