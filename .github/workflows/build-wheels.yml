@@ -51,7 +51,7 @@ jobs:
         shell: pwsh
         run: |
           mkdir -p cleaned
-          $wheels = Get-ChildItem -Psth "wheelhouse" -File
+          $wheels = Get-ChildItem -Path "wheelhouse" -File
           
           foreach ($wheel in $wheels){
               mkdir -p "wheel_tmp"
