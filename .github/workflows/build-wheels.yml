@@ -57,7 +57,7 @@ jobs:
               mkdir -p "wheel_tmp"
               Expand-Archive -Path $wheel.FullName -DestinationPath "wheel_tmp" -Force
               Remove-Item -Path "wheel_tmp\cm4\*.dll.a" -Force
-              Compress-Archive -Path wheel_tmp\* -DestinationPath "cleaned\$wheel.Name"
+              Compress-Archive -Path wheel_tmp\* -DestinationPath "cleaned\$($wheel.Name)" -Force
           }
          
 
