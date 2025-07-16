@@ -104,8 +104,7 @@ jobs:
           run: |
             .\venv\Scripts\Activate.ps1
             python -m pip install --upgrade pip
-            pip install (Get-Item wheelhouse\*.whl)
-            unzip -l (Get-Item wheelhouse\*.whl).FullName
+            pip install wheelhouse\cm4-1.0.0-cp313-cp313-win_amd64.whl
 
         - name: Run smoke test
           shell: pwsh
