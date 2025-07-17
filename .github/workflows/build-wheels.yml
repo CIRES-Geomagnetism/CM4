@@ -109,13 +109,13 @@ jobs:
           run: |
             .\venv\Scripts\Activate.ps1
             python -m pip install --upgrade pip
-            if ($env:python_version -eq "3.13") {
+            if (${{ matrix.python-version }} -eq "3.13") {
               pip install wheelhouse\cm4-${env:version}-cp313-cp313-win_amd64.whl
-            } elseif ($env:python_version -eq "3.12") {
+            } elseif (${{ matrix.python-version }} -eq "3.12") {
               pip install wheelhouse\cm4-${env:version}-cp312-cp312-win_amd64.whl
-            } elseif ($env:python_version -eq "3.11") {
+            } elseif (${{ matrix.python-version }} -eq "3.11") {
               pip install wheelhouse\cm4-${env:version}-cp311-cp311-win_amd64.whl
-            } elseif ($env:python_version -eq "3.10") {
+            } elseif (${{ matrix.python-version }} -eq "3.10") {
               pip install wheelhouse\cm4-${env:version}-cp310-cp310-win_amd64.whl
             } else {
               pip install wheelhouse\cm4-${env:version}-cp39-cp39-win_amd64.whl
