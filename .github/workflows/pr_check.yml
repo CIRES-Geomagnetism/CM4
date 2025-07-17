@@ -1,9 +1,10 @@
-name: Build Windows Wheel
+name: Pull Request Check
 
 on:
-  push:
-    branches: ["c_wrapper_winwheel"]
   pull_request:
+    branches: ["main"]
+    paths-ignore:
+      - "README.md"
 
 jobs:
   build-windows-wheel:
@@ -118,11 +119,11 @@ jobs:
             } else {
               pip install wheelhouse\cm4-*-cp39-cp39-win_amd64.whl
             }
+          
 
         - name: Run smoke test
           shell: pwsh
           run: |
             cd $env:GITHUB_WORKSPACE
             .\venv\Scripts\Activate.ps1
-            python -c "import cm4; print(cm4.__version__)"
-            python example.py
+            python tests/scientific_accuracy_test.py
