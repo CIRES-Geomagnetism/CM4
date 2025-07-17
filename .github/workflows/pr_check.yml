@@ -82,48 +82,50 @@ jobs:
     needs: build-windows-wheel
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
+    env:
+      version: "1.0.0"
 
     steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Set up Python
-          uses: actions/setup-python@v5
-          with:
-            python-version: ${{ matrix.python-version }}
-            architecture: "x64"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: "x64"
 
-        - name: Download Artifacts
-          uses: actions/download-artifact@v4
-          with:
-            name: windows-wheels
-            path: wheelhouse
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-wheels
+          path: wheelhouse
 
-        - name: Create virtual environment
-          run: python -m venv venv
+      - name: Create virtual environment
+        run: python -m venv venv
 
-        - name: Install the wheel
-          shell: pwsh
-          run: |
-            .\venv\Scripts\Activate.ps1
-            python -m pip install --upgrade pip
-            if ($env:python_version -eq "3.13") {
-              pip install wheelhouse\cm4-*-cp313-cp313-win_amd64.whl
-            } elseif ($env:python_version -eq "3.12") {
-              pip install wheelhouse\cm4-*-cp312-cp312-win_amd64.whl
-            } elseif ($env:python_version -eq "3.11") {
-              pip install wheelhouse\cm4-*-cp311-cp311-win_amd64.whl
-            } elseif ($env:python_version -eq "3.10") {
-              pip install wheelhouse\cm4-*-cp310-cp310-win_amd64.whl
-            } else {
-              pip install wheelhouse\cm4-*-cp39-cp39-win_amd64.whl
-            }
-          
+      - name: Install the wheel
+        shell: pwsh
+        run: |
+          .\venv\Scripts\Activate.ps1
+          python -m pip install --upgrade pip
+          if (${{ matrix.python-version }} -eq "3.13") {
+            pip install wheelhouse\cm4-${env:version}-cp313-cp313-win_amd64.whl
+          } elseif (${{ matrix.python-version }} -eq "3.12") {
+            pip install wheelhouse\cm4-${env:version}-cp312-cp312-win_amd64.whl
+          } elseif (${{ matrix.python-version }} -eq "3.11") {
+            pip install wheelhouse\cm4-${env:version}-cp311-cp311-win_amd64.whl
+          } elseif (${{ matrix.python-version }} -eq "3.10") {
+            pip install wheelhouse\cm4-${env:version}-cp310-cp310-win_amd64.whl
+          } else {
+            pip install wheelhouse\cm4-${env:version}-cp39-cp39-win_amd64.whl
+          }
 
-        - name: Run smoke test
-          shell: pwsh
-          run: |
-            cd $env:GITHUB_WORKSPACE
-            .\venv\Scripts\Activate.ps1
-            python tests/scientific_accuracy_test.py
+      - name: Run scientific test
+        shell: pwsh
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          .\venv\Scripts\Activate.ps1
+          python tests/scientific_accuracy_test.py
+  
