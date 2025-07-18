@@ -1,0 +1,80 @@
+name: Build Linux Wheel
+
+on:
+  push:
+    branches: ["c_wrapper_winwheel"]
+
+jobs:
+  build-wheel:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies and cibuildwheel
+        run: |
+          python -m pip install cibuildwheel
+          pip install -r requirements.txt
+
+      - name: Build wheels
+        run: |
+          CIBW_ARCHS_LINUX=x86_64 \
+          CIBW_MANYLINUX_X86_64_IMAGE=manylinux2014 # Be compatible to run in RHEL 7 which has older version of glibc 
+          CIBW_SKIP: "*-musllinux*"
+          cibuildwheel --platform linux --output-dir wheelhouse
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-wheels
+          path: wheelhouse/*.whl
+
+  test_artifacts:
+    name: Test Artifacts
+    runs-on: ubuntu-latest
+    needs: build-wheel
+    strategy:
+      matrix:
+        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
+    env:
+      version: "1.0.0"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-wheels
+          path: wheelhouse
+
+      - name: Install the wheels
+        run: |
+          if [ ${{ matrix.python-version }} == "3.13" ]; then
+            pip install wheelhous/cm4-${env:version}-cp313-cp313-manylinux_x86_64.whl
+          elif [ ${{ matrix.python-version }} == "3.12" ]; then
+            pip install wheelhous/cm4-${env:version}-cp312-cp312-manylinux_x86_64.whl
+          elif [ ${{ matrix.python-version }} == "3.11" ]; then
+            pip install wheelhous/cm4-${env:version}-cp311-cp311-manylinux_x86_64.whl
+          elif [ ${{ matrix.python-version }} == "3.10" ]; then
+            pip install wheelhous/cm4-${env:version}-cp310-cp310-manylinux_x86_64.whl
+          elif [ ${{ matrix.python-version }} == "3.9" ]; then
+            pip install wheelhous/cm4-${env:version}-cp39-cp39-manylinux_x86_64.whl
+          fi
+
+      - name: Run smoke test
+        run: |
+          python -c "import cm4field; print('cm4field imported successfully')"
+          python example.py

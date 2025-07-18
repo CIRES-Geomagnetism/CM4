@@ -2,8 +2,7 @@ name: Build Windows Wheel
 
 on:
   push:
-    branches: ["c_wrapper_winwheel"]
-  pull_request:
+    branches: ["xc_wrapper_winwheel"]
 
 jobs:
   build-windows-wheel:
@@ -32,7 +31,7 @@ jobs:
         run: |
           echo "C:\msys64\mingw64\bin" >> $env:GITHUB_PATH
 
-      - name: Install cibuildwheel
+      - name: Install dependencies and cibuildwheel
         shell: bash
         run: |
           python -m pip install cibuildwheel
