@@ -8,6 +8,7 @@ on:
 
 jobs:
   build-windows-wheel:
+    if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
     runs-on: windows-latest
     strategy:
       matrix:
