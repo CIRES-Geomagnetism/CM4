@@ -5,7 +5,7 @@ on:
     branches: ["c_wrapper_winwheel"]
 
 jobs:
-  build-mac-wheel:
+  build-mac-x86_64_wheel:
     runs-on: macos-latest
 
 
@@ -20,7 +20,7 @@ jobs:
       - name: Build universal2 wheels
         uses: pypa/cibuildwheel@v3.0.1
         env:
-            CIBW_ARCHS: x86_64 arm64
+            CIBW_ARCHS: x86_64
             CIBW_PLATFORM: macos
             CIBW_SKIP: "*-musllinux*"
 
