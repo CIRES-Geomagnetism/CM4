@@ -22,12 +22,13 @@ jobs:
           python -m pip install cibuildwheel
           pip install -r requirements.txt
 
-      - name: Build wheels
-        run: |
-          CIBW_ARCHS_LINUX=x86_64 \
-          CIBW_MANYLINUX_X86_64_IMAGE=manylinux2014 # Be compatible to run in RHEL 7 which has older version of glibc 
+      - name: Build wheels with cibuildwheel
+        uses: pypa/cibuildwheel@v2.19.1
+        env:
+          CIBW_ARCHS_LINUX: x86_64
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014 # Be compatible to run in RHEL 7 which has older version of glibc
           CIBW_SKIP: "*-musllinux*"
-          cibuildwheel --platform linux --output-dir wheelhouse
+
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
