@@ -83,10 +83,10 @@ jobs:
 
       - name: Run smoke test
         run: |
-          python -c "import cm4field; print('cm4field imported successfully')"
+          python -c "import cm4; print(cm4.__version__)"
           python example.py
 
       - name: Verify wheel compatibility
         run: |
-          auditwheel show wheelhous/cm4-${version}-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+          auditwheel show wheelhous/cm4-${version}-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
 
