@@ -70,15 +70,15 @@ jobs:
         run: |
           ls wheelhouse
           if [ ${{ matrix.python-version }} == "3.13" ]; then
-            pip install wheelhous/cm4-${version}-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+            pip install wheelhous/cm4-${version}-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
           elif [ ${{ matrix.python-version }} == "3.12" ]; then
-            pip install wheelhous/cm4-${version}-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+            pip install wheelhous/cm4-${version}-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
           elif [ ${{ matrix.python-version }} == "3.11" ]; then
-            pip install wheelhous/cm4-${version}-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+            pip install wheelhous/cm4-${version}-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
           elif [ ${{ matrix.python-version }} == "3.10" ]; then
-            pip install wheelhous/cm4-${version}-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+            pip install wheelhous/cm4-${version}-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
           elif [ ${{ matrix.python-version }} == "3.9" ]; then
-            pip install wheelhous/cm4-${version}-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+            pip install wheelhous/cm4-${version}-cp39-cp39-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
           fi
 
       - name: Run smoke test
