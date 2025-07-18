@@ -7,6 +7,10 @@ on:
 jobs:
   build-wheel:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Optional: limit Python versions
+        python-version: [ "cp39", "cp310", "cp311", "cp312", "cp313" ]
 
     steps:
       - name: Checkout code
@@ -25,8 +29,8 @@ jobs:
       - name: Build wheels with cibuildwheel
         uses: pypa/cibuildwheel@v2.19.1
         env:
-          CIBW_ARCHS_LINUX: x86_64
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014 # Be compatible to run in RHEL 7 which has older version of glibc
+          CIBW_ARCHS: x86_64
+          CIBW_BUILD: ${{ matrix.python-version }}-manylinux_x86_64
           CIBW_SKIP: "*-musllinux*"
 
 
@@ -63,6 +67,7 @@ jobs:
 
       - name: Install the wheels
         run: |
+          ls wheelhouse
           if [ ${{ matrix.python-version }} == "3.13" ]; then
             pip install wheelhous/cm4-${version}-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
           elif [ ${{ matrix.python-version }} == "3.12" ]; then
@@ -83,3 +88,4 @@ jobs:
       - name: Verify wheel compatibility
         run: |
           auditwheel show wheelhous/cm4-${version}-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+
