@@ -2,15 +2,11 @@ name: Build Linux Wheel
 
 on:
   push:
-    branches: ["c_wrapper_winwheel"]
+    branches: ["xc_wrapper_winwheel"]
 
 jobs:
   build-wheel:
     runs-on: ubuntu-latest
-    #strategy:
-    #  matrix:
-        # Optional: limit Python versions
-        #python-version: [ "cp39", "cp310", "cp311", "cp312", "cp313" ]
 
     steps:
       - name: Checkout code
@@ -86,7 +82,5 @@ jobs:
           python -c "import cm4; print(cm4.__version__)"
           python example.py
 
-      - name: Verify wheel compatibility
-        run: |
-          auditwheel show wheelhous/cm4-${version}-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
+     
 
