@@ -22,13 +22,23 @@ jobs:
           brew install gfortran
           which gfortran
 
-      - name: Build and install cm4
+      - name: Install dependencies and cibuildwheel
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          python -m build --wheel 
-          pip install dist/*.whl
+          python -m pip install cibuildwheel
 
-      
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v3.0.1
+        env:
+          CIBW_ARCHS: "x86_64"
+          CIBW_PLATFORM: macos
+          CIBW_SKIP: "*-musllinux*"
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-x86_64-wheels
+          path: wheelhouse/*.whl
 
 
