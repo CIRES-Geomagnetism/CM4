@@ -20,6 +20,7 @@ jobs:
       - name: Install gfortran
         run: |
           brew install gfortran
+          which gfortran
 
       - name: Build and install cm4
         run: |
