@@ -17,17 +17,13 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Build universal2 wheels
-        uses: pypa/cibuildwheel@v3.0.1
-        env:
-            CIBW_ARCHS: x86_64
-            CIBW_PLATFORM: macos
-            CIBW_SKIP: "*-musllinux*"
+      - name: Build and install cm4
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m build --wheel 
+          pip install dist/*.whl
 
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
-        with:
-            name: macos-universal2-wheels
-            path: wheelhouse/*.whl
+      
 
 
