@@ -6,8 +6,11 @@ on:
 
 jobs:
   build-mac-x86_64_wheel:
-    runs-on: macos-13
-
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["macos-13", "macos-latest"]
+        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
 
     steps:
       - uses: actions/checkout@v3
@@ -15,7 +18,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install gfortran
         run: |
@@ -28,13 +31,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           python -m build --wheel 
-          pip install dist/*.whl
-      
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: macos-x86_64-wheels
+          name: macos-wheels-${{ matrix.os }}-${{ matrix.python-version }}
           path: dist/*.whl
 
 
