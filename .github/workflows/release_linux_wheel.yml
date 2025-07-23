@@ -5,7 +5,7 @@ on:
     branches: ["c_wrapper_winwheel"]
 
 jobs:
-  build-wheel:
+  release-linux-wheel:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,9 +29,6 @@ jobs:
           CIBW_ARCHS: "x86_64"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_SKIP: "*-musllinux*"
-
-      - name: List built wheels
-        run: ls -l wheelhouse
 
       - name: Upload wheels to Github Release
         uses: softprops/action-gh-release@v1

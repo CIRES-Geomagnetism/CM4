@@ -2,10 +2,10 @@ name: Build Windows Wheel
 
 on:
   push:
-    branches: ["xc_wrapper_winwheel"]
+    branches: ["c_wrapper_winwheel"]
 
 jobs:
-  build-windows-wheel:
+  release-windows-wheel:
     runs-on: windows-latest
     strategy:
       matrix:
@@ -66,10 +66,11 @@ jobs:
           for file in cleaned/*.whl; do
             delvewheel repair "$file" --no-mangle cm4.cm4field_arr --wheel-dir wheelhouse
           done
-          
 
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
+      - name: Upload cleaned wheels
+        uses: softprops/action-gh-release@v1
         with:
-          name: windows-wheels
-          path: wheelhouse/*.whl
+            draft: true
+            files: wheelhouse/*.whl
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -2,10 +2,10 @@ name: Build Mac Wheel for CM4
 
 on:
   push:
-    branches: ["xc_wrapper_winwheel"]
+    branches: ["c_wrapper_winwheel"]
 
 jobs:
-  build-mac-x86_64_wheel:
+  build-mac-wheel:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -32,10 +32,12 @@ jobs:
           pip install -r requirements.txt
           python -m build --wheel 
 
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
+      - name: Upload cleaned wheels
+        uses: softprops/action-gh-release@v1
         with:
-          name: macos-wheels-${{ matrix.os }}-${{ matrix.python-version }}
-          path: dist/*.whl
+          draft: true
+          files: dist/*.whl
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
