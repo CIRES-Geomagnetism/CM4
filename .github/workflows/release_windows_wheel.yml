@@ -2,7 +2,8 @@ name: Build Windows Wheel
 
 on:
   push:
-    branches: ["c_wrapper_winwheel"]
+    tags:
+      - 'v*.*.*'
 
 jobs:
   release-windows-wheel:
@@ -70,7 +71,7 @@ jobs:
       - name: Upload cleaned wheels
         uses: softprops/action-gh-release@v1
         with:
-            draft: true
+            draft: false
             files: wheelhouse/*.whl
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
