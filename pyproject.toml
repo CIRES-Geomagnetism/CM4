@@ -15,6 +15,7 @@ readme = "readme.md"
 requires = ["meson-python", "ninja", "numpy"]
 build-backend = "mesonpy"
 
+
 [project.urls]
 Homepage = "https://github.com/CIRES-Geomagnetism/CM4.git"
 Repositories = "https://github.com/CIRES-Geomagnetism/CM4.git"

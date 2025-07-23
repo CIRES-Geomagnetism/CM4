@@ -2,7 +2,7 @@ name: Test Linux Wheel
 
 on:
   push:
-    branches: ["c_wrapper_winwheel"]
+    branches: ["xc_wrapper_winwheel"]
 
 jobs:
   build-wheel:
