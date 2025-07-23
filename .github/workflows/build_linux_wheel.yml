@@ -40,7 +40,7 @@ jobs:
   release:
     name: Create Github Release
     runs-on: ubuntu-latest
-    needs: build_wheel
+    needs: build-wheel
 
     steps:
       - name: Download Artifacts
