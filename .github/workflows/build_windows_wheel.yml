@@ -1,0 +1,75 @@
+name: Build Windows Wheel
+
+on:
+  push:
+    branches: ["xc_wrapper_winwheel"]
+
+jobs:
+  build-windows-wheel:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ["3.13"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: "x64"
+
+      - name: Install MSYS2 + gfortran
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: mingw-w64-x86_64-gcc-fortran
+
+      - name: Add MSYS2 to PATH
+        run: |
+          echo "C:\msys64\mingw64\bin" >> $env:GITHUB_PATH
+
+      - name: Install dependencies and cibuildwheel
+        shell: bash
+        run: |
+          python -m pip install cibuildwheel
+          pip install -r requirements.txt
+
+      - name: Build wheels
+        shell: bash
+        run: cibuildwheel --platform windows --output-dir wheelhouse
+        env:
+          CIBW_ARCHS: "AMD64"
+          FC: gfortran
+          CC: gcc
+          CXX: g++
+
+      - name: Repack cleaned wheel
+        shell: pwsh
+        run: |
+          mkdir -p cleaned
+          $wheels = Get-ChildItem -Path "wheelhouse" -File
+          
+          foreach ($wheel in $wheels){
+              $name = [IO.Path]::GetFileNameWithoutExtension($wheel.Name)
+              Expand-Archive -Path $wheel.FullName -DestinationPath "tmp_${name}" -Force
+              Remove-Item -Path "tmp_${name}\cm4\*.dll.a" -Force
+              Compress-Archive -Path "tmp_${name}\*" -DestinationPath "cleaned\$($wheel.Name)" -Force
+          }
+         
+
+      - name: Run delvewheel repair
+        shell: bash
+        run: |
+          for file in cleaned/*.whl; do
+            delvewheel repair "$file" --no-mangle cm4.cm4field_arr --wheel-dir wheelhouse
+          done
+          
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-wheels
+          path: wheelhouse/*.whl
