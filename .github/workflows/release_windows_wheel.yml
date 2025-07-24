@@ -41,7 +41,7 @@ jobs:
         shell: bash
         env:
           CIBW_ARCHS: "AMD64"
-          CIBW_SKIP: "cp314-* pp314-*"
+          CIBW_SKIP: "cp314t-* cp314-* pp314-*"
           FC: gfortran
           CC: gcc
           CXX: g++
