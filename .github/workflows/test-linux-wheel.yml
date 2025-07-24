@@ -2,7 +2,7 @@ name: Test Linux Wheel
 
 on:
   push:
-    branches: ["xc_wrapper_winwheel"] # Assign the branch that triggers this workflow
+    branches: ["c_wrapper_winwheel"] # Assign the branch that triggers this workflow
 
 jobs:
   build-wheel:

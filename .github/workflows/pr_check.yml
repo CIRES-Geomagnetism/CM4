@@ -45,6 +45,7 @@ jobs:
         run: cibuildwheel --platform windows --output-dir wheelhouse
         env:
           CIBW_ARCHS: "AMD64"
+          CIBW_SKIP: "cp314-*"
           FC: gfortran
           CC: gcc
           CXX: g++
