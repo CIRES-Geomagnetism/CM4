@@ -41,11 +41,13 @@ jobs:
         shell: bash
         env:
           CIBW_ARCHS: "AMD64"
-          CIBW_SKIP: "cp314-*"
+          CIBW_SKIP: "cp314-* pp314-*"
           FC: gfortran
           CC: gcc
           CXX: g++
-        run: cibuildwheel --platform windows --output-dir wheelhouse
+        run: |
+          cibuildwheel --platform windows --print-build-identifiers
+          cibuildwheel --platform windows --output-dir wheelhouse
 
 
       - name: Repack cleaned wheel
