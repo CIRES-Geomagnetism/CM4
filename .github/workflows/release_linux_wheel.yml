@@ -34,7 +34,7 @@ jobs:
       - name: Upload wheels to Github Release
         uses: softprops/action-gh-release@v1
         with:
-          draft: true
+          draft: false
           files: wheelhouse/*.whl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
