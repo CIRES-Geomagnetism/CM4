@@ -23,7 +23,7 @@ jobs:
           python -m pip install cibuildwheel
           pip install -r requirements.txt
 
-      - name: Build wheels with cibuildwheel
+      - name: Build wheels with cibuildwheel # Upgrade to >=3.1.0 after Python3.14 final release
         uses: pypa/cibuildwheel@v3.0.1
         env:
           CIBW_ARCHS: "x86_64"

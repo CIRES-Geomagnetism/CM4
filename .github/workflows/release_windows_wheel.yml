@@ -31,17 +31,16 @@ jobs:
         run: |
           echo "C:\msys64\mingw64\bin" >> $env:GITHUB_PATH
 
-      - name: Install dependencies and cibuildwheel
+      - name: Install dependencies and cibuildwheel # Upgrade to >=3.1.0 after Python3.14 final release
         shell: bash
         run: |
-          python -m pip install cibuildwheel
+          python -m pip install cibuildwheel==3.0.1
           pip install -r requirements.txt
 
       - name: Build wheels
         shell: bash
         env:
           CIBW_ARCHS: "AMD64"
-          CIBW_SKIP: "cp314t-* cp314-* pp314-*"
           FC: gfortran
           CC: gcc
           CXX: g++
@@ -74,7 +73,7 @@ jobs:
       - name: Upload cleaned wheels
         uses: softprops/action-gh-release@v1
         with:
-            draft: false
+            draft: true
             files: wheelhouse/*.whl
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
