@@ -2,7 +2,8 @@ name: Build Windows Wheel
 
 on:
   push:
-    branches: ["c_wrapper_winwheel"] # Assign the branch that triggers this workflow
+    tags:
+      - 'v*.*.*'
 
 jobs:
   release-windows-wheel:
