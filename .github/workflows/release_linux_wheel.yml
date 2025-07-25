@@ -1,0 +1,40 @@
+name: Release Linux Wheel
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release-linux-wheel:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+
+      - name: Install dependencies and cibuildwheel # Upgrade to >=3.1.0 after Python3.14 final release
+        run: |
+          python -m pip install cibuildwheel==3.0.1 
+          pip install -r requirements.txt
+
+      - name: Build wheels with cibuildwheel
+        uses: pypa/cibuildwheel@v3.0.1 # Upgrade to >=3.1.0 after Python3.14 final release
+        env:
+          CIBW_ARCHS: "x86_64"
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_SKIP: "*-musllinux*"
+
+      - name: Upload wheels to Github Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          files: wheelhouse/*.whl
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

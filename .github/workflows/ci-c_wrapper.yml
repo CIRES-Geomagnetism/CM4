@@ -1,0 +1,41 @@
+name: c_wrapper ci/cd
+
+on:
+  push:
+    branches: ["c_wrapper"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python_version: [ '3.13'] # Assign the branch that triggers this workflow
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python_version }}
+
+    - name: Build and install cm4field
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        python -m build --wheel 
+        pip install dist/*.whl
+
+    - name: Run scientific test
+      run: |
+            python tests/scientific_accuracy_test.py
+            zip -r results.zip tests/results
+
+    - name: Run upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: scientific_accuracy_results.zip
+        path: results.zip
+        
+    

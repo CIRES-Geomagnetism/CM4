@@ -1,0 +1,133 @@
+name: Pull Request Check
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths-ignore:
+      - "README.md"
+
+jobs:
+  build-windows-wheel:
+    if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ["3.13"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: "x64"
+
+      - name: Install MSYS2 + gfortran
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: mingw-w64-x86_64-gcc-fortran
+
+      - name: Add MSYS2 to PATH
+        run: |
+          echo "C:\msys64\mingw64\bin" >> $env:GITHUB_PATH
+
+      - name: Install cibuildwheel
+        shell: bash
+        run: |
+          python -m pip install cibuildwheel==3.0.1 # Upgrade to >=3.1.0 after Python3.14 final release 
+          pip install -r requirements.txt
+
+      - name: Build wheels
+        shell: bash
+        env:
+          CIBW_ARCHS: "AMD64"
+          CIBW_SKIP: "cp314-*"
+          FC: gfortran
+          CC: gcc
+          CXX: g++
+        run: cibuildwheel --platform windows --output-dir wheelhouse
+
+      - name: Repack cleaned wheel
+        shell: pwsh
+        run: |
+          mkdir -p cleaned
+          $wheels = Get-ChildItem -Path "wheelhouse" -File
+          
+          foreach ($wheel in $wheels){
+              $name = [IO.Path]::GetFileNameWithoutExtension($wheel.Name)
+              Expand-Archive -Path $wheel.FullName -DestinationPath "tmp_${name}" -Force
+              Remove-Item -Path "tmp_${name}\cm4\*.dll.a" -Force
+              Compress-Archive -Path "tmp_${name}\*" -DestinationPath "cleaned\$($wheel.Name)" -Force
+          }
+         
+
+      - name: Run delvewheel repair
+        shell: bash
+        run: |
+          for file in cleaned/*.whl; do
+            delvewheel repair "$file" --no-mangle cm4.cm4field_arr --wheel-dir wheelhouse
+          done
+          
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-wheels
+          path: wheelhouse/*.whl
+
+  test_artifacts:
+    name: Test Artifacts
+    runs-on: windows-latest
+    needs: build-windows-wheel
+    strategy:
+      matrix:
+        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
+    env:
+      version: "1.0.0"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: "x64"
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-wheels
+          path: wheelhouse
+
+      - name: Create virtual environment
+        run: python -m venv venv
+
+      - name: Install the wheel
+        shell: pwsh
+        run: |
+          .\venv\Scripts\Activate.ps1
+          python -m pip install --upgrade pip
+          if (${{ matrix.python-version }} -eq "3.13") {
+            pip install wheelhouse\cm4-${env:version}-cp313-cp313-win_amd64.whl
+          } elseif (${{ matrix.python-version }} -eq "3.12") {
+            pip install wheelhouse\cm4-${env:version}-cp312-cp312-win_amd64.whl
+          } elseif (${{ matrix.python-version }} -eq "3.11") {
+            pip install wheelhouse\cm4-${env:version}-cp311-cp311-win_amd64.whl
+          } elseif (${{ matrix.python-version }} -eq "3.10") {
+            pip install wheelhouse\cm4-${env:version}-cp310-cp310-win_amd64.whl
+          } else {
+            pip install wheelhouse\cm4-${env:version}-cp39-cp39-win_amd64.whl
+          }
+
+      - name: Run scientific test
+        shell: pwsh
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          .\venv\Scripts\Activate.ps1
+          python tests/scientific_accuracy_test.py
+  
