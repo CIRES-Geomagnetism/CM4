@@ -2,7 +2,7 @@ name: c_wrapper ci/cd
 
 on:
   push:
-    branches: ["c_wrapper"]  # Assign the branch that triggers this workflow
+    branches: ["colatitude"]  # Assign the branch that triggers this workflow
 
 jobs:
   test:
