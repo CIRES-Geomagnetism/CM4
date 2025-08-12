@@ -2,14 +2,14 @@ name: c_wrapper ci/cd
 
 on:
   push:
-    branches: ["c_wrapper"]
+    branches: ["c_wrapper"]  # Assign the branch that triggers this workflow
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python_version: [ '3.13'] # Assign the branch that triggers this workflow
+        python_version: [ '3.13']
 
     steps:
     - name: Checkout code

@@ -689,6 +689,10 @@ def py_mat_cm4_arr(alt: list[float], lat_geod: list[float], lon: list[float], ds
     cord = 0
     #Change geodetic lat/radius into geocentric
 
+    colat_geod = [90 - l for l in lat_geod]  # Convert geodetic latitude to colatitude
+
+
+
     if(geodflag):
         cord = 1
 
@@ -708,7 +712,9 @@ def py_mat_cm4_arr(alt: list[float], lat_geod: list[float], lon: list[float], ds
 
 
 
-    out_b = cm4field_arr.call_cm4(UT, lat_geod , lon, alt, dst, f107,
+
+
+    out_b = cm4field_arr.call_cm4(UT, colat_geod , lon, alt, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
                                       nmax[0],nmax[1], nmin[0],nmin[1], N, COF_PATH)

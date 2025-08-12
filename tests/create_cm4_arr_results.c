@@ -118,7 +118,7 @@ int main(){
         sscanf(line,"%lf,%lf,%lf,%lf,%lf,%lf",
                  &ut,&lat,&lon,&alt,&dst,&f107);
 
-        lats[idx] = lat;
+        lats[idx] = 90 - lat;
         lons[idx] = lon;
         alts[idx] = alt;
         uts[idx] = ut;
