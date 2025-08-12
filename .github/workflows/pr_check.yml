@@ -83,10 +83,11 @@ jobs:
     runs-on: windows-latest
     needs: build-windows-wheel
     strategy:
+      fail-fast: true  # Stop the jobs if it fails at one of Python versions
       matrix:
         python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
     env:
-      version: "1.0.0"
+      version: "1.0.1"
 
     steps:
       - name: Checkout code
