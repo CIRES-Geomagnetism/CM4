@@ -651,15 +651,24 @@ def py_mat_cm4(alt, lat_geod, lon, dst, f107,geodflag = 1,ymd_time = None, MJD_t
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
     return out_b,out_j, core, magnetosphere, ionoshere
 
-def py_mat_cm4_arr(alt: list[float], lat_geod: list[float], lon: list[float], dst: list[float], f107: list[float],pred: list[bool] = None, core_nmin: int = 1, core_nmax: int = 13, crust_nmin: int = 14, crust_nmax: int = 45, geodflag: int = 1,
+def py_mat_cm4_arr(alt: list[float], lat: list[float], lon: list[float], dst: list[float], f107: list[float],pred: list[bool] = None, core_nmin: int = 1, core_nmax: int = 13, crust_nmin: int = 14, crust_nmax: int = 45, geodflag: int = 1,
                    year: int = None, month: int = None, day: int = None, hour: int = None, minute: int = None, MJD_time: list[float] = None) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    if geodflag is falsy (0, False, etc) inputs are interpreted as geocentric latitude and radial altitude (radius-earth radius), 
+    and outputs return in geocentric spherical (e.g. core[0] is B_r, core[1] is B_theta, core[2] is B_phi)
+    
+    if geodflag is truthy (1, True, etc) inputs are interpreted as geodetic lat and altitude above ellipsoid
+    and outputs return in geodetic up, south, east (e.g. core[0] is B_up, core[1] is B_south, core[2] is B_east)
+    (note that this is the geodetic equivalent of r,theta and phi directions). This implicitly uses 
+    CM4's internal geodetic <-> geocentric subroutines which use an outdated ellipsoid
+    """
     if MJD_time is None and year is None:raise ValueError("a time input must be provided")
     #Change yyyymmddhhmmss time to Year decimal time
 
     N = len(alt)
 
-    if (len(lat_geod) != N or len(lon) != N or len(dst) != N or len(f107) != N):
-        raise ValueError("alt, lat_geod, lon, dst, and f107 must all be the same length")
+    if (len(lat) != N or len(lon) != N or len(dst) != N or len(f107) != N):
+        raise ValueError("alt, lat, lon, dst, and f107 must all be the same length")
 
 
     if pred is None:
@@ -667,8 +676,8 @@ def py_mat_cm4_arr(alt: list[float], lat_geod: list[float], lon: list[float], ds
 
     if isinstance(alt, list):
         alt = np.array(alt)
-    if isinstance(lat_geod, list):
-        lat_geod = np.array(lat_geod)
+    if isinstance(lat, list):
+        lat = np.array(lat)
     if isinstance(lon, list):
         lon = np.array(lon)
 
@@ -686,25 +695,15 @@ def py_mat_cm4_arr(alt: list[float], lat_geod: list[float], lon: list[float], ds
 
     # print(UT,1.990326027397260e3)
     # UT = 1.990326027397260e3
+    
+    colat = [90 - l for l in lat]  # Convert latitude to colatitude
+
+
     cord = 0
-    #Change geodetic lat/radius into geocentric
-
-    colat_geod = [90 - l for l in lat_geod]  # Convert geodetic latitude to colatitude
-
-
-
     if(geodflag):
         cord = 1
 
-        #r_geoc ,thet_geoc= geod2geoc(np.deg2rad(lat_geod), alt)
-        #thet_geoc = np.rad2deg(thet_geoc)
-        #r_geoc = r_geoc-6371.2
 
-    #else:
-    #    r_geoc = alt
-    #    thet_geoc = lat_geod
-    # print(r_geoc, thet_geoc)
-    
     nmin = [core_nmin,crust_nmin]
     nmax = [core_nmax,crust_nmax]
     # pred = np.array([True,True,True,True,True,True])
@@ -714,7 +713,7 @@ def py_mat_cm4_arr(alt: list[float], lat_geod: list[float], lon: list[float], ds
 
 
 
-    out_b = cm4field_arr.call_cm4(UT, colat_geod , lon, alt, dst, f107,
+    out_b = cm4field_arr.call_cm4(UT, colat , lon, alt, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
                                       nmax[0],nmax[1], nmin[0],nmin[1], N, COF_PATH)
@@ -731,6 +730,7 @@ def py_mat_cm4_arr(alt: list[float], lat_geod: list[float], lon: list[float], ds
     # print('raw', out_b, np.shape(out_b))
     # print('core z,x,y \n with x and z with flipped signs\n----------------------------------\n',-out_b[2,0], -out_b[0,0],out_b[1,0])
     return out_b, core,crust, magnetosphere, ionoshere
+
 def parse_survey_file(filename):
     with open(filename, 'r') as file:
         # Read the first line as headers
