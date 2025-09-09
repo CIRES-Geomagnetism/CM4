@@ -3,7 +3,7 @@
 
 set -e
 
-exe_dir="/Users/lily/Projects/CM4/CM4"
+exe_dir="/home/liamkilcommons/Projects/CM4/CM4"
 out_exe="cm4_results"
 while getopts "d:h" opt; do
   case $opt in

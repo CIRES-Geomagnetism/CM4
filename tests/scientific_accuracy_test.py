@@ -1,6 +1,9 @@
 import math
 import os
+import copy
+    
 import numpy as np
+import pandas as pd
 from collections import defaultdict
 
 import cm4
@@ -34,16 +37,17 @@ def measure_diff(true_vals, pred_vals, out_file, tol=1e-2):
     N = len(pred_vals["Bx"])
     diffs = [0]*N
 
-
-
     with open(out_file, "w") as f:
         f.write("key,max_diff,ave_diff,rmse\n")
         for key in keys:
+            max_diff_ind = -1
             max_diff = 0.0
             ave_diff = 0.0
             for i in range(N):
                 diff = abs(true_vals[key][i] - pred_vals[key][i])
-                max_diff = max(max_diff, diff)
+                if diff > max_diff:
+                    max_diff = diff
+                    max_diff_ind = i
                 ave_diff += diff
                 diffs[i] = diff
                 #if diff > tol:
@@ -56,26 +60,23 @@ def measure_diff(true_vals, pred_vals, out_file, tol=1e-2):
 
             rmse = math.sqrt(sum((diff - ave_diff)**2 for diff in diffs) / N)
 
-            f.write(f"{key},{max_diff},{ave_diff},{rmse}\n")
+            f.write(f"{key},{max_diff},{max_diff_ind},{ave_diff},{rmse}\n")
 
-def compare_fortran_results(inputs: dict, outpus:dict, field: str, stat_results_file: str):
+def generate_python_output(inputs: dict, field: str):
+    
+    outputs = copy.deepcopy(inputs)
 
-    colats = [90.0 - lat for lat in inputs["latitude"] ]
-
-
-
-    #if field == "core":
-    #    preds = [True, False, False, False, False, False]
-    #elif field == "crust":
-    #    preds = [True, True, False, False, False, False]
-    #else:
     preds = [True, True, True, True, True, True]
 
-
-    out_b, core, crust, magnetosphere, ionosphere = py_mat_cm4_arr(inputs["altitude"], inputs["latitude"], inputs["longitude"], inputs["dst"],inputs["f107"], pred=preds, MJD_time=inputs["date"], geodflag=1)
-
-
-
+    out_b, core, crust, magnetosphere, ionosphere = py_mat_cm4_arr(inputs["altitude"], 
+                                                                   inputs["latitude"], 
+                                                                   inputs["longitude"], 
+                                                                   inputs["dst"],
+                                                                   inputs["f107"], 
+                                                                   pred=preds, 
+                                                                   MJD_time=inputs["date"], 
+                                                                   geodflag=1)
+    
     if field == "core":
         res = {"Bx": -core[1], "By": core[2], "Bz": -core[0]}
     elif field == "crust":
@@ -87,15 +88,13 @@ def compare_fortran_results(inputs: dict, outpus:dict, field: str, stat_results_
     else:
         raise ValueError("Invalid field specified. Choose from 'core', 'crust', 'magnetosphere', or 'ionosphere'.")
 
+    outputs['Bx']=res['Bx']
+    outputs['By']=res['By']
+    outputs['Bz']=res['Bz']
+    return outputs
 
-
-
-
-
-
-    measure_diff(outpus, res, stat_results_file)
-
-
+def compare_results(fortran_outputs:dict, python_outputs:dict, stat_results_file: str): 
+    measure_diff(fortran_outputs, python_outputs, stat_results_file)
 
 def main():
 
@@ -103,13 +102,19 @@ def main():
     if not os.path.exists(os.path.join(curr_dir, "results")):
         os.mkdir(os.path.join(curr_dir, "results"))
 
-    testval_dict = {"core": "cm4arr_core_TestValues.csv", "crust": "cm4arr_crust_TestValues.csv", "magneto": "cm4arr_magneto_TestValues.csv", "iono": "cm4arr_iono_TestValues.csv"}
+    testval_dict = {"core": "cm4arr_core_TestValues.csv", 
+                    "crust": "cm4arr_crust_TestValues.csv", 
+                    "magneto": "cm4arr_magneto_TestValues.csv", 
+                    "iono": "cm4arr_iono_TestValues.csv"}
 
     for key, filename in testval_dict.items():
         testval_filename = os.path.join(curr_dir, "test_values", filename)
         results_filename = os.path.join(curr_dir, "results", f"{key}_results.csv")
-        inputs, outputs = read_inputs(testval_filename)
-        compare_fortran_results(inputs, outputs, key, results_filename)
+        pyresults_filename = os.path.join(curr_dir, "results", f"cm4py_{key}_TestValues.csv")
+        inputs, fortran_outputs = read_inputs(testval_filename)
+        python_outputs = generate_python_output(inputs,field=key)
+        pd.DataFrame(python_outputs).to_csv(pyresults_filename)
+        compare_results(fortran_outputs, python_outputs, key, results_filename)
 
 
 if __name__ == "__main__":

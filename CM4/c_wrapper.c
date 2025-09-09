@@ -69,37 +69,37 @@ PyObject* save_3d_array(int rows, int cols, int arr_len, double*** matrix){
 }
 
 
-double* pyooject_to_darray(PyArrayObject* obj){
+// double* pyooject_to_darray(PyArrayObject* obj){
 
-    if (!PyList_Check(obj)) {
-        PyErr_SetString(PyExc_TypeError, "Expected a list");
-        return NULL;
-    }
+//     if (!PyList_Check(obj)) {
+//         PyErr_SetString(PyExc_TypeError, "Expected a list");
+//         return NULL;
+//     }
 
-    Py_ssize_t len = PySequence_Length(obj);
+//     Py_ssize_t len = PySequence_Length(obj);
 
-    double* array = malloc(len * sizeof(double));
+//     double* array = malloc(len * sizeof(double));
 
-    for(Py_ssize_t i = 0; i < len; i++) {
+//     for(Py_ssize_t i = 0; i < len; i++) {
 
-        PyObject* item = PySequence_GetItem(obj, i);
-        if (!PyFloat_Check(item)){
-            Py_DECREF(item);
-            free(array);
-            PyErr_SetString(PyExc_TypeError, "Expected a float in the list");
-            return NULL;
-        }
-        array[i] = PyFloat_AsDouble(item);
+//         PyObject* item = PySequence_GetItem(obj, i);
+//         if (!PyFloat_Check(item)){
+//             Py_DECREF(item);
+//             free(array);
+//             PyErr_SetString(PyExc_TypeError, "Expected a float in the list");
+//             return NULL;
+//         }
+//         array[i] = PyFloat_AsDouble(item);
 
-        printf("Get %f \n", array[i]);
+//         printf("Get %f \n", array[i]);
 
-    }
+//     }
 
-    return array;
+//     return array;
 
-}
+// }
 
-double* pyobject_to_nparray(PyObject* array){
+double* pyobject_to_nparray(PyArrayObject* array){
 
     if (array == NULL) return NULL;
 
@@ -114,20 +114,29 @@ static PyObject* py_call_cm4_arr(PyObject* self, PyObject* args) {
 
     PyObject *ut_obj, *thet_obj, *phi_obj, *alt_obj, *dst_obj, *f107_obj;
     int pred1, pred2, pred3, pred4, pred5, pred6;
+    bool pred1b, pred2b, pred3b, pred4b, pred5b, pred6b;
     int cord;
+    bool cordb;
     int len;
-    const char* cof_path;
+    char* cof_path;
     int nhmf1 = 13, nhmf2 = 45, nlmf1 = 1, nlmf2 = 14;
 
-
-
     // Parse the arguments from Python
-    if (!PyArg_ParseTuple(args, "OOOOOOiiiiiiiiiiiis",
+    if (!PyArg_ParseTuple(args, "OOOOOOpppppppiiiiis",
           &ut_obj, &thet_obj, &phi_obj, &alt_obj, &dst_obj, &f107_obj,
           &pred1, &pred2, &pred3, &pred4, &pred5, &pred6,
           &cord, &nhmf1, &nhmf2, &nlmf1, &nlmf2, &len, &cof_path)) {
         return NULL;
     }
+
+    //convert flags to c bool type
+    pred1b = pred1 != 0;
+    pred2b = pred2 != 0;
+    pred3b = pred3 != 0;
+    pred4b = pred4 != 0;
+    pred5b = pred5 != 0;
+    pred6b = pred6 != 0;
+    cordb = cord != 0;
 
     PyArrayObject* py_ut_obj = (PyArrayObject*)PyArray_FROM_OTF(ut_obj, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
     PyArrayObject* py_thet_obj = (PyArrayObject*)PyArray_FROM_OTF(thet_obj, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
@@ -151,8 +160,8 @@ static PyObject* py_call_cm4_arr(PyObject* self, PyObject* args) {
 
 
     call_cm4_arr(ut, thet , phi, alt, dst, f107,
-                                      &pred1, &pred2, &pred3,&pred4, &pred5, &pred6
-                                      ,&cord,
+                                      &pred1b, &pred2b, &pred3b, &pred4b, &pred5b, &pred6b
+                                      ,&cordb,
                                       &nhmf1, &nhmf2, &nlmf1, &nlmf2, &len, cof_path, (double*)bmdl, (double*)jmdl);
 
     // Convert Fortran order to C order

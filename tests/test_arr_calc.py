@@ -4,8 +4,8 @@ import geomaglib.util
 import numpy as np
 import importlib
 import csv
-from CM4.callfpy import py_mat_cm4, py_mat_cm4_arr
-from CM4 import cm4field, cm4field_arr
+from cm4.callfpy import py_mat_cm4, py_mat_cm4_arr
+#from CM4 import cm4field, cm4field_arr
 # import geomaglib
 # Force reimport of the module
 # importlib.reload(cm4_py310)

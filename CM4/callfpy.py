@@ -699,9 +699,9 @@ def py_mat_cm4_arr(alt: list[float], lat: list[float], lon: list[float], dst: li
     colat = [90 - l for l in lat]  # Convert latitude to colatitude
 
 
-    cord = 0
+    cord = False
     if(geodflag):
-        cord = 1
+        cord = True
 
 
     nmin = [core_nmin,crust_nmin]

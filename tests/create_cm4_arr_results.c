@@ -41,6 +41,23 @@ void write_outputs(double* date, double* lat, double* lon, double* alt, double* 
 
     // Write the results to the output files
 
+    
+    // if field == "core":
+    //     core = np.array([-out_b[2,0], -out_b[0,0],out_b[1,0]])
+    //     res = {"Bx": -core[1], "By": core[2], "Bz": -core[0]}
+    // elif field == "crust":
+    //      crust = np.array([-out_b[2,1], -out_b[0,1],out_b[1,1]])
+    //     res = {"Bx": -crust[1], "By": crust[2], "Bz": -crust[0]}
+    // elif field == "magneto":
+    //      magnetosphere = np.array([-out_b[2,2]-out_b[2,3], -out_b[0,2]-out_b[0,3],out_b[1,2]+out_b[1,3]])
+    //     res = {"Bx": -magnetosphere[1], "By": magnetosphere[2], "Bz": -magnetosphere[0]}
+    // elif field == "iono":
+    //      ionoshere = np.array([-out_b[2,4]-out_b[2,5], -out_b[0,4]-out_b[0,5],out_b[1,4]+out_b[1,5]])
+    //     res = {"Bx": -ionosphere[1], "By": ionosphere[2], "Bz": -ionosphere[0]}
+    // else:
+    //     raise ValueError("Invalid field specified. Choose from 'core', 'crust', 'magnetosphere', or 'ionosphere'.")
+
+
     for (int i = 0; i < N ;i++){
 
         double bx, by, bz;
@@ -83,7 +100,7 @@ int main(){
     bool pred1 = true, pred2 = true, pred3  = true, pred4  = true, pred5  = true, pred6 = true;
     bool CORD = true; // True for geodetic; False for geocentric
     int NHMF1 = 13, NHMF2 = 45, NLMF1 = 1, NLMF2 = 14;
-    char cof_path[50] = "/Users/lily/Projects/CM4/CM4/umdl.CM4";
+    char cof_path[50] = "/home/liamkilcommons/Projects/CM4/CM4/umdl.CM4";
     double jmdl[3][4];
     
     // Open the file for writing
@@ -118,7 +135,7 @@ int main(){
         sscanf(line,"%lf,%lf,%lf,%lf,%lf,%lf",
                  &ut,&lat,&lon,&alt,&dst,&f107);
 
-        lats[idx] = 90 - lat;
+        lats[idx] = 90. - lat;
         lons[idx] = lon;
         alts[idx] = alt;
         uts[idx] = ut;
