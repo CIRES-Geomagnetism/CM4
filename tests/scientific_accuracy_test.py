@@ -64,18 +64,22 @@ def measure_diff(true_vals, pred_vals, out_file, tol=1e-2):
 
 def generate_python_output(inputs: dict, field: str):
     
+    #The C code converts the inputs from the original inputs to colat
+    #so inputs['latitude'] is actually colatitude
+    latitude = [90-colat for colat in inputs['latitude']]
+
     outputs = copy.deepcopy(inputs)
 
     preds = [True, True, True, True, True, True]
 
     out_b, core, crust, magnetosphere, ionosphere = py_mat_cm4_arr(inputs["altitude"], 
-                                                                   inputs["latitude"], 
+                                                                   latitude, 
                                                                    inputs["longitude"], 
                                                                    inputs["dst"],
                                                                    inputs["f107"], 
                                                                    pred=preds, 
                                                                    MJD_time=inputs["date"], 
-                                                                   geodflag=1)
+                                                                   geodflag=0)
     
     if field == "core":
         res = {"Bx": -core[1], "By": core[2], "Bz": -core[0]}
@@ -114,7 +118,7 @@ def main():
         inputs, fortran_outputs = read_inputs(testval_filename)
         python_outputs = generate_python_output(inputs,field=key)
         pd.DataFrame(python_outputs).to_csv(pyresults_filename)
-        compare_results(fortran_outputs, python_outputs, key, results_filename)
+        compare_results(fortran_outputs, python_outputs, results_filename)
 
 
 if __name__ == "__main__":

@@ -98,7 +98,7 @@ int main(){
     char magneto_out_file[50] = "test_values/cm4arr_magneto_TestValues.csv";
 
     bool pred1 = true, pred2 = true, pred3  = true, pred4  = true, pred5  = true, pred6 = true;
-    bool CORD = true; // True for geodetic; False for geocentric
+    bool CORD = false; // True for geodetic; False for geocentric
     int NHMF1 = 13, NHMF2 = 45, NLMF1 = 1, NLMF2 = 14;
     char cof_path[50] = "/home/liamkilcommons/Projects/CM4/CM4/umdl.CM4";
     double jmdl[3][4];
