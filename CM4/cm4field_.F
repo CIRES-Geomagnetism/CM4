@@ -764,7 +764,7 @@ C=======================================================================
       ! PRINT *, 'PRED6=', PRED(6)
       ! PRINT *, 'CORD=', CORD
 
-      STOP
+      !STOP
       IF (CERR.LT.50) THEN                                                      
          IF (LOAD(1)) THEN
             LOAD(1)=.FALSE.
