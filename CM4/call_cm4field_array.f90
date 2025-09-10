@@ -57,9 +57,6 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       if (i <= 256) fstr(i:) = ' '  ! Pad rest with spaces
       i = 1
 
-
-
-
       ! Assigning values
       PATH(1) = fstr
       !PATH(2) = "strings are weird"
@@ -84,7 +81,9 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       CURR = .true.
       COEF = .false.
 
-
+      print *, 'in call_cm4_arr in call_cm4field_array.f90'
+      print *, 'pred1 =', pred1, 'pred2 =', pred2, 'pred3 =', pred3, 'pred4 =', pred4, &
+           'pred5 =', pred5, 'pred6 =', pred6, 'cord =', cord
 
       !NHMF = [13, 45]
       !NLMF = [1, 14]

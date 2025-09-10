@@ -158,6 +158,10 @@ static PyObject* py_call_cm4_arr(PyObject* self, PyObject* args) {
      // Declare numpy array for the results
 
 
+    printf("py_call_cm4_arr in c_wrapper.c\n");
+    printf("pred1 = %d, pred2 = %d, pred3 = %d, pred4 = %d, pred5 = %d, pred6 = %d, cord = %d\n",
+        pred1, pred2, pred3, pred4, pred5, pred6, cord);
+
 
     call_cm4_arr(ut, thet , phi, alt, dst, f107,
                                       &pred1b, &pred2b, &pred3b, &pred4b, &pred5b, &pred6b

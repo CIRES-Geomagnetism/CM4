@@ -92,10 +92,10 @@ int main(){
     int N = 3000;
 
 
-    char crust_out_file[50] = "test_values/cm4arr_crust_TestValues.csv";
-    char core_out_file[50] = "test_values/cm4arr_core_TestValues.csv";
-    char iono_out_file[50] = "test_values/cm4arr_iono_TestValues.csv";
-    char magneto_out_file[50] = "test_values/cm4arr_magneto_TestValues.csv";
+    char crust_out_file[50] = "test_values/cm4arr_crust_TestValues_gc.csv";
+    char core_out_file[50] = "test_values/cm4arr_core_TestValues_gc.csv";
+    char iono_out_file[50] = "test_values/cm4arr_iono_TestValues_gc.csv";
+    char magneto_out_file[50] = "test_values/cm4arr_magneto_TestValues_gc.csv";
 
     bool pred1 = true, pred2 = true, pred3  = true, pred4  = true, pred5  = true, pred6 = true;
     bool CORD = false; // True for geodetic; False for geocentric

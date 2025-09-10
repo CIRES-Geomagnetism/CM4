@@ -60,7 +60,10 @@ def measure_diff(true_vals, pred_vals, out_file, tol=1e-2):
 
             rmse = math.sqrt(sum((diff - ave_diff)**2 for diff in diffs) / N)
 
-            f.write(f"{key},{max_diff},{max_diff_ind},{ave_diff},{rmse}\n")
+            keydiffstr = f"{key},{max_diff},{max_diff_ind},{ave_diff},{rmse}\n"
+            f.write(keydiffstr)
+            print(keydiffstr)
+
 
 def generate_python_output(inputs: dict, field: str):
     
@@ -106,15 +109,15 @@ def main():
     if not os.path.exists(os.path.join(curr_dir, "results")):
         os.mkdir(os.path.join(curr_dir, "results"))
 
-    testval_dict = {"core": "cm4arr_core_TestValues.csv", 
-                    "crust": "cm4arr_crust_TestValues.csv", 
-                    "magneto": "cm4arr_magneto_TestValues.csv", 
-                    "iono": "cm4arr_iono_TestValues.csv"}
+    testval_dict = {"core": "cm4arr_core_TestValues_gc.csv", 
+                    "crust": "cm4arr_crust_TestValues_gc.csv", 
+                    "magneto": "cm4arr_magneto_TestValues_gc.csv", 
+                    "iono": "cm4arr_iono_TestValues_gc.csv"}
 
     for key, filename in testval_dict.items():
         testval_filename = os.path.join(curr_dir, "test_values", filename)
-        results_filename = os.path.join(curr_dir, "results", f"{key}_results.csv")
-        pyresults_filename = os.path.join(curr_dir, "results", f"cm4py_{key}_TestValues.csv")
+        results_filename = os.path.join(curr_dir, "results", f"{key}_results_gc.csv")
+        pyresults_filename = os.path.join(curr_dir, "results", f"cm4py_{key}_TestValues_gc.csv")
         inputs, fortran_outputs = read_inputs(testval_filename)
         python_outputs = generate_python_output(inputs,field=key)
         pd.DataFrame(python_outputs).to_csv(pyresults_filename)
