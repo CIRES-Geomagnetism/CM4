@@ -755,8 +755,16 @@ C=======================================================================
       DATA DRAD /0.017453292519943D0/, DSTT /0.D0/
 
 C=======================================================================
-      PRINT *, 'IN CALLCM4 IN CM4FIELD_.F'
-      PRINT *, 'CORD=', CORD
+      ! PRINT *, 'IN CALLCM4 IN CM4FIELD_.F'
+      ! PRINT *, 'PRED1=', PRED(1)
+      ! PRINT *, 'PRED2=', PRED(2)
+      ! PRINT *, 'PRED3=', PRED(3)
+      ! PRINT *, 'PRED4=', PRED(4)
+      ! PRINT *, 'PRED5=', PRED(5)
+      ! PRINT *, 'PRED6=', PRED(6)
+      ! PRINT *, 'CORD=', CORD
+
+      STOP
       IF (CERR.LT.50) THEN                                                      
          IF (LOAD(1)) THEN
             LOAD(1)=.FALSE.
