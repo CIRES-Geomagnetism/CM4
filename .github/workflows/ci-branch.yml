@@ -30,12 +30,11 @@ jobs:
     - name: Run fortran python parity test
       run: |
             python tests/fortran_python_parity_test.py
-            zip results.zip tests/results/*
 
     - name: Run upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: fortran_python_parity_results.zip
-        path: results.zip
+        path: tests/results/*
         
     
