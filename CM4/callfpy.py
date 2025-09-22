@@ -29,16 +29,8 @@ def py_mat_cm4_arr(alt: list[float], lat: list[float], lon: list[float], dst: li
     if (len(lat) != N or len(lon) != N or len(dst) != N or len(f107) != N):
         raise ValueError("alt, lat, lon, dst, and f107 must all be the same length")
 
-
     if pred is None:
         pred = [True, True, True, True, True, True]
-
-    if isinstance(alt, list):
-        alt = np.array(alt)
-    if isinstance(lat, list):
-        lat = np.array(lat)
-    if isinstance(lon, list):
-        lon = np.array(lon)
 
     if year is not None:
         # year, month, day, hour, minute = parse_time(ymd_time)
@@ -55,8 +47,7 @@ def py_mat_cm4_arr(alt: list[float], lat: list[float], lon: list[float], dst: li
     # print(UT,1.990326027397260e3)
     # UT = 1.990326027397260e3
     
-    colat = [90 - l for l in lat]  # Convert latitude to colatitude
-
+    colat = [90.-l for l in lat]  # Convert latitude to colatitude
 
     cord = False
     if(geodflag):
