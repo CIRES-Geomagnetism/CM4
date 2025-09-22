@@ -1,16 +1,14 @@
-from datetime import datetime, timedelta
 import os
 import geomaglib.util
 import numpy as np
-import importlib
-import csv
 
 from cm4 import cm4field_arr
 
 curr_dir = os.path.dirname(__file__)
 COF_PATH = os.path.join(curr_dir, "umdl.CM4")            
    
-def py_mat_cm4_arr(alt: list[float], lat: list[float], lon: list[float], dst: list[float], f107: list[float],pred: list[bool] = None, core_nmin: int = 1, core_nmax: int = 13, crust_nmin: int = 14, crust_nmax: int = 45, geodflag: int = 1,
+def py_mat_cm4_arr(alt: list[float], lat: list[float], lon: list[float], dst: list[float], f107: list[float],pred: list[bool] = None, 
+                   core_nmin: int = 1, core_nmax: int = 13, crust_nmin: int = 14, crust_nmax: int = 45, geodflag: int = 1,
                    year: int = None, month: int = None, day: int = None, hour: int = None, minute: int = None, MJD_time: list[float] = None) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     if geodflag is falsy (0, False, etc) inputs are interpreted as geocentric latitude and radial altitude (radius-earth radius), 
@@ -33,20 +31,12 @@ def py_mat_cm4_arr(alt: list[float], lat: list[float], lon: list[float], dst: li
         pred = [True, True, True, True, True, True]
 
     if year is not None:
-        # year, month, day, hour, minute = parse_time(ymd_time)
-        # hour = hour - 1
 
-        # tmp = jd2000(year,month,day, hour + minute/60)
-        # UT = mjd2000_to_ut(tmp)
         UT = geomaglib.util.calc_dec_year_array(np.array(year), np.array(month), np.array(day), np.array(hour), np.array(minute))
 
-        # print(f"calc UT time", UT)
     else:
         UT = MJD_time
 
-    # print(UT,1.990326027397260e3)
-    # UT = 1.990326027397260e3
-    
     colat = [90.-l for l in lat]  # Convert latitude to colatitude
 
     cord = False
@@ -56,12 +46,6 @@ def py_mat_cm4_arr(alt: list[float], lat: list[float], lon: list[float], dst: li
 
     nmin = [core_nmin,crust_nmin]
     nmax = [core_nmax,crust_nmax]
-    # pred = np.array([True,True,True,True,True,True])
-
-
-
-
-
 
     out_b = cm4field_arr.call_cm4(UT, colat , lon, alt, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
