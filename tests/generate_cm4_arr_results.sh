@@ -4,7 +4,7 @@
 set -e
 
 exe_dir="/home/liamkilcommons/Projects/CM4/CM4"
-out_exe="cm4_results"
+out_exe="create_cm4_results"
 while getopts "d:h" opt; do
   case $opt in
     d) exe_dir="$OPTARG" ;;

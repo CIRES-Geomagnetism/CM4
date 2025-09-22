@@ -27,7 +27,7 @@ jobs:
         python -m build --wheel 
         pip install dist/*.whl
 
-    - name: Run scientific test
+    - name: Run fortran python parity test
       run: |
             python tests/fortran_python_parity_test.py
             zip -r results.zip tests/results

@@ -66,13 +66,13 @@ def write_python_output(inputs : dict, outputs : dict, out_filename : str):
     """Write out a CSV file from inputs and outputs dictionaries 
     For both inputs and outputs keys should be column names and values should lists of floats 
     (value of that column for all rows)"""
-    with open(out_filename,' w') as csvfile:
+    with open(out_filename,'w') as csvfile:
         input_cols = [column_name for column_name in inputs.keys()]
         output_cols = [column_name for column_name in outputs.keys()]
         fieldnames = input_cols+output_cols 
         writer = csv.DictWriter(csvfile,fieldnames=fieldnames)
         nrows = len(outputs[output_cols[0]])
-        for i in range(len(nrows)):
+        for i in range(nrows):
             row = {}
             for key in input_cols:
                 row[key]=inputs[key][i]
@@ -135,7 +135,7 @@ def main():
 
     for key, filename in testval_dict.items():
         testval_filename = os.path.join(curr_dir, "test_values", filename)
-        pyoutputs_filename = os.path.join(curr_dir, "results", f"cm4py_{key}_TestValues.csv")
+        pyoutputs_filename = os.path.join(curr_dir, "test_values", f"cm4py_{key}_TestValues.csv")
         inputs, fortran_outputs = read_inputs(testval_filename)
         #Create python outputs
         python_outputs = generate_python_output(inputs,field=key)
