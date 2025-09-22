@@ -62,20 +62,18 @@ def measure_diff(true_vals, pred_vals, out_file, tol=1e-2):
             f.write(keydiffstr)
             print(keydiffstr)
 
-def write_python_output(inputs : dict, outputs : dict, out_filename : str):
-    """Write out a CSV file from inputs and outputs dictionaries 
-    For both inputs and outputs keys should be column names and values should lists of floats 
+def write_python_output(outputs : dict, out_filename : str):
+    """Write out a CSV file from outputs dictionary 
+    Keys should be column names and values should lists of floats 
     (value of that column for all rows)"""
     with open(out_filename,'w') as csvfile:
-        input_cols = [column_name for column_name in inputs.keys()]
         output_cols = [column_name for column_name in outputs.keys()]
-        fieldnames = input_cols+output_cols 
+        fieldnames = output_cols 
         writer = csv.DictWriter(csvfile,fieldnames=fieldnames)
+        writer.writeheader()
         nrows = len(outputs[output_cols[0]])
         for i in range(nrows):
             row = {}
-            for key in input_cols:
-                row[key]=inputs[key][i]
             for key in output_cols:
                 row[key]=outputs[key][i] 
             writer.writerow(row)
@@ -139,7 +137,7 @@ def main():
         inputs, fortran_outputs = read_inputs(testval_filename)
         #Create python outputs
         python_outputs = generate_python_output(inputs,field=key)
-        write_python_output(inputs,python_outputs,pyoutputs_filename)
+        write_python_output(python_outputs,pyoutputs_filename)
         #Compare Python and C/Fortran outputs for same inputs
         results_filename = os.path.join(curr_dir, "results", f"{key}_results.csv")
         compare_results(fortran_outputs, python_outputs, results_filename)
