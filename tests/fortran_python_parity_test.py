@@ -1,9 +1,8 @@
 import math
 import os
 import copy
+import csv
     
-import numpy as np
-import pandas as pd
 from collections import defaultdict
 
 from cm4.callfpy import py_mat_cm4_arr
@@ -63,6 +62,23 @@ def measure_diff(true_vals, pred_vals, out_file, tol=1e-2):
             f.write(keydiffstr)
             print(keydiffstr)
 
+def write_python_output(inputs : dict, outputs : dict, out_filename : str):
+    """Write out a CSV file from inputs and outputs dictionaries 
+    For both inputs and outputs keys should be column names and values should lists of floats 
+    (value of that column for all rows)"""
+    with open(out_filename,' w') as csvfile:
+        input_cols = [column_name for column_name in inputs.keys()]
+        output_cols = [column_name for column_name in outputs.keys()]
+        fieldnames = input_cols+output_cols 
+        writer = csv.DictWriter(csvfile,fieldnames=fieldnames)
+        nrows = len(outputs[output_cols[0]])
+        for i in range(len(nrows)):
+            row = {}
+            for key in input_cols:
+                row[key]=inputs[key][i]
+            for key in output_cols:
+                row[key]=outputs[key][i] 
+            writer.writerow(row)
 
 def generate_python_output(inputs: dict, field: str):
     
@@ -81,7 +97,7 @@ def generate_python_output(inputs: dict, field: str):
                                                                    inputs["f107"], 
                                                                    pred=preds, 
                                                                    MJD_time=inputs["date"], 
-                                                                   geodflag=1)
+                                                                   geodflag=0)
     
     if field == "core":
         res = {"Bx": -core[1], "By": core[2], "Bz": -core[0]}
@@ -103,10 +119,11 @@ def compare_results(fortran_outputs:dict, python_outputs:dict, stat_results_file
     measure_diff(fortran_outputs, python_outputs, stat_results_file)
 
 def main():
-    
+    #Compares output from Python and C/Fortran interfaces for same inputs
+  
     #Run after calling Fortran CM4 via C (create_cm4_arr_results.c)
-    #and generating
-
+    #and generating _TestValues CSV files
+ 
     curr_dir = os.path.dirname(os.path.abspath(__file__))
     if not os.path.exists(os.path.join(curr_dir, "results")):
         os.mkdir(os.path.join(curr_dir, "results"))
@@ -118,11 +135,13 @@ def main():
 
     for key, filename in testval_dict.items():
         testval_filename = os.path.join(curr_dir, "test_values", filename)
-        results_filename = os.path.join(curr_dir, "results", f"{key}_results.csv")
-        pyresults_filename = os.path.join(curr_dir, "results", f"cm4py_{key}_TestValues.csv")
+        pyoutputs_filename = os.path.join(curr_dir, "results", f"cm4py_{key}_TestValues.csv")
         inputs, fortran_outputs = read_inputs(testval_filename)
+        #Create python outputs
         python_outputs = generate_python_output(inputs,field=key)
-        pd.DataFrame(python_outputs).to_csv(pyresults_filename)
+        write_python_output(inputs,python_outputs,pyoutputs_filename)
+        #Compare Python and C/Fortran outputs for same inputs
+        results_filename = os.path.join(curr_dir, "results", f"{key}_results.csv")
         compare_results(fortran_outputs, python_outputs, results_filename)
 
 
