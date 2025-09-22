@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 
-import cm4
 from cm4.callfpy import py_mat_cm4_arr
 
 def read_inputs(filename: str):
@@ -82,7 +81,7 @@ def generate_python_output(inputs: dict, field: str):
                                                                    inputs["f107"], 
                                                                    pred=preds, 
                                                                    MJD_time=inputs["date"], 
-                                                                   geodflag=0)
+                                                                   geodflag=1)
     
     if field == "core":
         res = {"Bx": -core[1], "By": core[2], "Bz": -core[0]}
@@ -104,20 +103,23 @@ def compare_results(fortran_outputs:dict, python_outputs:dict, stat_results_file
     measure_diff(fortran_outputs, python_outputs, stat_results_file)
 
 def main():
+    
+    #Run after calling Fortran CM4 via C (create_cm4_arr_results.c)
+    #and generating
 
     curr_dir = os.path.dirname(os.path.abspath(__file__))
     if not os.path.exists(os.path.join(curr_dir, "results")):
         os.mkdir(os.path.join(curr_dir, "results"))
 
-    testval_dict = {"core": "cm4arr_core_TestValues_gc.csv", 
-                    "crust": "cm4arr_crust_TestValues_gc.csv", 
-                    "magneto": "cm4arr_magneto_TestValues_gc.csv", 
-                    "iono": "cm4arr_iono_TestValues_gc.csv"}
+    testval_dict = {"core": "cm4arr_core_TestValues.csv", 
+                    "crust": "cm4arr_crust_TestValues.csv", 
+                    "magneto": "cm4arr_magneto_TestValues.csv", 
+                    "iono": "cm4arr_iono_TestValues.csv"}
 
     for key, filename in testval_dict.items():
         testval_filename = os.path.join(curr_dir, "test_values", filename)
-        results_filename = os.path.join(curr_dir, "results", f"{key}_results_gc.csv")
-        pyresults_filename = os.path.join(curr_dir, "results", f"cm4py_{key}_TestValues_gc.csv")
+        results_filename = os.path.join(curr_dir, "results", f"{key}_results.csv")
+        pyresults_filename = os.path.join(curr_dir, "results", f"cm4py_{key}_TestValues.csv")
         inputs, fortran_outputs = read_inputs(testval_filename)
         python_outputs = generate_python_output(inputs,field=key)
         pd.DataFrame(python_outputs).to_csv(pyresults_filename)

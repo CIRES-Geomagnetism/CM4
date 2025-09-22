@@ -130,5 +130,5 @@ jobs:
         run: |
           cd $env:GITHUB_WORKSPACE
           .\venv\Scripts\Activate.ps1
-          python tests/scientific_accuracy_test.py
+          python tests/fortran_python_partity_test.py
   

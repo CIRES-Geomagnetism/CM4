@@ -1,13 +1,7 @@
 import sys
 import os
-# Remove the local dir from sys.path to force import from site-packages
-
 from cm4.callfpy import py_mat_cm4_arr
 
-
-
-
-#from python_CM4.callfpy import py_mat_cm4_arr
 import numpy as np
 if __name__ == '__main__':
 

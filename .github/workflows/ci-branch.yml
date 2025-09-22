@@ -2,7 +2,7 @@ name: c_wrapper ci/cd
 
 on:
   push:
-    branches: ["colatitude"]  # Assign the branch that triggers this workflow
+    branches: ["linux-compile"]  # Assign the branch that triggers this workflow
 
 jobs:
   test:
@@ -29,13 +29,13 @@ jobs:
 
     - name: Run scientific test
       run: |
-            python tests/scientific_accuracy_test.py
+            python tests/fortran_python_parity_test.py
             zip -r results.zip tests/results
 
     - name: Run upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: scientific_accuracy_results.zip
+        name: fortran_python_parity_results.zip
         path: results.zip
         
     
