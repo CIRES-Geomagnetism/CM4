@@ -29,9 +29,9 @@ void call_cm4_arrays(double* UT, double* thet, double* phi, double* alt,
 
      double jmdl[3][4];
     
-    printf("call_cm4_arrays in ccm4.c\n");
+    /*printf("call_cm4_arrays in ccm4.c\n");
     printf("pred1 = %d, pred2 = %d, pred3 = %d, pred4 = %d, pred5 = %d, pred6 = %d, cord = %d\n",
-        pred1, pred2, pred3, pred4, pred5, pred6, cord);
+        pred1, pred2, pred3, pred4, pred5, pred6, cord);*/
 
 
     call_cm4_arr(UT, thet , phi, alt, dst, f107,

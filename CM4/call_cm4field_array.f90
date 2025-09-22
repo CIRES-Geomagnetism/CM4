@@ -82,9 +82,9 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       CURR = .true.
       COEF = .false.
 
-      print *, 'in call_cm4_arr in call_cm4field_array.f90'
-      print *, 'pred1 =', pred1, 'pred2 =', pred2, 'pred3 =', pred3, 'pred4 =', pred4, &
-           'pred5 =', pred5, 'pred6 =', pred6, 'cord =', cord
+      !print *, 'in call_cm4_arr in call_cm4field_array.f90'
+      !print *, 'pred1 =', pred1, 'pred2 =', pred2, 'pred3 =', pred3, 'pred4 =', pred4, &
+      !     'pred5 =', pred5, 'pred6 =', pred6, 'cord =', cord
 
       !Ensure that the logical passed to the Fortran 77 code
       !is a -1 (all bits set) when true rather than a 1
