@@ -83,10 +83,11 @@ jobs:
     runs-on: windows-latest
     needs: build-windows-wheel
     strategy:
+      fail-fast: true  # Stop the jobs if it fails at one of Python versions
       matrix:
         python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
     env:
-      version: "1.0.0"
+      version: "1.0.3"
 
     steps:
       - name: Checkout code
@@ -124,10 +125,10 @@ jobs:
             pip install wheelhouse\cm4-${env:version}-cp39-cp39-win_amd64.whl
           }
 
-      - name: Run scientific test
+      - name: Run fortran python parity test
         shell: pwsh
         run: |
           cd $env:GITHUB_WORKSPACE
           .\venv\Scripts\Activate.ps1
-          python tests/scientific_accuracy_test.py
+          python tests/fortran_python_parity_test.py
   

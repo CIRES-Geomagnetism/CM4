@@ -1,6 +1,7 @@
 .DS_Store
 dist
 .idea
+.vscode
 CMakeFiles
 buildbuild_lib
 build
@@ -19,6 +20,4 @@ CM4/fortran
 CM4/*.so
 CM4/out_1.txt
 
-tests/cm4_results
-tests/test_values/cm4_10_inputs.csv
 tests/results

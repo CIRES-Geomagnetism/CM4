@@ -31,6 +31,7 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       real(8) :: MUT
       logical(c_bool), intent(in) :: pred1,pred2,pred3,pred4,pred5,pred6
       logical(c_bool), intent(in) :: CORD
+      logical :: FCORD
       logical :: PRED(6)
       logical :: CURR, COEF
       integer(c_int), intent(in) :: NHMF1,NHMF2, NLMF1,NLMF2
@@ -57,9 +58,6 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       if (i <= 256) fstr(i:) = ' '  ! Pad rest with spaces
       i = 1
 
-
-
-
       ! Assigning values
       PATH(1) = fstr
       !PATH(2) = "strings are weird"
@@ -84,6 +82,17 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       CURR = .true.
       COEF = .false.
 
+      !print *, 'in call_cm4_arr in call_cm4field_array.f90'
+      !print *, 'pred1 =', pred1, 'pred2 =', pred2, 'pred3 =', pred3, 'pred4 =', pred4, &
+      !     'pred5 =', pred5, 'pred6 =', pred6, 'cord =', cord
+
+      !Ensure that the logical passed to the Fortran 77 code
+      !is a -1 (all bits set) when true rather than a 1
+      if (CORD) then !CORD is type logical(c_bool)
+        FCORD=.true. !FCORD is type logical
+      else
+        FCORD=.false.
+      end if
 
 
       !NHMF = [13, 45]
@@ -115,7 +124,7 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       gmdl = 0.0
 
       do i = 1, N
-            call CM4FIELD(PATH, UNIT, LOAD, INDX, GMUT, CORD, PRED, &
+            call CM4FIELD(PATH, UNIT, LOAD, INDX, GMUT, FCORD, PRED, &
          CURR, COEF, NHMF, NLMF, UT(i), MUT, thet(i), &
          phi(i), alt(i), dst(i), f107(i),&
          gather_B, jmdl, gmdl, perr, oerr, cerr)

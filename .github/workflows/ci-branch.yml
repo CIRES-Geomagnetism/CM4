@@ -2,14 +2,14 @@ name: c_wrapper ci/cd
 
 on:
   push:
-    branches: ["c_wrapper"]
+    branches: ["linux-compile"]  # Assign the branch that triggers this workflow
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python_version: [ '3.13'] # Assign the branch that triggers this workflow
+        python_version: [ '3.13']
 
     steps:
     - name: Checkout code
@@ -27,15 +27,14 @@ jobs:
         python -m build --wheel 
         pip install dist/*.whl
 
-    - name: Run scientific test
+    - name: Run fortran python parity test
       run: |
-            python tests/scientific_accuracy_test.py
-            zip -r results.zip tests/results
+            python tests/fortran_python_parity_test.py
 
     - name: Run upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: scientific_accuracy_results.zip
-        path: results.zip
+        name: fortran_python_parity_results.zip
+        path: tests/results/*
         
     
