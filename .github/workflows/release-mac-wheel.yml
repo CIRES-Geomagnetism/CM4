@@ -21,12 +21,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install gfortran
-        run: |
-          brew install gfortran
-          which gfortran
-
-
       - name: Build and install cm4
         run: |
           python -m pip install --upgrade pip
