@@ -2,7 +2,7 @@ name: Build Windows Wheel
 
 on:
   push:
-    branches: ["main"] # Assign the branch that triggers this workflow
+    branches: ["linux-compile"] # Assign the branch that triggers this workflow
 
 jobs:
   build-windows-wheel:
