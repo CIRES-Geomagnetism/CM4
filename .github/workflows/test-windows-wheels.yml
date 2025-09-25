@@ -64,7 +64,7 @@ jobs:
         shell: bash
         run: |
           for file in cleaned/*.whl; do
-            delvewheel show "$file" --no-mangle cm4.cm4field_arr --wheel-dir wheelhouse
+            delvewheel show "$file"
             delvewheel repair "$file" --no-mangle cm4.cm4field_arr --wheel-dir wheelhouse
           done
           
