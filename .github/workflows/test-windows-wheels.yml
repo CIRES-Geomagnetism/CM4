@@ -2,7 +2,7 @@ name: Build Windows Wheel
 
 on:
   push:
-    branches: ["xc_wrapper_winwheel"] # Assign the branch that triggers this workflow
+    branches: ["main"] # Assign the branch that triggers this workflow
 
 jobs:
   build-windows-wheel:
@@ -64,6 +64,7 @@ jobs:
         shell: bash
         run: |
           for file in cleaned/*.whl; do
+            delvewheel show "$file" --no-mangle cm4.cm4field_arr --wheel-dir wheelhouse
             delvewheel repair "$file" --no-mangle cm4.cm4field_arr --wheel-dir wheelhouse
           done
           
@@ -82,7 +83,7 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     env:
-      version: "1.0.0"
+      version: "1.0.3"
 
     steps:
         - name: Checkout code
@@ -110,14 +111,19 @@ jobs:
             python -m pip install --upgrade pip
             if (${{ matrix.python-version }} -eq "3.13") {
               pip install wheelhouse\cm4-${env:version}-cp313-cp313-win_amd64.whl
+              pip freeze
             } elseif (${{ matrix.python-version }} -eq "3.12") {
               pip install wheelhouse\cm4-${env:version}-cp312-cp312-win_amd64.whl
+              pip freeze
             } elseif (${{ matrix.python-version }} -eq "3.11") {
               pip install wheelhouse\cm4-${env:version}-cp311-cp311-win_amd64.whl
+              pip freeze
             } elseif (${{ matrix.python-version }} -eq "3.10") {
               pip install wheelhouse\cm4-${env:version}-cp310-cp310-win_amd64.whl
+              pip freeze
             } else {
               pip install wheelhouse\cm4-${env:version}-cp39-cp39-win_amd64.whl
+              pip freeze
             }
 
         - name: Run smoke test
@@ -126,4 +132,4 @@ jobs:
             cd $env:GITHUB_WORKSPACE
             .\venv\Scripts\Activate.ps1
             python -c "import cm4; print(cm4.__version__)"
-            python example.py
+            python tests/fortran_python_parity_test.py
