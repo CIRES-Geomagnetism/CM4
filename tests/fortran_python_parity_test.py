@@ -95,7 +95,7 @@ def generate_python_output(inputs: dict, field: str):
                                                                    inputs["f107"], 
                                                                    pred=preds, 
                                                                    MJD_time=inputs["date"], 
-                                                                   geodflag=0)
+                                                                   geodflag=1)
     
     if field == "core":
         res = {"Bx": -core[1], "By": core[2], "Bz": -core[0]}
