@@ -2,7 +2,7 @@ name: Test Linux Wheel
 
 on:
   push:
-    branches: ["linux-compile"] # Assign the branch that triggers this workflow
+    branches: ["python314"] # Assign the branch that triggers this workflow
 
 jobs:
   build-wheel:
@@ -15,7 +15,7 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.14"
 
 
       - name: Install dependencies and cibuildwheel
@@ -24,7 +24,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Build wheels with cibuildwheel # Upgrade to >=3.1.0 after Python3.14 final release
-        uses: pypa/cibuildwheel@v3.0.1
+        uses: pypa/cibuildwheel@v3.1.0
         env:
           CIBW_ARCHS: "x86_64"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
@@ -43,7 +43,7 @@ jobs:
     needs: build-wheel
     strategy:
       matrix:
-        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
+        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" , "3.14""]
     env:
       version: "1.0.3"
 
@@ -70,7 +70,10 @@ jobs:
           ./venv/bin/activate
           python -m pip install --upgrade pip
           ls wheelhouse
-          if [ ${{ matrix.python-version }} == "3.13" ]; then
+          if [ ${{ matrix.python-version }} == "3.14" ]; then
+            pip install wheelhouse/cm4-${version}-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
+            pip freeze
+          elif [ ${{ matrix.python-version }} == "3.13" ]; then
             pip install wheelhouse/cm4-${version}-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
             pip freeze
           elif [ ${{ matrix.python-version }} == "3.12" ]; then
