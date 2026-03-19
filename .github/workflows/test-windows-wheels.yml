@@ -62,17 +62,7 @@ jobs:
               Remove-Item -Path "tmp_${name}\cm4\*.dll.a" -Force
               Compress-Archive -Path "tmp_${name}\*" -DestinationPath "cleaned\$($wheel.Name)" -Force
           }
-         
-
-      - name: Run delvewheel repair
-        shell: bash
-        run: |
-          for file in cleaned/*.whl; do
-            delvewheel show "$file"
-            delvewheel repair "$file" --no-mangle cm4.cm4field_arr --wheel-dir wheelhouse
-          done
-          
-
+         :
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
