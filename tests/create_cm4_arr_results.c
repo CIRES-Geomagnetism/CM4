@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 
@@ -100,8 +101,14 @@ int main(){
     bool pred1 = true, pred2 = true, pred3  = true, pred4  = true, pred5  = true, pred6 = true;
     bool CORD = true; // True for geodetic; False for geocentric
     int NHMF1 = 13, NHMF2 = 45, NLMF1 = 1, NLMF2 = 14;
-    char cof_path[50] = "/home/liamkilcommons/Projects/CM4/CM4/umdl.CM4";
+    char cof_path[512] = "umdl.CM4";
     double jmdl[3][4];
+
+    const char* cof_env = getenv("CM4_COEFF_PATH");
+    if (cof_env != NULL && cof_env[0] != '\0') {
+        strncpy(cof_path, cof_env, sizeof(cof_path) - 1);
+        cof_path[sizeof(cof_path) - 1] = '\0';
+    }
     
     // Open the file for writing
     FILE* fpw_s = fopen(crust_out_file, "w");
@@ -121,6 +128,15 @@ int main(){
 
 
     FILE* fp =  fopen(inputs_file, "r");
+    if (!fp || !fpw_s || !fpw_r || !fpw_i || !fpw_m) {
+        fprintf(stderr, "Failed to open input/output files. inputs='%s' coeffs='%s'\n", inputs_file, cof_path);
+        if (fp) fclose(fp);
+        if (fpw_s) fclose(fpw_s);
+        if (fpw_r) fclose(fpw_r);
+        if (fpw_i) fclose(fpw_i);
+        if (fpw_m) fclose(fpw_m);
+        return 1;
+    }
     
 
         
@@ -132,7 +148,7 @@ int main(){
         double lat, lon;
         double ut, thet, alt, dst, f107;
 
-        sscanf(line,"%lf,%lf,%lf,%lf,%lf,%lf",
+        sscanf(line,"%lf %lf %lf %lf %lf %lf",
                  &ut,&lat,&lon,&alt,&dst,&f107);
 
         lats[idx] = 90. - lat;
