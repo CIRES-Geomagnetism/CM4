@@ -25,6 +25,7 @@ jobs:
         id: setup-fortran
         with:
           compiler: gcc
+          version: "15"
 
       - name: Build and install cm4
         run: |
