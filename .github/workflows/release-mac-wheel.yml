@@ -10,8 +10,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["macos-13", "macos-latest"]
-        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
+        os: ["macos-26-intel", "macos-26"]
+        python-version: [ "3.11", "3.12", "3.13", "3.14" ]
 
     steps:
       - uses: actions/checkout@v3
@@ -26,6 +26,7 @@ jobs:
         id: setup-fortran
         with:
           compiler: gcc
+          version: "15"
 
       - name: Build and install cm4
         run: |
