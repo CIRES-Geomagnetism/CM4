@@ -2,14 +2,14 @@ name: Build Windows Wheel
 
 on:
   push:
-    branches: ["linux-compile"] # Assign the branch that triggers this workflow
+    branches: ["-python314"] # Assign the branch that triggers this workflow
 
 jobs:
   build-windows-wheel:
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: ["3.13"]
+        python-version: ["3.14"]
 
     steps:
       - name: Checkout code
@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies and cibuildwheel # Upgrade to >=3.1.0 after Python3.14 final release
         shell: bash
         run: |
-          python -m pip install cibuildwheel==3.0.1 
+          python -m pip install cibuildwheel==3.1.0 delvewheel
           pip install -r requirements.txt
 
       - name: Build wheels
@@ -45,91 +45,14 @@ jobs:
           FC: gfortran
           CC: gcc
           CXX: g++
+          CIBW_BUILD: "cp311-* cp312-* cp313-* cp314-*"
+          CIBW_TEST_REQUIRES: "numpy"
+          CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair --add-path C:\\\\msys64\\\\mingw64\\\\bin -w {dest_dir} {wheel}"
 
-      - name: Repack cleaned wheel
-        shell: pwsh
-        run: |
-          mkdir -p cleaned
-          $wheels = Get-ChildItem -Path "wheelhouse" -File
-          
-          foreach ($wheel in $wheels){
-              $name = [IO.Path]::GetFileNameWithoutExtension($wheel.Name)
-              Expand-Archive -Path $wheel.FullName -DestinationPath "tmp_${name}" -Force
-              Remove-Item -Path "tmp_${name}\cm4\*.dll.a" -Force
-              Compress-Archive -Path "tmp_${name}\*" -DestinationPath "cleaned\$($wheel.Name)" -Force
-          }
-         
-
-      - name: Run delvewheel repair
-        shell: bash
-        run: |
-          for file in cleaned/*.whl; do
-            delvewheel show "$file"
-            delvewheel repair "$file" --no-mangle cm4.cm4field_arr --wheel-dir wheelhouse
-          done
-          
-
+      
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
           name: windows-wheels
           path: wheelhouse/*.whl
-
-  test_artifacts:
-    name: Test Artifacts
-    runs-on: windows-latest
-    needs: build-windows-wheel
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-    env:
-      version: "1.0.3"
-
-    steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
-
-        - name: Set up Python
-          uses: actions/setup-python@v5
-          with:
-            python-version: ${{ matrix.python-version }}
-            architecture: "x64"
-
-        - name: Download Artifacts
-          uses: actions/download-artifact@v4
-          with:
-            name: windows-wheels
-            path: wheelhouse
-
-        - name: Create virtual environment
-          run: python -m venv venv
-
-        - name: Install the wheel
-          shell: pwsh
-          run: |
-            .\venv\Scripts\Activate.ps1
-            python -m pip install --upgrade pip
-            if (${{ matrix.python-version }} -eq "3.13") {
-              pip install wheelhouse\cm4-${env:version}-cp313-cp313-win_amd64.whl
-              pip freeze
-            } elseif (${{ matrix.python-version }} -eq "3.12") {
-              pip install wheelhouse\cm4-${env:version}-cp312-cp312-win_amd64.whl
-              pip freeze
-            } elseif (${{ matrix.python-version }} -eq "3.11") {
-              pip install wheelhouse\cm4-${env:version}-cp311-cp311-win_amd64.whl
-              pip freeze
-            } elseif (${{ matrix.python-version }} -eq "3.10") {
-              pip install wheelhouse\cm4-${env:version}-cp310-cp310-win_amd64.whl
-              pip freeze
-            } else {
-              pip install wheelhouse\cm4-${env:version}-cp39-cp39-win_amd64.whl
-              pip freeze
-            }
-
-        - name: Run smoke test
-          shell: pwsh
-          run: |
-            cd $env:GITHUB_WORKSPACE
-            .\venv\Scripts\Activate.ps1
-            python -c "import cm4; print(cm4.__version__)"
-            python tests/fortran_python_parity_test.py

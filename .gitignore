@@ -20,4 +20,7 @@ CM4/fortran
 CM4/*.so
 CM4/out_1.txt
 
+tests/fort.50
+
+
 tests/results
