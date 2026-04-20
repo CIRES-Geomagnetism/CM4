@@ -37,7 +37,7 @@ jobs:
         run: |
           pip install dist/*.whl
           python -c "import cm4; print(cm4.__version__)"
-          python {project}/tests/fortran_python_parity_test.py
+          python tests/fortran_python_parity_test.py
 
       - name: Upload cleaned wheels
         uses: actions/upload-artifact@v4
