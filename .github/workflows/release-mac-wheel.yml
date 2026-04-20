@@ -1,4 +1,4 @@
-name: Build Mac Wheel for CM4
+name: Release Mac Wheels
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - 'v*.*.*'
 
 jobs:
-  build-mac-wheel:
+  release-mac-wheel:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

@@ -1,4 +1,4 @@
-name: Build Windows Wheel
+name: Release Windows Wheel
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - 'v*.*.*'
 
 jobs:
-  build-windows-wheel:
+  release-windows-wheel:
     runs-on: windows-latest
     strategy:
       matrix:

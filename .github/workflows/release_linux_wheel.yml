@@ -1,4 +1,4 @@
-name: Release Linux Wheel
+name: Release Linux Wheels
 
 on:
   push:
