@@ -4,7 +4,9 @@
 #include <string.h>
 #include <math.h>
 
+#ifndef M_PI
 #define M_PI 3.14159265358979323846
+#endif
 #define RAD2DEG(rad)    ((rad)*(180.0L/M_PI))
 #define DEG2RAD(deg)    ((deg)*(M_PI/180.0L))
 
@@ -29,10 +31,12 @@ void rotate_magvec(double* Bx, double* By, double* Bz, double geoc_lat, double g
 
     double psi;
 
+    double orig_Bx, orig_Bz;
     psi = (M_PI / 180.0) * (geoc_lat - geod_lat);
-
-    *Bz = *Bx * sin(psi) + *Bz * cos(psi);
-    *Bx = *Bx * cos(psi) - *Bz * sin(psi);
+    orig_Bx = *Bx;
+    orig_Bz = *Bz;
+    *Bz = orig_Bx * sin(psi) + orig_Bz * cos(psi);
+    *Bx = orig_Bx * cos(psi) - orig_Bz * sin(psi);
 
 }
 
@@ -133,7 +137,7 @@ void write_outputs(double* date, double* lat, double* lon, double* alt, double* 
             by = bmdl[1][2][i] + bmdl[1][3][i];
         }
 
-        fprintf(fptw, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
+        fprintf(fptw, "%lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
                 date[i], lat[i], lon[i], alt[i], dst[i], f107[i], bx, by, bz);
     }
 
