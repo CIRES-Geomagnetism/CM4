@@ -2,6 +2,11 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+
+#define M_PI 3.14159265358979323846
+#define RAD2DEG(rad)    ((rad)*(180.0L/M_PI))
+#define DEG2RAD(deg)    ((deg)*(M_PI/180.0L))
 
 
 
@@ -18,6 +23,54 @@ void print_results(double B[3][7][3000]) {
         }
     }
    }
+}
+
+void rotate_magvec(double* Bx, double* By, double* Bz, double geoc_lat, double geod_lat){
+
+    double psi;
+
+    psi = (M_PI / 180.0) * (geoc_lat - geod_lat);
+
+    *Bz = *Bx * sin(psi) + *Bz * cos(psi);
+    *Bx = *Bx * cos(psi) - *Bz * sin(psi);
+
+}
+
+double geod_to_geocentric(double geod_lat, double ellip_alt){
+
+    double CosLat, SinLat, rc, xp, zp; /*all local variables */
+    double ellip_a, ellip_b, ellip_f, eps, epssq; /* WGS-84 ellipsoid parameters */
+    double r, phig;
+
+    /*
+     ** Convert geodetic coordinates, (defined by the WGS-84
+     ** reference ellipsoid), to Earth Centered Earth Fixed Cartesian
+     ** coordinates, and then to spherical coordinates.
+     */
+
+    CosLat = cos(DEG2RAD(geod_lat));
+    SinLat = sin(DEG2RAD(geod_lat));
+    ellip_a = 6378.137;
+    ellip_f = 1 / 298.257223563;
+    ellip_b = ellip_a * (1 - ellip_f);
+    eps = sqrt(1 - (ellip_b * ellip_b) / (ellip_a * ellip_a)); /*first eccentricity */
+    epssq = (eps * eps);
+
+    /* compute the local radius of curvature on the WGS-84 reference ellipsoid */
+
+    rc = ellip_a / sqrt(1.0 - epssq * SinLat * SinLat);
+
+    /* compute ECEF Cartesian coordinates of specified point (for longitude=0) */
+
+    xp = (rc + ellip_alt) * CosLat;
+    zp = (rc * (1.0 - epssq) + ellip_alt) * SinLat;
+
+    /* compute spherical radius and angle lambda and phi of specified point */
+
+    r = sqrt(xp * xp + zp * zp);
+    phig = RAD2DEG(asin(zp / r)); /* geocentric latitude */
+
+    return phig;
 }
 
 void fortran_to_c_order(double* f_array, double* c_array, int row, int col, int depth) {
@@ -150,6 +203,7 @@ int main(){
 
         sscanf(line,"%lf %lf %lf %lf %lf %lf",
                  &ut,&lat,&lon,&alt,&dst,&f107);
+
 
         lats[idx] = 90. - lat;
         lons[idx] = lon;

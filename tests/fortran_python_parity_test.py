@@ -2,14 +2,14 @@ import math
 import os
 import copy
 import csv
-    
+
 from collections import defaultdict
 
 from cm4.callfpy import py_mat_cm4_arr
 
-def read_inputs(filename: str):
 
-    inp_keys = ["date","latitude", "longitude", "altitude", "dst", "f107"]
+def read_inputs(filename: str):
+    inp_keys = ["date", "latitude", "longitude", "altitude", "dst", "f107"]
     out_keys = ["Bx", "By", "Bz"]
 
     inputs = defaultdict(list)
@@ -21,19 +21,18 @@ def read_inputs(filename: str):
             vals = line.strip().split(',')
 
             for key in inp_keys:
-
-                    inputs[key].append(float(vals[inp_keys.index(key)]))
+                inputs[key].append(float(vals[inp_keys.index(key)]))
 
             for key in out_keys:
                 outputs[key].append(float(vals[out_keys.index(key) + len(inp_keys)]))
 
     return inputs, outputs
 
-def measure_diff(true_vals, pred_vals, out_file, tol=1e-2):
 
+def measure_diff(true_vals, pred_vals, out_file, tol=1e-2):
     keys = ["Bx", "By", "Bz"]
     N = len(pred_vals["Bx"])
-    diffs = [0]*N
+    diffs = [0] * N
 
     with open(out_file, "w") as f:
         f.write("key,max_diff,ave_diff,rmse\n")
@@ -48,55 +47,56 @@ def measure_diff(true_vals, pred_vals, out_file, tol=1e-2):
                     max_diff_ind = i
                 ave_diff += diff
                 diffs[i] = diff
-                #if diff > tol:
-                    #f.write(f"{key},{true_vals[key][i]},{pred_vals[key][i]}\n")
+                # if diff > tol:
+                # f.write(f"{key},{true_vals[key][i]},{pred_vals[key][i]}\n")
                 #    raise ValueError(f"In {out_file}, Difference for {key} at index {i} exceeds tolerance: {diff} > {tol}. True: {true_vals[key][i]} Pred: {pred_vals[key][i]}")
-                #else:
+                # else:
                 #    f.write(f"{key},{true_vals[key][i]},{pred_vals[key][i]}\n")
 
             ave_diff = ave_diff / N
 
-            rmse = math.sqrt(sum((diff - ave_diff)**2 for diff in diffs) / N)
+            rmse = math.sqrt(sum((diff - ave_diff) ** 2 for diff in diffs) / N)
 
             keydiffstr = f"{key},{max_diff},{max_diff_ind},{ave_diff},{rmse}\n"
             f.write(keydiffstr)
             print(keydiffstr)
 
-def write_python_output(outputs : dict, out_filename : str):
-    """Write out a CSV file from outputs dictionary 
-    Keys should be column names and values should lists of floats 
+
+def write_python_output(outputs: dict, out_filename: str):
+    """Write out a CSV file from outputs dictionary
+    Keys should be column names and values should lists of floats
     (value of that column for all rows)"""
-    with open(out_filename,'w') as csvfile:
+    with open(out_filename, 'w') as csvfile:
         output_cols = [column_name for column_name in outputs.keys()]
-        fieldnames = output_cols 
-        writer = csv.DictWriter(csvfile,fieldnames=fieldnames)
+        fieldnames = output_cols
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         nrows = len(outputs[output_cols[0]])
         for i in range(nrows):
             row = {}
             for key in output_cols:
-                row[key]=outputs[key][i] 
+                row[key] = outputs[key][i]
             writer.writerow(row)
 
+
 def generate_python_output(inputs: dict, field: str):
-    
-    #The C code converts the inputs from the original inputs to colat
-    #so inputs['latitude'] is actually colatitude
-    latitude = [90-colat for colat in inputs['latitude']]
+    # The C code converts the inputs from the original inputs to colat
+    # so inputs['latitude'] is actually colatitude
+    latitude = [90 - colat for colat in inputs['latitude']]
 
     outputs = copy.deepcopy(inputs)
 
     preds = [True, True, True, True, True, True]
 
-    out_b, core, crust, magnetosphere, ionosphere = py_mat_cm4_arr(inputs["altitude"], 
-                                                                   latitude, 
-                                                                   inputs["longitude"], 
+    out_b, core, crust, magnetosphere, ionosphere = py_mat_cm4_arr(inputs["altitude"],
+                                                                   latitude,
+                                                                   inputs["longitude"],
                                                                    inputs["dst"],
-                                                                   inputs["f107"], 
-                                                                   pred=preds, 
-                                                                   MJD_time=inputs["date"], 
+                                                                   inputs["f107"],
+                                                                   pred=preds,
+                                                                   MJD_time=inputs["date"],
                                                                    geodflag=1)
-    
+
     if field == "core":
         res = {"Bx": -core[1], "By": core[2], "Bz": -core[0]}
     elif field == "crust":
@@ -108,37 +108,39 @@ def generate_python_output(inputs: dict, field: str):
     else:
         raise ValueError("Invalid field specified. Choose from 'core', 'crust', 'magnetosphere', or 'ionosphere'.")
 
-    outputs['Bx']=res['Bx']
-    outputs['By']=res['By']
-    outputs['Bz']=res['Bz']
+    outputs['Bx'] = res['Bx']
+    outputs['By'] = res['By']
+    outputs['Bz'] = res['Bz']
     return outputs
 
-def compare_results(fortran_outputs:dict, python_outputs:dict, stat_results_file: str): 
+
+def compare_results(fortran_outputs: dict, python_outputs: dict, stat_results_file: str):
     measure_diff(fortran_outputs, python_outputs, stat_results_file)
 
+
 def main():
-    #Compares output from Python and C/Fortran interfaces for same inputs
-  
-    #Run after calling Fortran CM4 via C (create_cm4_arr_results.c)
-    #and generating _TestValues CSV files
- 
+    # Compares output from Python and C/Fortran interfaces for same inputs
+
+    # Run after calling Fortran CM4 via C (create_cm4_arr_results.c)
+    # and generating _TestValues CSV files
+
     curr_dir = os.path.dirname(os.path.abspath(__file__))
     if not os.path.exists(os.path.join(curr_dir, "results")):
         os.mkdir(os.path.join(curr_dir, "results"))
 
-    testval_dict = {"core": "cm4arr_core_TestValues.csv", 
-                    "crust": "cm4arr_crust_TestValues.csv", 
-                    "magneto": "cm4arr_magneto_TestValues.csv", 
+    testval_dict = {"core": "cm4arr_core_TestValues.csv",
+                    "crust": "cm4arr_crust_TestValues.csv",
+                    "magneto": "cm4arr_magneto_TestValues.csv",
                     "iono": "cm4arr_iono_TestValues.csv"}
 
     for key, filename in testval_dict.items():
         testval_filename = os.path.join(curr_dir, "test_values", filename)
         pyoutputs_filename = os.path.join(curr_dir, "test_values", f"cm4py_{key}_TestValues.csv")
         inputs, fortran_outputs = read_inputs(testval_filename)
-        #Create python outputs
-        python_outputs = generate_python_output(inputs,field=key)
-        write_python_output(python_outputs,pyoutputs_filename)
-        #Compare Python and C/Fortran outputs for same inputs
+        # Create python outputs
+        python_outputs = generate_python_output(inputs, field=key)
+        write_python_output(python_outputs, pyoutputs_filename)
+        # Compare Python and C/Fortran outputs for same inputs
         results_filename = os.path.join(curr_dir, "results", f"{key}_results.csv")
         compare_results(fortran_outputs, python_outputs, results_filename)
 
