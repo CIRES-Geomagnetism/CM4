@@ -2,7 +2,7 @@ name: Test Mac Wheel for CM4
 
 on:
   push:
-    branches: ["python314"]
+    branches: ["-python314"]
 
 jobs:
   build-mac-wheel:
