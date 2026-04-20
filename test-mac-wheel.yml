@@ -1,0 +1,41 @@
+name: Test Mac Wheel for CM4
+
+on:
+  push:
+    branches: ["python314"]
+
+jobs:
+  build-mac-wheel:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["macos-13", "macos-latest"]
+        python-version: [ "3.11", "3.12", "3.13", "3.14"" ]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install gfortran
+        uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran
+        with:
+          compiler: gcc
+
+      - name: Build and install cm4
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m build --wheel 
+
+      - name: Upload cleaned wheels
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          files: dist/*.whl
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
