@@ -68,37 +68,6 @@ PyObject* save_3d_array(int rows, int cols, int arr_len, double*** matrix){
     return py_list;
 }
 
-
-// double* pyooject_to_darray(PyArrayObject* obj){
-
-//     if (!PyList_Check(obj)) {
-//         PyErr_SetString(PyExc_TypeError, "Expected a list");
-//         return NULL;
-//     }
-
-//     Py_ssize_t len = PySequence_Length(obj);
-
-//     double* array = malloc(len * sizeof(double));
-
-//     for(Py_ssize_t i = 0; i < len; i++) {
-
-//         PyObject* item = PySequence_GetItem(obj, i);
-//         if (!PyFloat_Check(item)){
-//             Py_DECREF(item);
-//             free(array);
-//             PyErr_SetString(PyExc_TypeError, "Expected a float in the list");
-//             return NULL;
-//         }
-//         array[i] = PyFloat_AsDouble(item);
-
-//         printf("Get %f \n", array[i]);
-
-//     }
-
-//     return array;
-
-// }
-
 double* pyobject_to_nparray(PyArrayObject* array){
 
     if (array == NULL) return NULL;
@@ -158,11 +127,6 @@ static PyObject* py_call_cm4_arr(PyObject* self, PyObject* args) {
      // Declare numpy array for the results
 
 
-    /*printf("py_call_cm4_arr in c_wrapper.c\n");
-    printf("pred1 = %d, pred2 = %d, pred3 = %d, pred4 = %d, pred5 = %d, pred6 = %d, cord = %d\n",
-        pred1, pred2, pred3, pred4, pred5, pred6, cord);*/
-
-
     call_cm4_arr(ut, thet , phi, alt, dst, f107,
                                       &pred1b, &pred2b, &pred3b, &pred4b, &pred5b, &pred6b
                                       ,&cordb,
@@ -197,31 +161,7 @@ static PyObject* py_call_cm4_arr(PyObject* self, PyObject* args) {
 
     return results;
 }
-/*static PyObject* py_call_cm4(PyObject* self, PyObject* args) {
 
-    double ut, thet, phi, alt, dst, f107;
-    int pred1, pred2, pred3, pred4, pred5, pred6;
-    int cord, nhmf1, nhmf2, nlmf1, nlmf2;
-    char* cof_path;
-    double bmdl[3][7]; // Assuming bmdl is a 3x7 array
-    double jmdl[3][7];
-
-
-    // Parse the arguments from Python
-    if (!PyArg_ParseTuple(args, "ddddddiiiiiiiiiiic", &ut, &thet, &phi, &alt, &dst, &f107,
-          &pred1, &pred2, &pred3, &pred4, &pred5, &pred6,
-          &cord, &nhmf1, &nhmf2, &nlmf1, &nlmf2, &cof_path)) {
-        return NULL;
-    }
-
-    // Call the Fortran function
-    call_cm4(&ut, &thet, &phi, &alt, &dst, &f107,
-          &pred1, &pred2, &pred3, &pred4, &pred5, &pred6,
-          &cord, &nhmf1, &nhmf2, &nlmf1, &nlmf2, &cof_path, (double*)bmdl, (double*)jmdl);
-
-    // Return the result to Python
-    //return PyLong_FromLong(result);
-}*/
 
 // Method table that maps Python methods to C functions
 // This array defines all the functions that will be exposed from C to Python.

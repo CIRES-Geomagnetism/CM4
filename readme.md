@@ -1,29 +1,33 @@
 # CM4 Python API
 
-This package wraps CM4 fortran code in python 3.9 to 3.13
+This package wraps CM4 fortran code in python 3.11 to 3.14
 
 ## To install CM4 Python API 
 
-Please select the wheel based on your python version and platform from the GitHub Releases. It only supports x86_64 architecture for linux and Windows OS.
+Please select the wheel based on your python version and platform from the GitHub Releases. 
+It supports Mac OS and x86_64 architecture for linux and Windows OS.
 
 ### For Linux users
 
-Select the wheels which have the `manylinux2014_x86_64` tag in the name. It is compatible with older version of Linux distributions such as `Ubuntu 18.04`, `CentOS 7` and `REHL 7`.
+Select the wheels which have the `manylinux2014_x86_64` tag in the name. 
+The `cp3**` tag indicates the compatible Python version. 
+It is compatible with older version of Linux distributions such as `Ubuntu 18.04`, `CentOS 7` and `REHL 7`.
 
 Then install it using pip:
 ```commandline
-pip install cm4-1.0.0-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
+pip install cm4-1.0.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
 ```
 
 ### For MacOS users
 
-- For x86_64 architecture, select the wheels which have the `macosx_13_0_x86_64` tag in the name. 
-- For Apple Silicon (arm64) architecture, select the wheels which have the `macosx_14_0_arm64` tag in the name.
+- For x86_64 architecture, select the wheels which have the `macosx_26_0_x86_64` tag in the name. 
+- For Apple Silicon (arm64) architecture, select the wheels which have the `macosx_26_0_arm64` tag in the name.
 
+The `cp3**` tag indicates the compatible Python version.
 ### For Windows users
 
 Select the wheels which have the `win_amd64` tag in the name. It is compatible with `Windows 10` and later versions.
-
+The `cp3**` tag indicates the compatible Python version.
 ## Quick Start
 
 ```python
@@ -74,7 +78,7 @@ if __name__ == '__main__':
 ```
 
 ## Source codes
-- The file `cm4field_.F` contains the original function CM4_FIELD. 
+- The `cm4field_.F` contains the original function CM4_FIELD. 
 - The `call_cm4field_array.f90` file is a Fortran 90 wrapper that allows the original CM4_FIELD function to be called with an array of inputs.
-- The `ccm4.c` and `c_wrapper.c` contains functions wrapped in python to call CM4_FIELD with array input alt, lat, lon, f107 and dst. 
-
+- The `ccm4.c` and `c_wrapper.c` is the C wrapper that allows the Fortran code to be called from Python using the `ctypes` library.
+- The `callfpy.py` file contains the Python wrapper that provides a user-friendly interface to call the CM4 function from Python.
