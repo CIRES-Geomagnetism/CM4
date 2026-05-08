@@ -7,8 +7,9 @@ on:
 jobs:
   build-wheel:
     runs-on: ubuntu-latest
-    matrix:
-      python-version: ["cp311", "cp312", "cp313", "cp314"]
+    strategy:
+      matrix:
+        python-version: ["cp311", "cp312", "cp313", "cp314"]
 
     steps:
       - name: Checkout code
@@ -28,7 +29,7 @@ jobs:
           CIBW_BUILD_FRONTEND: "build[uv]"
           # Skip to build musllinux and 32-bit manylinux wheels
           CIBW_SKIP: "*-musllinux* *-manylinux_i686"
-          CIBW_BUILD: ${{ matrix.python-version }}
+          CIBW_BUILD: "${{ matrix.python-version }}-*"
           CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
 
       - name: Release wheels to Github Release
