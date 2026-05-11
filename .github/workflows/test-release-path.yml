@@ -36,6 +36,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wheels-${{ matrix.python-version }}
+          path: wheelhouse/*.whl
 
 
   build-mac-wheel:
