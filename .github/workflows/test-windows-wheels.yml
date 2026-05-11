@@ -2,7 +2,7 @@ name: Build Windows Wheel
 
 on:
   push:
-    branches: ["-parallize_cicd"] # Assign the branch that triggers this workflow
+    branches: ["parallize_cicd"] # Assign the branch that triggers this workflow
 
 jobs:
   build-windows-wheel:

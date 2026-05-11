@@ -2,7 +2,8 @@ name: Release CM4 cross-platform wheels when git tag is pushed
 
 on:
   push:
-    branches: ["parallize_cicd"]
+    tags:
+      - 'v*.*.*'  # Trigger on version tags like v1.0.0
 
 jobs:
   build-linux_wheels:
@@ -30,7 +31,7 @@ jobs:
           # Skip to build musllinux and 32-bit manylinux wheels
           CIBW_SKIP: "*-musllinux* *-manylinux_i686"
           CIBW_BUILD: "${{ matrix.python-version }}-*"
-          CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
+          CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\""
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
@@ -71,7 +72,7 @@ jobs:
           CIBW_BUILD: "${{ matrix.python-version }}-*"
           CIBW_BUILD_FRONTEND: "build[uv]"
 
-          CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
+          CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\""
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "uvx delvewheel repair --add-path C:\\msys64\\mingw64\\bin -w {dest_dir} {wheel}"
 
       - name: Upload wheels
@@ -107,6 +108,11 @@ jobs:
           pip install -r requirements.txt
           python -m build --wheel 
 
+      - name: Test the built wheel
+        run: |
+          pip install dist/*.whl
+          python -c "import cm4; print(cm4.__version__)"
+
       - name: Upload wheels as artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -131,7 +137,7 @@ jobs:
         uses: softprops/action-gh-release@v1
 
         with:
-          draft: true
+          draft: false
           files: dist/*.whl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -2,7 +2,7 @@ name: Release Mac Wheels
 
 on:
   push:
-    branches: [ "-parallize_cicd" ]
+    branches: [ "parallize_cicd" ]
 
 jobs:
   release-mac-wheel:
@@ -31,6 +31,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           python -m build --wheel 
+
+      - name: Test the built wheel
+        run: |
+          pip install dist/*.whl
+          python -c "import cm4; print(cm4.__version__)"
 
       - name: Upload wheels as artifacts
         uses: actions/upload-artifact@v4
