@@ -34,7 +34,8 @@ jobs:
         uses: pypa/cibuildwheel@v3.4.0
         env:
           CIBW_BUILD: "${{ matrix.python-version }}-*"
-
+          FC: gfortran
+          CC: gcc
           CIBW_ARCHS_MACOS: ${{ matrix.arch }}
           # Set the OS floor (11.0 is a safe modern bet for universal2)
           MACOSX_DEPLOYMENT_TARGET: "11.0"
