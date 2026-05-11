@@ -1,19 +1,19 @@
-name: Test Mac Wheel for CM4
+name: Release Mac Wheels
 
 on:
   push:
-    branches: ["python314"]
+    branches: [ "parallize_cicd" ]
 
 jobs:
-  build-mac-wheel:
+  release-mac-wheel:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["macos-26-intel"]
-        python-version: [ "3.14"]
+        os: ["macos-latest", "macos-15-intel"]
+        python-version: [ "3.11", "3.12", "3.13", "3.14" ]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -25,7 +25,6 @@ jobs:
         id: setup-fortran
         with:
           compiler: gcc
-          version: "15"
 
       - name: Build and install cm4
         run: |
@@ -33,16 +32,34 @@ jobs:
           pip install -r requirements.txt
           python -m build --wheel 
 
-      - name: Test the wheel
+      - name: Test the built wheel
         run: |
           pip install dist/*.whl
           python -c "import cm4; print(cm4.__version__)"
           python tests/fortran_python_parity_test.py
 
-      - name: Upload cleaned wheels
+
+      - name: Upload wheels as artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: mac-wheels
+          name: wheel-${{ matrix.os }}-py${{ matrix.python-version }}
           path: dist/*.whl
+
+
+  combined-artifacts:
+    needs: release-mac-wheel
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v5
+        with:
+          pattern: wheel-*
+          path: dist
+          merge: true
+
+      - name: List downloaded files
+        run: ls -R dist
+
 
 

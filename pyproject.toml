@@ -1,10 +1,17 @@
 [project]
 name = "cm4"
-version = "1.0.4"
+version = "1.0.5"
 description = "Python wrapper of CM4"
 authors = [{name = "Collin Kadlecek", email = "collin.kadlecek@colorado.edu"}, {name = "Li-Yin Young", email = "liyin.young@colorado.edu"}, {name = "Liam Kilcommons", email = "liam.kilcommons@colorado.edu"}]
 maintainers = [{name = "Collin Kadlecek", email = "collin.kadlecek@colorado.edu"}]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
 dependencies = ["numpy", "geomaglib>=1.2.1"]
 
 
