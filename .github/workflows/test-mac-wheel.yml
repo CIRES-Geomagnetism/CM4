@@ -56,7 +56,7 @@ jobs:
         with:
           pattern: wheel-*
           path: dist
-          merge: true
+          merge-multiple: true
 
       - name: List downloaded files
         run: ls -R dist

@@ -6,7 +6,7 @@ on:
 
 jobs:
   build_linux_wheels:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["cp311", "cp312", "cp313", "cp314"]
@@ -88,6 +88,7 @@ jobs:
         with:
           pattern: wheels-*
           path: dist
+          # Use merge-multiple to merge all downloaded artifacts into the single flat directory.
           merge-multiple: true
 
       - name: List Wheels
