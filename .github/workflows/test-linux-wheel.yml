@@ -2,7 +2,7 @@ name: Test manylinux 2_28 Wheel
 
 on:
   push:
-    branches: ["parallize_cicd"] # Assign the branch that triggers this workflow
+    branches: ["-parallize_cicd"] # Assign the branch that triggers this workflow
 
 jobs:
   build-wheel:
@@ -32,10 +32,3 @@ jobs:
           CIBW_BUILD: "${{ matrix.python-version }}-*"
           CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
 
-      - name: Release wheels to Github Release
-        uses: softprops/action-gh-release@v1
-        with:
-          draft: true
-          files: wheelhouse/*.whl
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
