@@ -2,47 +2,38 @@ name: Test Mac Wheel for CM4
 
 on:
   push:
-    branches: ["python314"]
+    branches: ["parallize_cicd"] # Assign the branch that triggers this workflow
 
 jobs:
   build-mac-wheel:
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
     strategy:
       matrix:
-        os: ["macos-26-intel"]
-        python-version: [ "3.14"]
+        python-version: ["cp311", "cp312", "cp313", "cp314"]
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8.1.0
         with:
-          python-version: ${{ matrix.python-version }}
+          version: latest
 
       - name: Install gfortran
-        uses: fortran-lang/setup-fortran@v1
+        uses: fortran-lang/setup-fortran@v1.9.0
         id: setup-fortran
         with:
           compiler: gcc
-          version: "15"
 
-      - name: Build and install cm4
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          python -m build --wheel 
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v3.4.0
+        env:
+          CIBW_BUILD: "${{ matrix.python-version }}-*"
+          CIBW_ARCHS_MACOS: "x86_64 arm64"
+          # Set the OS floor (11.0 is a safe modern bet for universal2)
+          MACOSX_DEPLOYMENT_TARGET: "11.0"
+          CIBW_BUILD_FRONTEND: "build[uv]"
+          CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
 
-      - name: Test the wheel
-        run: |
-          pip install dist/*.whl
-          python -c "import cm4; print(cm4.__version__)"
-          python tests/fortran_python_parity_test.py
-
-      - name: Upload cleaned wheels
-        uses: actions/upload-artifact@v4
-        with:
-          name: mac-wheels
-          path: dist/*.whl
 
 
