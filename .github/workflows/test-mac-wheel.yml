@@ -6,9 +6,14 @@ on:
 
 jobs:
   build-mac-wheel:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        include:
+          - os: "macos-latest"
+            arch: "x86_64"
+          - os: "macos-15"
+            arch: "x86_64"
         python-version: ["cp311", "cp312", "cp313", "cp314"]
 
     steps:
@@ -29,7 +34,7 @@ jobs:
         uses: pypa/cibuildwheel@v3.4.0
         env:
           CIBW_BUILD: "${{ matrix.python-version }}-*"
-          CIBW_ARCHS_MACOS: "x86_64 arm64"
+          CIBW_ARCHS_MACOS: ${{ matrix.arch }}
           # Set the OS floor (11.0 is a safe modern bet for universal2)
           MACOSX_DEPLOYMENT_TARGET: "11.0"
           CIBW_BUILD_FRONTEND: "build[uv]"
