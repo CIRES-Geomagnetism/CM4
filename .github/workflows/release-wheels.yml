@@ -36,6 +36,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
             name: wheels-linux-${{ matrix.python-version }}
+            path: wheelhouse/*.whl
 
   build-windows-wheels:
     runs-on: windows-latest
@@ -77,6 +78,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
             name: wheels-windows-${{ matrix.python-version }}
+            path: wheelhouse/*.whl
 
   build-mac-wheels:
     runs-on: ${{ matrix.os }}
