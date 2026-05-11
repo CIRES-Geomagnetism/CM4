@@ -15,7 +15,7 @@ It is compatible with older version of Linux distributions such as `Ubuntu 18.04
 
 Then install it using pip:
 ```commandline
-pip install cm4-1.0.4-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+pip install cm4-<latest_version>-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
 ```
 
 ### For MacOS users
