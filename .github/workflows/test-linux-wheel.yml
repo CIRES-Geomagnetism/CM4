@@ -21,7 +21,7 @@ jobs:
           version: latest
 
 
-      - name: Build wheels with cibuildwheel # Upgrade to >=3.1.0 after Python3.14 final release
+      - name: Build wheels with cibuildwheel
         uses: pypa/cibuildwheel@v3.4.0
         env:
           CIBW_ARCHS: "x86_64"
