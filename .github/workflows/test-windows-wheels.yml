@@ -43,14 +43,7 @@ jobs:
           CIBW_ARCHS: "AMD64"
           CIBW_BUILD: "${{ matrix.python-version }}-*"
           CIBW_BUILD_FRONTEND: "build[uv]"
-          # NEW: Tell delocate where to find the Fortran libs
-          # setup-fortran sets $FC_PATH or you can find it via gfortran
-          CIBW_ENVIRONMENT_MACOS: >
-              REPAIR_LIBRARY_PATH=$(dirname $(gfortran -print-file-name libgfortran.dylib))
-            
-          # NEW: Force delocate to use the library path during repair
-          CIBW_REPAIR_WHEEL_COMMAND_MACOS: >
-              DYLD_LIBRARY_PATH=$REPAIR_LIBRARY_PATH delocate-wheel --require-archs {delocate_archs} -w {dest_dir} {wheel}
+
           CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "uvx delvewheel repair --add-path D:\\msys64\\mingw64\\bin -w {dest_dir} {wheel}"
 
