@@ -128,7 +128,7 @@ jobs:
         with:
           pattern: wheels-*
           path: dist
-          merge: true
+          merge-multiple: true
 
       - name: List Wheels
         run: ls -R dist
