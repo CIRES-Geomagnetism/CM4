@@ -85,8 +85,8 @@ jobs:
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: true
       matrix:
-        fail-fast: true
         os: [ "macos-latest", "macos-15-intel" ]
         python-version: [ "3.11", "3.12", "3.13", "3.14" ]
 
