@@ -47,7 +47,8 @@ def measure_diff(true_vals, pred_vals, out_file, tol=1e-2):
                     max_diff_ind = i
                 ave_diff += diff
                 diffs[i] = diff
-                # if diff > tol:
+                #if diff > tol:
+                    #raise ValueError(f"Difference between {key} and {max_diff_ind} is {diff}")
                 # f.write(f"{key},{true_vals[key][i]},{pred_vals[key][i]}\n")
                 #    raise ValueError(f"In {out_file}, Difference for {key} at index {i} exceeds tolerance: {diff} > {tol}. True: {true_vals[key][i]} Pred: {pred_vals[key][i]}")
                 # else:
@@ -60,6 +61,9 @@ def measure_diff(true_vals, pred_vals, out_file, tol=1e-2):
             keydiffstr = f"{key},{max_diff},{max_diff_ind},{ave_diff},{rmse}\n"
             f.write(keydiffstr)
             print(keydiffstr)
+
+            if rmse > 1:
+                raise ValueError(f"RMSE at {key} is {rmse}, which exceeds tolerance of 1")
 
 
 def write_python_output(outputs: dict, out_filename: str):
@@ -142,6 +146,7 @@ def main():
         write_python_output(python_outputs, pyoutputs_filename)
         # Compare Python and C/Fortran outputs for same inputs
         results_filename = os.path.join(curr_dir, "results", f"{key}_results.csv")
+        print(key)
         compare_results(fortran_outputs, python_outputs, results_filename)
 
 
