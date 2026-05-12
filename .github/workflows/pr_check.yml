@@ -81,7 +81,40 @@ jobs:
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "uvx delvewheel repair --add-path C:\\msys64\\mingw64\\bin -w {dest_dir} {wheel}"
 
 
+  test-macos:
+    if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        fail-fast: true
+        os: [ "macos-latest", "macos-15-intel" ]
+        python-version: [ "3.11", "3.12", "3.13", "3.14" ]
 
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install gfortran
+        uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran
+        with:
+          compiler: gcc
+
+      - name: Build and install cm4
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m build --wheel 
+
+      - name: Test the built wheel
+        run: |
+          pip install dist/*.whl
+          python -c "import cm4; print(cm4.__version__)"
+          python tests/fortran_python_parity_test.py
 
     
 
