@@ -16,8 +16,8 @@ env:
 jobs:
   test-linux:
     runs-on: ubuntu-latest
-    fail-fast: true
     strategy:
+      fail-fast: true
       matrix:
         python-version: [ "cp311", "cp312", "cp313", "cp314" ]
 
@@ -44,8 +44,9 @@ jobs:
 
   test-windows:
     runs-on: windows-latest
-    fail-fast: true
+
     strategy:
+      fail-fast: true
       matrix:
         python-version: [ "cp311", "cp312", "cp313", "cp314" ]
 
