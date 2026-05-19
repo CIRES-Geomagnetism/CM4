@@ -1,0 +1,27 @@
+name: Test Build Wheels without using uv - linux
+
+on:
+  push:
+    branches: ["remove_uv"]  # Assign the branch that triggers this workflow
+
+jobs:
+  test-linux:
+    runs-on: ubuntu-latest
+    strategy:
+        fail-fast: true
+        matrix:
+          python-version: [ "cp311", "cp312", "cp313", "cp314" ]
+
+    steps:
+    - uses: actions/checkout@v4
+
+
+    - name: Build wheels by cibuildwheel
+      uses: pypa/cibuildwheel@v3.4.0
+      env:
+        CIBW_ARCHS: "x86_64"
+        CIBW_BUILD: "${{ matrix.python-version }}-*"
+        CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+        # Skip to build musllinux and 32-bit manylinux wheels
+        CIBW_SKIP: "*-musllinux* *-manylinux_i686"
+        CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
