@@ -83,8 +83,7 @@ int main(){
             return 1;
         }
 
-        colat = 90 - lat;
-        lats[idx] = colat;
+        lats[idx] = lat;
         lons[idx] = lon;
         alts[idx] = alt;
         uts[idx] = ut;
