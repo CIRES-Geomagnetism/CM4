@@ -146,7 +146,7 @@ void write_outputs(double* date, double* lat, double* lon, double* alt, double* 
             return;
         }
 
-        spherical_vector_to_geodetic(bx, by, bz, lat[i], geoc_lat[i], &results);
+        spherical_vector_to_geodetic(bx, by, bz, lat[i], 90 - geoc_lat[i], &results);
 
         fprintf(fptw, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
                 date[i], lat[i], lon[i], alt[i], dst[i], f107[i], results.Bx, results.By, results.Bz);
