@@ -78,7 +78,7 @@ jobs:
           path: dist/*.whl
           retention-days: 1
 
-  test-windows-wheel:
+  test-windows-wheels:
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
     runs-on: windows-latest
     strategy:
