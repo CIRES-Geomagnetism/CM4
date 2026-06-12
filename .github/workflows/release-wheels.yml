@@ -75,7 +75,7 @@ jobs:
           path: dist/*.whl
           retention-days: 1
 
-  build-windows-wheel:
+  build-windows-wheels:
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
     runs-on: windows-latest
     strategy:
@@ -118,7 +118,7 @@ jobs:
           path: dist/*.whl
           retention-days: 1
 
-  dry-run-release:
+  release:
     needs: [ build-linux-wheels, build-windows-wheels, build-mac-wheels ]
     runs-on: ubuntu-latest
     steps:
