@@ -2,7 +2,7 @@ name: Build CM4 wheels in Windows
 
 on:
   push:
-    branches: [remove_uv]
+    branches: [-remove_uv]
 
 jobs:
   build-windows-wheel:

@@ -119,7 +119,7 @@ jobs:
           retention-days: 1
 
   dry-run-release:
-    needs: [ build-linux_wheels, build-windows-wheels, build-mac-wheels ]
+    needs: [ build-linux-wheels, build-windows-wheels, build-mac-wheels ]
     runs-on: ubuntu-latest
     steps:
       - name: Download built wheels

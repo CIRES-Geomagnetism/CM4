@@ -1,10 +1,8 @@
-name: Pull Request Check
+name: Test the path for uploading wheels to github release
 
 on:
-  pull_request:
-    branches: ["main"]
-    paths-ignore:
-      - "README.md"
+  push:
+    branches: ["remove_uv"]
 
 jobs:
   test-linux-wheels:
@@ -65,11 +63,10 @@ jobs:
           python -m build --wheel 
 
       - name: Test the built wheel
-        # To save the runtime usage of the macOS runners, we skip to run parity test on macOS.
         run: |
           pip install dist/*.whl
-          python -c "import cm4; print(cm4.__version__)" 
-          
+          python -c "import cm4; print(cm4.__version__)"
+          python tests/fortran_python_parity_test.py
 
       - name: Upload wheels as artifacts
         uses: actions/upload-artifact@v4
@@ -78,7 +75,7 @@ jobs:
           path: dist/*.whl
           retention-days: 1
 
-  test-windows-wheel:
+  build-windows-wheel:
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
     runs-on: windows-latest
     strategy:
@@ -120,9 +117,8 @@ jobs:
           name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}
           path: dist/*.whl
           retention-days: 1
-
-  dry-run-release:
-    needs: [ test-linux_wheels, test-windows-wheels, test-mac-wheels ]
+  release-wheels:
+    needs: [ build-linux_wheels, build-windows-wheels, build-mac-wheels ]
     runs-on: ubuntu-latest
     steps:
       - name: Download built wheels
@@ -143,7 +139,3 @@ jobs:
           files: dist/*.whl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    
-
-
