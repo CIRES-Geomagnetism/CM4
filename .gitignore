@@ -26,7 +26,3 @@ tests/cm4_results
 tests/create_cm4_results
 
 
-.github/workflows/test-linux-wheel.yml
-.github/workflows/test-mac-wheel.yml
-.github/workflows/test-release-path.yml
-.github/workflows/test-windows-wheels.yml
