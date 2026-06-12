@@ -5,7 +5,7 @@ on:
     branches: [remove_uv]
 
 jobs:
-  build-linux_wheels:
+  build-linux-wheels:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -28,7 +28,7 @@ jobs:
 
   build-windows-wheels:
     runs-on: windows-latest
-    needs: build-linux_wheels # Only run after linux wheels are built
+    needs: build-linux-wheels # Only run after linux wheels are built
     strategy:
       matrix:
         python-version: [ "cp311", "cp312", "cp313", "cp314" ]
@@ -59,7 +59,7 @@ jobs:
 
   build-mac-wheels:
     runs-on: ${{ matrix.os }}
-    needs: build-windows_wheels # Only run after windows wheels are built
+    needs: build-windows-wheels # Only run after windows wheels are built
     strategy:
       matrix:
         os: [ "macos-latest", "macos-15-intel" ]
