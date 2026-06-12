@@ -1,0 +1,91 @@
+name: Build CM4 wheels in Windows, Linux and MacOS
+
+on:
+  push:
+    branches: [remove_uv]
+
+jobs:
+  build-linux_wheels:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "cp311", "cp312", "cp313", "cp314" ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build wheels with cibuildwheel
+        uses: pypa/cibuildwheel@v3.4.0
+        env:
+          CIBW_ARCHS: "x86_64"
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+          
+          # Skip to build musllinux and 32-bit manylinux wheels
+          CIBW_SKIP: "*-musllinux* *-manylinux_i686"
+          CIBW_BUILD: "${{ matrix.python-version }}-*"
+          CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\""
+
+  build-windows-wheels:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: [ "cp311", "cp312", "cp313", "cp314" ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+
+      - name: Install MSYS2 + gfortran
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: mingw-w64-x86_64-gcc-fortran
+
+      - name: Add MSYS2 to PATH
+        run: |
+          echo "C:\msys64\mingw64\bin" >> $env:GITHUB_PATH
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v3.4.0
+        env:
+          CIBW_ARCHS: "AMD64"
+          CIBW_BUILD: "${{ matrix.python-version }}-*"
+          
+          CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\""
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "uvx delvewheel repair --add-path C:\\msys64\\mingw64\\bin -w {dest_dir} {wheel}"
+
+   build-mac-wheels:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ "macos-latest", "macos-15-intel" ]
+        python-version: [ "3.11", "3.12", "3.13", "3.14" ]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install gfortran
+        uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran
+        with:
+          compiler: gcc
+
+      - name: Build and install cm4
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m build --wheel 
+
+      - name: Test the built wheel
+        run: |
+          pip install dist/*.whl
+          python -c "import cm4; print(cm4.__version__)"
+
+
