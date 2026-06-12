@@ -28,6 +28,7 @@ jobs:
 
   build-windows-wheels:
     runs-on: windows-latest
+    needs: build-linux_wheels # Only run after linux wheels are built
     strategy:
       matrix:
         python-version: [ "cp311", "cp312", "cp313", "cp314" ]
@@ -35,7 +36,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
 
       - name: Install MSYS2 + gfortran
         uses: msys2/setup-msys2@v2
@@ -52,12 +52,14 @@ jobs:
         env:
           CIBW_ARCHS: "AMD64"
           CIBW_BUILD: "${{ matrix.python-version }}-*"
+          CIBW_TEST_REQUIRES: "delvewheel"
           
           CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\""
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair --add-path C:\\msys64\\mingw64\\bin -w {dest_dir} {wheel}"
 
   build-mac-wheels:
     runs-on: ${{ matrix.os }}
+    needs: build-windows_wheels # Only run after windows wheels are built
     strategy:
       matrix:
         os: [ "macos-latest", "macos-15-intel" ]
