@@ -2,7 +2,7 @@ name: Build CM4 wheels in Windows, Linux and MacOS
 
 on:
   push:
-    branches: [remove_uv]
+    branches: [-remove_uv]
 
 jobs:
   build-linux-wheels:
@@ -52,8 +52,7 @@ jobs:
         env:
           CIBW_ARCHS: "AMD64"
           CIBW_BUILD: "${{ matrix.python-version }}-*"
-          CIBW_TEST_REQUIRES: "delvewheel"
-          
+          CIBW_BEFORE_BUILD_WINDOWS: "python -m pip install delvewheel"
           CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\""
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair --add-path C:\\msys64\\mingw64\\bin -w {dest_dir} {wheel}"
 

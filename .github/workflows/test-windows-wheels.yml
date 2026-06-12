@@ -5,7 +5,7 @@ on:
     branches: [remove_uv]
 
 jobs:
-  build-windows-wheels:
+  build-windows-wheel:
     runs-on: windows-latest
     strategy:
       matrix:
@@ -14,6 +14,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
 
       - name: Install MSYS2 + gfortran
         uses: msys2/setup-msys2@v2
@@ -24,12 +25,17 @@ jobs:
       - name: Add MSYS2 to PATH
         run: |
           echo "C:\msys64\mingw64\bin" >> $env:GITHUB_PATH
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.4.0
         env:
           CIBW_ARCHS: "AMD64"
           CIBW_BUILD: "${{ matrix.python-version }}-*"
-          #CIBW_BEFORE_BUILD_WINDOWS: "python -m pip install delvewheel"
-          CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\""
-          #CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair --add-path C:\\msys64\\mingw64\\bin -w {dest_dir} {wheel}"
+          CIBW_BUILD_FRONTEND: "build[uv]"
+          CIBW_ENVIRONMENT_WINDOWS: "FC=gfortran CC=gcc CXX=g++"
+          CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
+          #CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "uvx delvewheel repair --add-path C:\\msys64\\mingw64\\bin -w {dest_dir} {wheel}"
