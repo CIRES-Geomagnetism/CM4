@@ -6,7 +6,8 @@ on:
       - 'v*.*.*'  # Trigger on version tags like v1.0.0
 
 jobs:
-  build-linux_wheels:
+  build-linux-wheels:
+    if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -16,18 +17,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v8.1.0
-        with:
-          version: latest
-
-
       - name: Build wheels with cibuildwheel
         uses: pypa/cibuildwheel@v3.4.0
         env:
           CIBW_ARCHS: "x86_64"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
-          CIBW_BUILD_FRONTEND: "build[uv]"
+
           # Skip to build musllinux and 32-bit manylinux wheels
           CIBW_SKIP: "*-musllinux* *-manylinux_i686"
           CIBW_BUILD: "${{ matrix.python-version }}-*"
@@ -36,52 +31,12 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-            name: wheels-linux-${{ matrix.python-version }}
-            path: wheelhouse/*.whl
-
-  build-windows-wheels:
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        python-version: [ "cp311", "cp312", "cp313", "cp314" ]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-
-      - name: Install MSYS2 + gfortran
-        uses: msys2/setup-msys2@v2
-        with:
-          update: true
-          install: mingw-w64-x86_64-gcc-fortran
-
-      - name: Add MSYS2 to PATH
-        run: |
-          echo "C:\msys64\mingw64\bin" >> $env:GITHUB_PATH
-
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          version: "latest"
-
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v3.4.0
-        env:
-          CIBW_ARCHS: "AMD64"
-          CIBW_BUILD: "${{ matrix.python-version }}-*"
-          CIBW_BUILD_FRONTEND: "build[uv]"
-
-          CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\""
-          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "uvx delvewheel repair --add-path C:\\msys64\\mingw64\\bin -w {dest_dir} {wheel}"
-
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
-        with:
-            name: wheels-windows-${{ matrix.python-version }}
-            path: wheelhouse/*.whl
+          name: wheels-linux-${{ matrix.python-version }}
+          path: wheelhouse/*.whl
+          retention-days: 1
 
   build-mac-wheels:
+    if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -118,9 +73,53 @@ jobs:
         with:
           name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}
           path: dist/*.whl
+          retention-days: 1
 
-  release-wheels:
-    needs: [build-linux_wheels, build-windows-wheels, build-mac-wheels]
+  build-windows-wheels:
+    if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: [ "cp311", "cp312", "cp313", "cp314" ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+
+      - name: Install MSYS2 + gfortran
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: mingw-w64-x86_64-gcc-fortran
+
+      - name: Add MSYS2 to PATH
+        run: |
+          echo "C:\msys64\mingw64\bin" >> $env:GITHUB_PATH
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v3.4.0
+        env:
+          CIBW_ARCHS: "AMD64"
+          CIBW_BUILD: "${{ matrix.python-version }}-*"
+          CIBW_BUILD_FRONTEND: "build[uv]"
+          CIBW_ENVIRONMENT_WINDOWS: "FC=gfortran CC=gcc CXX=g++"
+          CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\""
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "uvx delvewheel repair --add-path C:\\msys64\\mingw64\\bin -w {dest_dir} {wheel}"
+
+      - name: Upload wheels as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: wheelhouse/*.whl
+          retention-days: 1
+
+  release:
+    needs: [ build-linux-wheels, build-windows-wheels, build-mac-wheels ]
     runs-on: ubuntu-latest
     steps:
       - name: Download built wheels

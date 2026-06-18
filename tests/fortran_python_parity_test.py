@@ -86,14 +86,14 @@ def write_python_output(outputs: dict, out_filename: str):
 def generate_python_output(inputs: dict, field: str):
     # The C code converts the inputs from the original inputs to colat
     # so inputs['latitude'] is actually colatitude
-    latitude = [90 - colat for colat in inputs['latitude']]
+    #latitude = [90 - colat for colat in inputs['latitude']]
 
     outputs = copy.deepcopy(inputs)
 
     preds = [True, True, True, True, True, True]
 
     out_b, core, crust, magnetosphere, ionosphere = py_mat_cm4_arr(inputs["altitude"],
-                                                                   latitude,
+                                                                   inputs["latitude"],
                                                                    inputs["longitude"],
                                                                    inputs["dst"],
                                                                    inputs["f107"],
@@ -124,6 +124,9 @@ def compare_results(fortran_outputs: dict, python_outputs: dict, stat_results_fi
 
 def main():
     # Compares output from Python and C/Fortran interfaces for same inputs
+    # test value files used our own coordinate conversion tool to convert the position from geodetic to geocentric.
+    # However, py_mat_cm4_arr() in the test used the CM4 FORTRAN API built-in coordinate conversion (geodflag=1)
+
 
     # Run after calling Fortran CM4 via C (create_cm4_arr_results.c)
     # and generating _TestValues CSV files
@@ -132,10 +135,10 @@ def main():
     if not os.path.exists(os.path.join(curr_dir, "results")):
         os.mkdir(os.path.join(curr_dir, "results"))
 
-    testval_dict = {"core": "cm4arr_core_TestValues.csv",
-                    "crust": "cm4arr_crust_TestValues.csv",
-                    "magneto": "cm4arr_magneto_TestValues.csv",
-                    "iono": "cm4arr_iono_TestValues.csv"}
+    testval_dict = {"core": "geoc_cm4arr_core_TestValues.csv",
+                    "crust": "geoc_cm4arr_crust_TestValues.csv",
+                    "magneto": "geoc_cm4arr_magneto_TestValues.csv",
+                    "iono": "geoc_cm4arr_iono_TestValues.csv"}
 
     for key, filename in testval_dict.items():
         testval_filename = os.path.join(curr_dir, "test_values", filename)
