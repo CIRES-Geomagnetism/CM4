@@ -2,7 +2,7 @@ name: Build CM4 wheels in macOS
 
 on:
   push:
-    branches: [-remove_uv]
+    branches: [vendor_gfortran_into_wheel]
 
 jobs:
   build-mac-wheels:
@@ -11,27 +11,36 @@ jobs:
     strategy:
       matrix:
         os: [ "macos-latest", "macos-15-intel" ]
-        python-version: [ "3.11", "3.12", "3.13", "3.14" ]
+        python-version: [ "3.13"]
+        include:
+          - os: "macos-latest"
+            arch: "arm64"
+          - os: "macos-15-intel"
+            arch: "x86_64"
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install gfortran
-        uses: fortran-lang/setup-fortran@v1
-        id: setup-fortran
-        with:
-          compiler: gcc
-
-      - name: Build and install cm4
+      - name: Install gcc
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          python -m build --wheel 
+            brew update
+            brew install gcc
+            echo "DYLD_LIBRARY_PATH=/opt/homebrew/lib:/usr/local/lib:${DYLD_LIBRARY_PATH}" >> $GITHUB_ENV
+            ls -l /usr/local/opt/gcc/lib/gcc/current/ || true
+            
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v3.4.0
+        env:
+            CIBW_BUILD: "${{ matrix.python-version }}-*"
+            CIBW_ARCHS_MACOS: "${{ matrix.arch }}"
+            # Set the OS floor (11.0 is a safe modern bet for universal2)
+            MACOSX_DEPLOYMENT_TARGET: "11.0"
+            CIBW_BEFORE_TEST: "brew uninstall gcc || true"
+            #CIBW_REPAIR_WHEEL_COMMAND_MACOS: >
+            #  DYLD_LIBRARY_PATH="/opt/homebrew/lib:/usr/local/lib:${DYLD_LIBRARY_PATH}"
+            #  delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}
+            CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\""
 
       - name: Test the built wheel
         run: |
