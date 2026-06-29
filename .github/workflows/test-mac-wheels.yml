@@ -2,7 +2,7 @@ name: Build CM4 wheels in macOS
 
 on:
   push:
-    branches: [vendor_gfortran_into_wheel]
+    branches: [-vendor_gfortran_into_wheel]
 
 jobs:
   build-mac-wheels:
@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ "macos-latest", "macos-15-intel" ]
-        python-version: [ "3.13"]
+        python-version: [ "cp313"]
         include:
           - os: "macos-latest"
             arch: "arm64"
