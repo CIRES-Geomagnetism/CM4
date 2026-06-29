@@ -2,15 +2,15 @@ name: Build CM4 wheels in macOS
 
 on:
   push:
-    branches: [-vendor_gfortran_into_wheel]
+    branches: [vendor_gfortran_into_wheel]
 
 jobs:
   build-mac-wheels:
     runs-on: ${{ matrix.os }}
-
+    if: ${{ matrix.os == 'macos-15-intel' }} == false
     strategy:
       matrix:
-        os: [ "macos-latest", "macos-15-intel" ]
+        os: [ "macos-latest", "macos-26-intel" ]
         python-version: [ "cp313"]
         include:
           - os: "macos-latest"
