@@ -31,5 +31,5 @@ jobs:
           # Skip to build musllinux and 32-bit manylinux wheels
           CIBW_SKIP: "*-musllinux* *-manylinux_i686"
           CIBW_BUILD: "${{ matrix.python-version }}-*"
-          CIBW_BEFORE_TEST: "apt-get remove -y gfortran"
+          CIBW_BEFORE_TEST: "yum remove -y gcc-gfortran"
           CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\""

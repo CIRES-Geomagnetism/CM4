@@ -39,6 +39,6 @@ jobs:
           CIBW_BUILD_FRONTEND: "build[uv]"
           CIBW_ENVIRONMENT_WINDOWS: "FC=gfortran CC=gcc CXX=g++"
           # Ensure the wheel can run without gfortran installed on the machine.
-          CIBW_BEFORE_TEST: "C:\\msys64\\usr\\bin\\pacman.exe -Rsu --noconfirm mingw-w64-x86_64-gfortran"
+          CIBW_BEFORE_TEST: "C:\\msys64\\usr\\bin\\pacman.exe -Rsu --noconfirm mingw-w64-x86_64-gcc-gfortran"
           CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "uvx delvewheel repair --add-path C:\\msys64\\mingw64\\bin -w {dest_dir} {wheel}"
