@@ -36,7 +36,7 @@ jobs:
             CIBW_BUILD: "${{ matrix.python-version }}-*"
             CIBW_ARCHS_MACOS: "${{ matrix.arch }}"
 
-            MACOSX_DEPLOYMENT_TARGET: "15.0"
+            MACOSX_DEPLOYMENT_TARGET: "16.0"
             FC: "${{ env.FC }}"
             CC: "${{ env.CC }}"
             CXX: "${{ env.CXX }}"
