@@ -2,7 +2,7 @@ name: Build CM4 wheels in Linux OS
 
 on:
   push:
-    branches: [-vendor_gfortran_into_wheel]
+    branches: [vendor_gfortran_into_wheel]
 
 jobs:
   build-linux-wheels:
@@ -15,11 +15,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install toolchain (Linux)
-        run: |
-            sudo apt-get update
-            sudo apt-get install -y gfortran
-
       - name: Build wheels with cibuildwheel
         uses: pypa/cibuildwheel@v3.4.0
         env:
@@ -31,5 +26,4 @@ jobs:
           # Skip to build musllinux and 32-bit manylinux wheels
           CIBW_SKIP: "*-musllinux* *-manylinux_i686"
           CIBW_BUILD: "${{ matrix.python-version }}-*"
-          CIBW_BEFORE_TEST: "yum remove -y gcc-gfortran"
           CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\""
