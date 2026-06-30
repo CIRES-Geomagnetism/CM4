@@ -27,4 +27,4 @@ void spherical_vector_to_geodetic(double Bt, double Bp, double Br, double geod_l
 void geod_to_geocentric(double geod_lat, double ellip_alt, CoordSpherical *coord);
 void fortran_to_c_order(double* f_array, double* c_array, int row, int col, int depth);
 void write_header(FILE* fpw);
-void write_outputs(double* date, double* lat, double* lon, double* alt, double* dst, double* f107, double bmdl[3][7][3000], FILE* fptw, char key, int N, double* geoc_lat, double* rad_alt);
+void write_outputs(double* date, double* lat, double* lon, double* alt, double* dst, double* f107, double bmdl[3][7][3000], FILE* fptw, char* key, int N, double* geoc_lat, double* rad_alt);

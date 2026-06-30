@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <unistd.h>
 
 #include "cm4_c_library.h"
 extern void call_cm4_arr(double* UT,double* thet, double* phi, double* alt,
@@ -13,11 +14,12 @@ extern void call_cm4_arr(double* UT,double* thet, double* phi, double* alt,
 
 int main(int argc, char* argv[]) {
 
-    char inputs_file[50];
-    char line[200];
+    char inputs_file[80];
+
     int N = 3000;
     int opt;
-    char out_file[50];
+    char out_file[80];
+    char key[10];
 
     bool pred1 = true, pred2 = true, pred3  = true, pred4  = true, pred5  = true, pred6 = true;
     bool CORD = false; // True for geodetic; False for geocentric
@@ -25,7 +27,7 @@ int main(int argc, char* argv[]) {
     char cof_path[512] = "umdl.CM4";
     double jmdl[3][4];
 
-    CoordSpherical sph_coord;
+
     Results results;
 
     const char* cof_env = getenv("CM4_COEFF_PATH");
@@ -34,7 +36,9 @@ int main(int argc, char* argv[]) {
         cof_path[sizeof(cof_path) - 1] = '\0';
     }
 
-    while getopt(argc, argv, "c:f:") != -1) {
+
+
+    while ((opt = getopt(argc, argv, "i:f:k:")) != -1) {
         switch (opt) {
             case 'i':
                 strncpy(inputs_file, optarg, sizeof(inputs_file) - 1);
@@ -44,9 +48,13 @@ int main(int argc, char* argv[]) {
                 strncpy(out_file, optarg, sizeof(inputs_file) - 1);
                 out_file[sizeof(out_file) - 1] = '\0';
                 break;
+            case 'k':
+                strncpy(key, optarg, sizeof(key)-1);
+                key[sizeof(key) - 1] = '\0';
+                break;
 
             default:
-                fprintf(stderr, "Usage: %s [-i the path to the inputs file] [-f the path of output files]\n", argv[0]);
+                fprintf(stderr, "Usage: %s [-i the path to the inputs file] [-f the path of output files] [-k the field whcih testvalue file based on]\n", argv[0]);
                 return 1;
         }
     }
@@ -84,7 +92,7 @@ int main(int argc, char* argv[]) {
 
    FILE* fpw = fopen(out_file, "w");
    write_header(fpw);
-   write_outputs(uts, lats, lons, alts, dsts, f107s, B, fpw_s, 's', N, geocLat, radAlt);
+   write_outputs(uts, lats, lons, alts, dsts, f107s, B, fpw, key, N, geocLat, radAlt);
    fclose(fpw);
 
     // Free allocated memory

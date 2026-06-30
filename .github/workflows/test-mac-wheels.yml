@@ -9,13 +9,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ "macos-latest" ]
+        os: [ "macos-26-intel" ]
         python-version: [ "cp313"]
         include:
-          - os: "macos-latest"
-            arch: "arm64"
-          #- os: "macos-15-intel"
-          #  arch: "x86_64"
+          #- os: "macos-latest"
+          #  arch: "arm64"
+          - os: "macos-26-intel"
+            arch: "x86_64"
 
     steps:
       - uses: actions/checkout@v3
@@ -38,7 +38,3 @@ jobs:
           CIBW_REPAIR_WHEEL_COMMAND_MACOS: "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
           CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
 
-      - name: Test the built wheel
-        run: |
-          pip install wheelhouse/*.whl
-          python -c "import cm4; print(cm4.__version__)"

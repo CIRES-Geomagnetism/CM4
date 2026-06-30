@@ -100,31 +100,31 @@ void write_header(FILE* fpw){
     fprintf(fpw, "date,latitude,longitude,altitude,dst,f107,Bx,By,Bz\n");
 }
 
-void write_outputs(double* date, double* lat, double* lon, double* alt, double* dst, double* f107, double bmdl[3][7][3000], FILE* fptw, char key, int N, double* geoc_lat, double* rad_alt){
+void write_outputs(double* date, double* lat, double* lon, double* alt, double* dst, double* f107, double bmdl[3][7][3000], FILE* fptw, char* key, int N, double* geoc_lat, double* rad_alt){
 
     // Write the results to the output files
     Results results;
     for (int i = 0; i < N ;i++){
 
         double bx, by, bz;
-        if (key == 's'){
+        if (strcmp(key, "crust") == 0){
             bz = bmdl[2][1][i];
             bx = bmdl[0][1][i];
             by = bmdl[1][1][i];
-        }else if (key == 'r'){
+        }else if (strcmp(key, "core") == 0){
             bz = bmdl[2][0][i];
             bx = bmdl[0][0][i];
             by = bmdl[1][0][i];
-        }else if (key == 'i'){
+        }else if (strcmp(key, "iono") == 0){
             bz = bmdl[2][4][i] + bmdl[2][5][i];
             bx = bmdl[0][4][i] + bmdl[0][5][i];
             by = bmdl[1][4][i] + bmdl[1][5][i];
-        }else if (key == 'm'){
+        }else if (strcmp(key, "magneto") == 0){
             bz = bmdl[2][2][i] + bmdl[2][3][i];
             bx = bmdl[0][2][i] + bmdl[0][3][i];
             by = bmdl[1][2][i] + bmdl[1][3][i];
         }else{
-            fprintf(stderr, "Error: unknown field key '%c'. Use 's', 'r', 'i', or 'm'.\n", key);
+            fprintf(stderr, "Error: unknown field was assigned to -k '%c'. Use 'crust', 'core', 'iono', or 'magneto'.\n", key);
             return;
         }
 
@@ -138,10 +138,14 @@ void write_outputs(double* date, double* lat, double* lon, double* alt, double* 
 
 void load_inputs(double* lats, double* lons, double* alts, double* uts, double* dsts, double* f107s, double* geocLat, double* radAlt, int N, const char* inputs_file){
 
+    printf("Get inputs file %s\n", inputs_file);
     FILE* fp = fopen(inputs_file, "r");
+    CoordSpherical sph_coord;
+    char line[200];
 
      // Read the first line (header)
    fgets(line,sizeof(line), fp);
+   printf("Start reading inputs from %s\n", inputs_file);
 
    int idx = 0;
    while(fgets(line, sizeof(line), fp) != NULL){
@@ -159,9 +163,8 @@ void load_inputs(double* lats, double* lons, double* alts, double* uts, double* 
             fprintf(stderr, "Error: expected 6 values on line %d, got %d. Line: %s\n",
                     idx + 2, parsed, line);
             fclose(fp);
-            fclose(fpw_s); fclose(fpw_r); fclose(fpw_i); fclose(fpw_m);
             free(lats); free(lons); free(uts); free(alts); free(dsts); free(f107s);
-            return 1;
+            exit(EXIT_FAILURE);
         }
 
         lats[idx] = lat;
