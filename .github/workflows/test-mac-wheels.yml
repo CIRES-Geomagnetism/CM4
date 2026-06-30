@@ -20,12 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          version: "latest"
-
-
       - name: Install Fortran compiler
         run: |
             brew update
@@ -40,8 +34,7 @@ jobs:
           CIBW_BUILD: "${{ matrix.python-version }}-*"
           CIBW_ARCHS_MACOS: "${{ matrix.arch }}"
           MACOSX_DEPLOYMENT_TARGET: "15.0"
-          CIBW_BUILD_FRONTEND: "build[uv]"
-          CIBW_BEFORE_BUILD_MACOS: "uv tool install delocate"
-          CIBW_REPAIR_WHEEL_COMMAND_MACOS: "uvx delocate-wheel --require-archs {delocate_archs} -w {dest_dir} {wheel}"
+          CIBW_BEFORE_BUILD_MACOS: "python -m pip install delocate"
+          CIBW_REPAIR_WHEEL_COMMAND_MACOS: "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
           CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
 
