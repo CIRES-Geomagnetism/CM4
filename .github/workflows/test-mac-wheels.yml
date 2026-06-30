@@ -20,28 +20,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install older GCC
-        run: |
-          brew update
-          brew install gcc@13
-          echo "PATH=$(brew --prefix gcc@13)/bin:$PATH" >> $GITHUB_ENV
-          echo "FC=$(brew --prefix gcc@13)/bin/gfortran-13" >> $GITHUB_ENV
-          echo "CC=$(brew --prefix gcc@13)/bin/gcc-13" >> $GITHUB_ENV
-          echo "CXX=$(brew --prefix gcc@13)/bin/g++-13" >> $GITHUB_ENV
-            
-
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.4.0
         env:
             CIBW_BUILD: "${{ matrix.python-version }}-*"
             CIBW_ARCHS_MACOS: "${{ matrix.arch }}"
-
-            MACOSX_DEPLOYMENT_TARGET: "11.0"
-            FC: "${{ env.FC }}"
-            CC: "${{ env.CC }}"
-            CXX: "${{ env.CXX }}"
-            CIBW_ENVIRONMENT_MACOS: >
-                FC=${FC} CC=${CC} CXX=${CXX}
             CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\""
 
       - name: Test the built wheel
