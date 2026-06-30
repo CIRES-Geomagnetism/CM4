@@ -103,24 +103,6 @@ void write_header(FILE* fpw){
 void write_outputs(double* date, double* lat, double* lon, double* alt, double* dst, double* f107, double bmdl[3][7][3000], FILE* fptw, char key, int N, double* geoc_lat, double* rad_alt){
 
     // Write the results to the output files
-
-
-    // if field == "core":
-    //     core = np.array([-out_b[2,0], -out_b[0,0],out_b[1,0]])
-    //     res = {"Bx": -core[1], "By": core[2], "Bz": -core[0]}
-    // elif field == "crust":
-    //      crust = np.array([-out_b[2,1], -out_b[0,1],out_b[1,1]])
-    //     res = {"Bx": -crust[1], "By": crust[2], "Bz": -crust[0]}
-    // elif field == "magneto":
-    //      magnetosphere = np.array([-out_b[2,2]-out_b[2,3], -out_b[0,2]-out_b[0,3],out_b[1,2]+out_b[1,3]])
-    //     res = {"Bx": -magnetosphere[1], "By": magnetosphere[2], "Bz": -magnetosphere[0]}
-    // elif field == "iono":
-    //      ionoshere = np.array([-out_b[2,4]-out_b[2,5], -out_b[0,4]-out_b[0,5],out_b[1,4]+out_b[1,5]])
-    //     res = {"Bx": -ionosphere[1], "By": ionosphere[2], "Bz": -ionosphere[0]}
-    // else:
-    //     raise ValueError("Invalid field specified. Choose from 'core', 'crust', 'magnetosphere', or 'ionosphere'.")
-
-
     Results results;
     for (int i = 0; i < N ;i++){
 
@@ -151,5 +133,53 @@ void write_outputs(double* date, double* lat, double* lon, double* alt, double* 
         fprintf(fptw, "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
                 date[i], lat[i], lon[i], alt[i], dst[i], f107[i], results.Bx, results.By, results.Bz);
     }
+
+}
+
+void load_inputs(double* lats, double* lons, double* alts, double* uts, double* dsts, double* f107s, double* geocLat, double* radAlt, int N, const char* inputs_file){
+
+    FILE* fp = fopen(inputs_file, "r");
+
+     // Read the first line (header)
+   fgets(line,sizeof(line), fp);
+
+   int idx = 0;
+   while(fgets(line, sizeof(line), fp) != NULL){
+        double lat, lon, colat;
+        double ut, thet, alt, dst, f107;
+
+        if (idx >= N) {
+            fprintf(stderr, "Warning: input file has more than %d rows; extra rows ignored.\n", N);
+            break;
+        }
+
+        int parsed = sscanf(line,"%lf %lf %lf %lf %lf %lf",
+                 &ut,&lat,&lon,&alt,&dst,&f107);
+        if (parsed != 6) {
+            fprintf(stderr, "Error: expected 6 values on line %d, got %d. Line: %s\n",
+                    idx + 2, parsed, line);
+            fclose(fp);
+            fclose(fpw_s); fclose(fpw_r); fclose(fpw_i); fclose(fpw_m);
+            free(lats); free(lons); free(uts); free(alts); free(dsts); free(f107s);
+            return 1;
+        }
+
+        lats[idx] = lat;
+        lons[idx] = lon;
+        alts[idx] = alt;
+        uts[idx] = ut;
+        dsts[idx] = dst;
+        f107s[idx] = f107;
+
+        geod_to_geocentric(lat, alt, &sph_coord);
+        geocLat[idx] = 90 - sph_coord.phig;
+        radAlt[idx] = sph_coord.r_alt;
+
+        sph_coord.phig = 0;
+        sph_coord.r_alt = 0;
+
+        idx += 1;
+
+   }
 
 }

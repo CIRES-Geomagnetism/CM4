@@ -21,6 +21,8 @@ typedef struct {
 } Results;
 
 void print_results(double B[3][7][3000]);
+void load_inputs(double* lats, double* lons, double* alts, double* uts, double* dsts, double* f107s, double* geocLat, double* radAlt, int N, const char* inputs_file);
+
 void spherical_vector_to_geodetic(double Bt, double Bp, double Br, double geod_lat, double geoc_lat, Results* results);
 void geod_to_geocentric(double geod_lat, double ellip_alt, CoordSpherical *coord);
 void fortran_to_c_order(double* f_array, double* c_array, int row, int col, int depth);
