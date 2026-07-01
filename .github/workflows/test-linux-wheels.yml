@@ -2,14 +2,14 @@ name: Build CM4 wheels in Linux OS
 
 on:
   push:
-    branches: [-vendor_gfortran_into_wheel]
+    branches: [vendor_gfortran_into_wheel]
 
 jobs:
   build-linux-wheels:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "cp313"]
+        python-version: [ "cp311", "cp312", "cp313", "cp314" ]
 
     steps:
       - name: Checkout code
