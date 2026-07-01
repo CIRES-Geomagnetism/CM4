@@ -14,8 +14,10 @@ jobs:
         include:
           - os: "macos-latest"
             arch: "arm64"
+            target: "26.0"
           #- os: "macos-15-intel"
           #  arch: "x86_64"
+          #   target: "15.0"
 
     steps:
       - uses: actions/checkout@v3
@@ -33,7 +35,7 @@ jobs:
         env:
           CIBW_BUILD: "${{ matrix.python-version }}-*"
           CIBW_ARCHS_MACOS: "${{ matrix.arch }}"
-          MACOSX_DEPLOYMENT_TARGET: "15.0"
+          MACOSX_DEPLOYMENT_TARGET: ${{ matrix.target }}
           CIBW_BEFORE_BUILD_MACOS: "python -m pip install delocate"
           CIBW_REPAIR_WHEEL_COMMAND_MACOS: "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
           CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
