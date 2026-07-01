@@ -35,4 +35,4 @@ gfortran -I${exe_dir} -I${test_dir} \
     "${exe_dir}/cm4field_.F" \
     -o "${out_exe}"
 
-./${out_exe} -k "core" -i "${test_values_dir}/cm4_fortran_core_inputs.csv" -f "${test_values_dir}/cm4_core_TestValues.csv"
+./${out_exe}

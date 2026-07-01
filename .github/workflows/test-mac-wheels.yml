@@ -9,13 +9,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ "macos-15-intel" ]
+        os: [ "macos-latest" ]
         python-version: [ "cp313"]
         include:
-          #- os: "macos-latest"
-          #  arch: "arm64"
-          - os: "macos-15-intel"
-            arch: "x86_64"
+          - os: "macos-latest"
+            arch: "arm64"
+          #- os: "macos-15-intel"
+          #  arch: "x86_64"
 
     steps:
       - uses: actions/checkout@v3
@@ -37,4 +37,44 @@ jobs:
           CIBW_BEFORE_BUILD_MACOS: "python -m pip install delocate"
           CIBW_REPAIR_WHEEL_COMMAND_MACOS: "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
           CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
+
+      - name: Upload wheels as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+            name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}
+            path: wheelhouse/*.whl
+            retention-days: 1
+
+  test-mac-wheels:
+    needs: build-mac-wheels
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ "macos-latest" ]
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+            python-version: "3.13"
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v5
+        with:
+          pattern: wheels-*
+          path: dist
+          merge-multiple: true
+
+      - name: Install the wheel
+        run: |
+            python -m pip install --upgrade pip
+            python -m pip install dist/*.whl
+
+      - name: Run tests
+        run: |
+            python -c "import cm4; print(cm4.__version__)"
+            python {project}/tests/fortran_python_parity_test.py
 
