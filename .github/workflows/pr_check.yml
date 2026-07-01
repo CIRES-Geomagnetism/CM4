@@ -7,7 +7,7 @@ on:
       - "README.md"
 
 jobs:
-  test-linux-wheels:
+  build-linux-wheels:
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
     runs-on: ubuntu-latest
     strategy:
@@ -36,13 +36,13 @@ jobs:
           path: wheelhouse/*.whl
           retention-days: 1
 
-  test-mac-wheels:
+  build-mac-wheels:
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ "macos-15", "macos-15-intel" ]
-        python-version: [ "3.11", "3.12", "3.13", "3.14" ]
+        python-version: [ "cp311", "cp312", "cp313", "cp314" ]
         include:
           - os: "macos-15"
             arch: "arm64"
@@ -77,7 +77,7 @@ jobs:
           path: wheelhouse/*.whl
           retention-days: 1
 
-  test-windows-wheels:
+  build-windows-wheels:
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
     runs-on: windows-latest
     strategy:
@@ -120,8 +120,36 @@ jobs:
           path: wheelhouse/*.whl
           retention-days: 1
 
+  test-wheels:
+    # Test the built wheels vendor gfortran dylib into the wheel
+    needs: [ build-linux-wheels, build-windows-wheels, build-mac-wheels ]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ "ubuntu-latest", "windows-latest", "macos-15" ]
+    steps:
+        - name: Download built wheels
+          uses: actions/download-artifact@v5
+          with:
+            name: wheels-${{ matrix.os }}-cp313
+            path: dist
+
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: "3.13"
+
+        - name: Install wheel
+          run: |
+            python -m pip install --upgrade pip
+            python -m pip install dist/*.whl
+
+        - name: Run smoke test
+          run: |
+            python -c "import cm4; print(cm4.__version__)"
+            python tests/fortran_python_parity_test.py
   dry-run-release:
-    needs: [ test-linux-wheels, test-windows-wheels, test-mac-wheels ]
+    needs: test-wheels
     runs-on: ubuntu-latest
     steps:
       - name: Download built wheels

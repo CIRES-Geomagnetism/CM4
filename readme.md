@@ -21,7 +21,7 @@ pip install cm4-1.0.8-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.wh
 - **x86_64 (Intel):** wheel has `macosx_*_x86_64` in the name.
 - **arm64 (Apple Silicon):** wheel has `macosx_*_arm64` in the name.
 
-The `cp3**` tag indicates the compatible Python version. Compatible with macOS 10.15 and later.
+The `cp3**` tag indicates the compatible Python version. Compatible with macOS 15.0 and later.
 
 ```bash
 pip install cm4-1.0.8-cp313-cp313-macosx_15_0_arm64.whl
