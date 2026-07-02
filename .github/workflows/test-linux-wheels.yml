@@ -2,7 +2,7 @@ name: Build CM4 wheels in Linux OS
 
 on:
   push:
-    branches: [-vendor_gfortran_into_wheel]
+    branches: [vendor_gfortran_into_wheel]
 
 jobs:
   build-linux-wheels:
