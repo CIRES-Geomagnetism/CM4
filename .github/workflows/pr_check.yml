@@ -136,6 +136,7 @@ jobs:
           with:
             name: wheels-${{ matrix.os }}-cp313
             path: dist
+            merge-multiple: true
 
         - name: Set up Python
           uses: actions/setup-python@v5
