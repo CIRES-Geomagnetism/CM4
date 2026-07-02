@@ -9,7 +9,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: [ "cp314" ]
+        python-version: [ "cp313" ]
 
     steps:
       - name: Checkout code
