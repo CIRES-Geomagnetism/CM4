@@ -9,7 +9,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: [ "cp311", "cp312", "cp313", "cp314" ]
+        python-version: [ "cp314" ]
 
     steps:
       - name: Checkout code
@@ -39,6 +39,13 @@ jobs:
           CIBW_ENVIRONMENT_WINDOWS: "FC=gfortran CC=gcc CXX=g++"
           CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\" && python {project}/tests/fortran_python_parity_test.py"
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "uvx delvewheel repair --add-path C:\\msys64\\mingw64\\bin -w {dest_dir} {wheel}"
+
+      - name: Upload wheels as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-windows-latest-${{ matrix.python-version }}
+          path: wheelhouse/*.whl
+          retention-days: 1
 
   test-wheels:
     needs: build-windows-wheel
