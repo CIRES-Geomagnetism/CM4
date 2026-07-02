@@ -50,7 +50,7 @@ jobs:
       - name: Download built wheels
         uses: actions/download-artifact@v5
         with:
-          name: wheels-${{ matrix.os }}-cp313
+          name: wheels-windows-latest-cp313
           path: dist
           merge-multiple: true
 
