@@ -7,7 +7,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 TOP_DIR=$(dirname "$SCRIPT_DIR")
 exe_dir="${TOP_DIR}/CM4"
 test_dir="${TOP_DIR}/tests"
-test_values_dir="${test_dir}/test_values"
+
 echo $exe_dir
 out_exe="create_cm4_results"
 while getopts "d:h" opt; do

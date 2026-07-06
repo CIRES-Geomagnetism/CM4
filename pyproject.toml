@@ -17,15 +17,11 @@ classifiers = [
     "Operating System :: MacOS :: MacOS X",
 ]
 dependencies = ["numpy", "geomaglib>=1.2.1"]
-
-
 readme = "readme.md"
-
 
 [build-system]
 requires = ["meson-python", "ninja", "numpy"]
 build-backend = "mesonpy"
-
 
 [project.urls]
 Homepage = "https://github.com/CIRES-Geomagnetism/CM4.git"

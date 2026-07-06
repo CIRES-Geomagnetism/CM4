@@ -31,7 +31,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-ububtu-latest-${{ matrix.python-version }}
+          name: wheels-ubuntu-latest-${{ matrix.python-version }}
           path: wheelhouse/*.whl
           retention-days: 1
 
