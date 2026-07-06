@@ -13,7 +13,7 @@ Select the wheel with the `manylinux` tag. The `cp3**` tag indicates the Python 
 Compatible with distributions using glibc ≥ 2.27, such as Ubuntu 18.04+, Debian 10+, and RHEL 8+.
 
 ```bash
-pip install cm4-1.0.6-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+pip install cm4-1.0.8-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
 ```
 
 ### macOS
@@ -21,10 +21,10 @@ pip install cm4-1.0.6-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.wh
 - **x86_64 (Intel):** wheel has `macosx_*_x86_64` in the name.
 - **arm64 (Apple Silicon):** wheel has `macosx_*_arm64` in the name.
 
-The `cp3**` tag indicates the compatible Python version. Compatible with macOS 10.15 and later.
+The `cp3**` tag indicates the compatible Python version. Compatible with macOS 15.0 and later.
 
 ```bash
-pip install cm4-1.0.6-cp313-cp313-macosx_14_0_arm64.whl
+pip install cm4-1.0.8-cp313-cp313-macosx_15_0_arm64.whl
 ```
 
 ### Windows

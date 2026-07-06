@@ -1,6 +1,6 @@
 [project]
 name = "cm4"
-version = "1.0.7"
+version = "1.0.8"
 description = "Python wrapper of CM4"
 authors = [{name = "Collin Kadlecek", email = "collin.kadlecek@colorado.edu"}, {name = "Li-Yin Young", email = "liyin.young@colorado.edu"}, {name = "Liam Kilcommons", email = "liam.kilcommons@colorado.edu"}]
 maintainers = [{name = "Collin Kadlecek", email = "collin.kadlecek@colorado.edu"}]
@@ -17,16 +17,14 @@ classifiers = [
     "Operating System :: MacOS :: MacOS X",
 ]
 dependencies = ["numpy", "geomaglib>=1.2.1"]
-
-
 readme = "readme.md"
-
 
 [build-system]
 requires = ["meson-python", "ninja", "numpy"]
 build-backend = "mesonpy"
 
-
 [project.urls]
 Homepage = "https://github.com/CIRES-Geomagnetism/CM4.git"
 Repositories = "https://github.com/CIRES-Geomagnetism/CM4.git"
+
+

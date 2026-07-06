@@ -31,7 +31,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-linux-${{ matrix.python-version }}
+          name: wheels-ubuntu-latest-${{ matrix.python-version }}
           path: wheelhouse/*.whl
           retention-days: 1
 
@@ -40,39 +40,40 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ "macos-latest", "macos-15-intel" ]
-        python-version: [ "3.11", "3.12", "3.13", "3.14" ]
+        os: [ "macos-15", "macos-15-intel" ]
+        python-version: [ "cp311", "cp312", "cp313", "cp314"  ]
+        include:
+          - os: "macos-15"
+            arch: "arm64"
+          - os: "macos-15-intel"
+            arch: "x86_64"
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install gfortran
-        uses: fortran-lang/setup-fortran@v1
-        id: setup-fortran
-        with:
-          compiler: gcc
-
-      - name: Build and install cm4
+      - name: Install Fortran compiler
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          python -m build --wheel 
+          brew update
+          brew install gcc
+          echo "$(brew --prefix)/bin" >> "$GITHUB_PATH"
+          echo "FC=$(brew --prefix)/bin/gfortran" >> "$GITHUB_ENV"
+          gfortran --version
 
-      - name: Test the built wheel
-        run: |
-          pip install dist/*.whl
-          python -c "import cm4; print(cm4.__version__)"
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v3.4.0
+        env:
+          CIBW_BUILD: "${{ matrix.python-version }}-*"
+          CIBW_ARCHS_MACOS: "${{ matrix.arch }}"
+          MACOSX_DEPLOYMENT_TARGET: "15.0"
+          CIBW_BEFORE_BUILD_MACOS: "python -m pip install delocate"
+          CIBW_REPAIR_WHEEL_COMMAND_MACOS: "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
+          CIBW_TEST_COMMAND: "python -c \"import cm4; print(cm4.__version__)\""
 
       - name: Upload wheels as artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}
-          path: dist/*.whl
+          name: wheels-${{ matrix.os }}-${{ matrix.python-version }}
+          path: wheelhouse/*.whl
           retention-days: 1
 
   build-windows-wheels:
@@ -114,7 +115,7 @@ jobs:
       - name: Upload wheels as artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}
+          name: wheels-windows-latest-${{ matrix.python-version }}
           path: wheelhouse/*.whl
           retention-days: 1
 
