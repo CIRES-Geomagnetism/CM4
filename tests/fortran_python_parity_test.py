@@ -135,10 +135,10 @@ def main():
     if not os.path.exists(os.path.join(curr_dir, "results")):
         os.mkdir(os.path.join(curr_dir, "results"))
 
-    testval_dict = {"core": "geoc_cm4arr_core_TestValues.csv",
-                    "crust": "geoc_cm4arr_crust_TestValues.csv",
-                    "magneto": "geoc_cm4arr_magneto_TestValues.csv",
-                    "iono": "geoc_cm4arr_iono_TestValues.csv"}
+    testval_dict = {"core": "cm4_core_TestValues.csv",
+                    "crust": "cm4_crust_TestValues.csv",
+                    "magneto": "cm4_magneto_TestValues.csv",
+                    "iono": "cm4_iono_TestValues.csv"}
 
     for key, filename in testval_dict.items():
         testval_filename = os.path.join(curr_dir, "test_values", filename)
