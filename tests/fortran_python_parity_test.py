@@ -67,7 +67,7 @@ def read_inputs(filename: str):
     return inputs, outputs
 
 
-def measure_diff(true_vals, pred_vals, out_file, tol=1e-2):
+def measure_diff(true_vals, pred_vals, out_file, tol=1e-1):
     keys = ["Bx", "By", "Bz"]
     N = len(pred_vals["Bx"])
     diffs = [0] * N
@@ -85,12 +85,11 @@ def measure_diff(true_vals, pred_vals, out_file, tol=1e-2):
                     max_diff_ind = i
                 ave_diff += diff
                 diffs[i] = diff
-                #if diff > tol:
-                    #raise ValueError(f"Difference between {key} and {max_diff_ind} is {diff}")
-                # f.write(f"{key},{true_vals[key][i]},{pred_vals[key][i]}\n")
-                #    raise ValueError(f"In {out_file}, Difference for {key} at index {i} exceeds tolerance: {diff} > {tol}. True: {true_vals[key][i]} Pred: {pred_vals[key][i]}")
-                # else:
-                #    f.write(f"{key},{true_vals[key][i]},{pred_vals[key][i]}\n")
+                if diff > tol:
+                    f.write(f"{key},{true_vals[key][i]},{pred_vals[key][i]}\n")
+                    raise ValueError(f"In {out_file}, Difference for {key} at index {i} exceeds tolerance: {diff} > {tol}. True: {true_vals[key][i]} Pred: {pred_vals[key][i]}")
+                else:
+                    f.write(f"{key},{true_vals[key][i]},{pred_vals[key][i]}\n")
 
             ave_diff = ave_diff / N
 
@@ -100,8 +99,8 @@ def measure_diff(true_vals, pred_vals, out_file, tol=1e-2):
             f.write(keydiffstr)
             print(keydiffstr)
 
-            #if rmse > 1:
-                #raise ValueError(f"RMSE at {key} is {rmse}, which exceeds tolerance of 1")
+            if rmse > 1:
+                raise ValueError(f"RMSE at {key} is {rmse}, which exceeds tolerance of 1")
 
 
 def write_python_output(outputs: dict, out_filename: str):
@@ -164,13 +163,14 @@ def generate_python_output(inputs: dict, fieldname: str):
     # Return order when geodflag=0 is r, theta, phi
     if fieldname == "core":
         res = get_geoc_outputs(core[0], core[1], core[2], gclat, geod_lat)
-        print(res["x"][:5])
     elif fieldname == "crust":
         res = get_geoc_outputs(crust[0], crust[1], crust[2], gclat, geod_lat)
     elif fieldname == "magneto":
         res = get_geoc_outputs(magnetosphere[0], magnetosphere[1], magnetosphere[2], gclat, geod_lat)
     elif fieldname == "iono":
         res = get_geoc_outputs(ionosphere[0], ionosphere[1], ionosphere[2], gclat, geod_lat)
+    else:
+        raise ValueError("Invalid field specified. Choose from 'core', 'crust', 'magnetosphere', or 'ionosphere'.")
 
 
     outputs['Bx'] = res['x']

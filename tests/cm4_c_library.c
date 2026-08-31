@@ -136,7 +136,7 @@ void write_outputs(double* date, double* lat, double* lon, double* alt, double* 
 
 }
 
-void load_inputs(double* lats, double* lons, double* alts, double* uts, double* dsts, double* f107s, double* geocLat, double* radAlt, int N, const char* inputs_file){
+int load_inputs(double* lats, double* lons, double* alts, double* uts, double* dsts, double* f107s, double* geocLat, double* radAlt, int N, const char* inputs_file){
 
     printf("Get inputs file %s\n", inputs_file);
     FILE* fp = fopen(inputs_file, "r");
@@ -184,5 +184,7 @@ void load_inputs(double* lats, double* lons, double* alts, double* uts, double* 
         idx += 1;
 
    }
+
+   return idx;
 
 }

@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
 
     char inputs_file[80];
 
-    int N = 3000;
+    int max_rows = 3000;
     int opt;
     char out_file[80];
     char key[10];
@@ -62,17 +62,22 @@ int main(int argc, char* argv[]) {
 
     // Open the file for reading
 
-    double* lats  = malloc(N*sizeof(double));
-    double* lons  = malloc(N*sizeof(double));
-    double* uts   = malloc(N*sizeof(double));
-    double* alts  = malloc(N*sizeof(double));
-    double* dsts  = malloc(N*sizeof(double));
-    double* f107s = malloc(N*sizeof(double));
-    double* geocLat = malloc(N*sizeof(double));
-    double* radAlt = malloc(N*sizeof(double));
+    double* lats  = malloc(max_rows*sizeof(double));
+    double* lons  = malloc(max_rows*sizeof(double));
+    double* uts   = malloc(max_rows*sizeof(double));
+    double* alts  = malloc(max_rows*sizeof(double));
+    double* dsts  = malloc(max_rows*sizeof(double));
+    double* f107s = malloc(max_rows*sizeof(double));
+    double* geocLat = malloc(max_rows*sizeof(double));
+    double* radAlt = malloc(max_rows*sizeof(double));
+    int N;
 
-    load_inputs(lats, lons, alts, uts, dsts, f107s, geocLat, radAlt, N, inputs_file);
+    N = load_inputs(lats, lons, alts, uts, dsts, f107s, geocLat, radAlt, max_rows, inputs_file);
 
+    if (N <= 0) {
+        fprintf(stderr, "Error: no valid rows were read from the input file.\n");
+        return 1;
+    }
 
     double bmdl[3][7][N];
     double B[3][7][N];
