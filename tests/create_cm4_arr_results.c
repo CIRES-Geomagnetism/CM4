@@ -11,6 +11,15 @@ extern void call_cm4_arr(double* UT,double* thet, double* phi, double* alt,
      bool* CORD, int* NHMF1, int* NHMF2, int* NLMF1, int* NLMF2, int* N, char* cof_path, double* bmdl, double* jmdl);
 
 
+bool check_file_exist(const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (file) {
+        fclose(file);
+        return true;
+    }
+    return false;
+
+}
 
 int main(int argc, char* argv[]) {
 
@@ -45,7 +54,7 @@ int main(int argc, char* argv[]) {
                 inputs_file[sizeof(inputs_file) - 1] = '\0';
                 break;
             case 'f':
-                strncpy(out_file, optarg, sizeof(inputs_file) - 1);
+                strncpy(out_file, optarg, sizeof(out_file) - 1);
                 out_file[sizeof(out_file) - 1] = '\0';
                 break;
             case 'k':
@@ -59,6 +68,15 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    if (!check_file_exist(inputs_file)) {
+        fprintf(stderr, "Error: input file '%s' does not exist.\n", inputs_file);
+        return 1;
+    }
+    
+    if (strncmp(key, "core", sizeof(key)) != 0 && strncmp(key, "crust", sizeof(key)) != 0 && strncmp(key, "iono", sizeof(key)) != 0 && strncmp(key, "magneto", sizeof(key)) != 0) {
+        fprintf(stderr, "Error: unknown field was assigned to -k '%s'. Use 'crust', 'core', 'iono', or 'magneto'.\n", key);
+        return 1;
+    }
 
     // Open the file for reading
 
@@ -77,6 +95,10 @@ int main(int argc, char* argv[]) {
     if (N <= 0) {
         fprintf(stderr, "Error: no valid rows were read from the input file.\n");
         return 1;
+    }
+
+    if (N != 3000){
+        printf("Warning: expected 3000 rows, but got %d rows.\n", N);
     }
 
     double bmdl[3][7][N];

@@ -4,12 +4,12 @@ This package wraps CM4 Fortran code in Python 3.11 to 3.14.
 
 ## Install in the developer mode:
 
-For the first time users, 
+For first-time users, 
 ```command
 python -m pip install -e . 
 ```
 
-For the developer already install `meson-python`, `meson`, `ninja`, and `numpy` 
+For the developer who have already installed `meson-python`, `meson`, `ninja`, and `numpy` 
 and want to update the CM4 package with the latest version.
 
 ```command

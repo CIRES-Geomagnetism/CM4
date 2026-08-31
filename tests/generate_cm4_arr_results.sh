@@ -40,7 +40,7 @@ gfortran -I${exe_dir} -I${test_dir} \
 
 if [ -n "$field" ]; then
     echo "Running for field: $field"
-    ./create_cm4_results -k "$field" -i "${test_values_dir}/cm4_fortran_${field}_inputs.csv" -f "${test_values_dir}/cm4_${field}_TestValues.csv"
+    ./${out_exe} -k "$field" -i "${test_values_dir}/cm4_fortran_${field}_inputs.csv" -f "${test_values_dir}/cm4_${field}_TestValues.csv"
     exit 0
 else
   echo "Running for core, crust, iono and magneto field."

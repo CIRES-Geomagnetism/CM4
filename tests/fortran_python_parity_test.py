@@ -73,7 +73,7 @@ def measure_diff(true_vals, pred_vals, out_file, tol=1e-1):
     diffs = [0] * N
 
     with open(out_file, "w") as f:
-        f.write("key,max_diff,ave_diff,rmse\n")
+        f.write("key,max_diff,max_diff_ind,ave_diff,rmse\n")
         for key in keys:
             max_diff_ind = -1
             max_diff = 0.0
@@ -141,7 +141,6 @@ def generate_python_output(inputs: dict, fieldname: str):
     outputs = copy.deepcopy(inputs)
 
     preds = [True, True, True, True, True, True]
-    field = [[] for _ in range(4)]
 
     geod_lat = list(inputs["latitude"]).copy()
     alt = list(inputs["altitude"]).copy()

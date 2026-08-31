@@ -124,7 +124,7 @@ void write_outputs(double* date, double* lat, double* lon, double* alt, double* 
             bx = bmdl[0][2][i] + bmdl[0][3][i];
             by = bmdl[1][2][i] + bmdl[1][3][i];
         }else{
-            fprintf(stderr, "Error: unknown field was assigned to -k '%c'. Use 'crust', 'core', 'iono', or 'magneto'.\n", key);
+            fprintf(stderr, "Error: unknown field was assigned to -k '%s'. Use 'crust', 'core', 'iono', or 'magneto'.\n", key);
             return;
         }
 
