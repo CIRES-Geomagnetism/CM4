@@ -100,7 +100,7 @@ void write_header(FILE* fpw){
     fprintf(fpw, "date,latitude,longitude,altitude,dst,f107,Bx,By,Bz\n");
 }
 
-void write_outputs(double* date, double* lat, double* lon, double* alt, double* dst, double* f107, double bmdl[3][7][3000], FILE* fptw, char* key, int N, double* geoc_lat, double* rad_alt){
+void write_outputs(double* date, double* lat, double* lon, double* alt, double* dst, double* f107, int N, double bmdl[3][7][N], FILE* fptw, char* key, double* geoc_lat, double* rad_alt){
 
     // Write the results to the output files
     Results results;

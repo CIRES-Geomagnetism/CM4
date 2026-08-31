@@ -119,7 +119,7 @@ int main(int argc, char* argv[]) {
 
    FILE* fpw = fopen(out_file, "w");
    write_header(fpw);
-   write_outputs(uts, lats, lons, alts, dsts, f107s, B, fpw, key, N, geocLat, radAlt);
+   write_outputs(uts, lats, lons, alts, dsts, f107s, N, B, fpw, key, geocLat, radAlt);
    fclose(fpw);
 
     // Free allocated memory
