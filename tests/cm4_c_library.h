@@ -4,7 +4,7 @@
 #define RAD2DEG(rad)    ((rad)*(180.0L/M_PI))
 #define DEG2RAD(deg)    ((deg)*(M_PI/180.0L))
 
-
+#include <stdio.h>
 
 
 typedef struct {
