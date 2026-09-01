@@ -8,6 +8,7 @@ build
 build_lib
 Makefile
 fort.50
+git_rm.sh
 
 py311_env
 py313_env
@@ -25,4 +26,9 @@ tests/results
 tests/cm4_results
 tests/create_cm4_results
 
+tests/test_values/cm4py_core_TestValues.csv
+tests/test_values/cm4py_crust_TestValues.csv
+tests/test_values/cm4py_iono_TestValues.csv
+tests/test_values/cm4py_magneto_TestValues.csv
+tests/__pycache__/
 

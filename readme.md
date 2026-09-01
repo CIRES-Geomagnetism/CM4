@@ -2,7 +2,24 @@
 
 This package wraps CM4 Fortran code in Python 3.11 to 3.14.
 
-## Installation
+## Install in the developer mode:
+
+For first-time users, 
+```command
+python -m pip install -e . 
+```
+
+For the developer who have already installed `meson-python`, `meson`, `ninja`, and `numpy` 
+and want to update the CM4 package with the latest version.
+
+```command
+python -m pip install -e . --no-build-isolation
+```
+
+`--no-build-isolation` flag ensures pip doesn't look for Ninja from temporary pip-build-env.
+
+
+## Install CM4 from wheel
 
 Please select the wheel based on your Python version and platform from the latest [GitHub Releases](https://github.com/CIRES-Geomagnetism/CM4/releases).  
 It supports macOS (x86_64 and arm64) and Linux x86_64 and Windows x86_64.
@@ -29,6 +46,8 @@ pip install cm4-1.0.8-cp313-cp313-macosx_15_0_arm64.whl
 
 ### Windows
 Select the wheel with `win_amd64` in the name.
+
+
 
 ## Quick Start
 
