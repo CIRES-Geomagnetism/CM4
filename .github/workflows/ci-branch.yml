@@ -2,14 +2,18 @@ name: c_wrapper ci/cd
 
 on:
   push:
-    branches: ["linux-compile"]  # Assign the branch that triggers this workflow
+    branches-ignore:
+        - main
+        - master
+    paths-ignore:
+        - "Readme.md"
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python_version: [ '3.13']
+        python_version: [ '3.15']
 
     steps:
     - name: Checkout code
