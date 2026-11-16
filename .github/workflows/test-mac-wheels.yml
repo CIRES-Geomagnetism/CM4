@@ -29,7 +29,7 @@ jobs:
             gfortran --version
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v3.4.0
+        uses: pypa/cibuildwheel@v4.3.5
         env:
           CIBW_BUILD: "${{ matrix.python-version }}-*"
           CIBW_ARCHS_MACOS: "${{ matrix.arch }}"
