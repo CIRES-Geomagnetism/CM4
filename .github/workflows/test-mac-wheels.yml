@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ "macos-15", "macos-15-intel" ]
-        python-version: [ "cp313" ]
+        python-version: [ "cp315" ]
         include:
           - os: "macos-15"
             arch: "arm64"
@@ -59,7 +59,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-            python-version: "3.13"
+            python-version: "3.15"
 
       - name: Download Artifacts
         uses: actions/download-artifact@v5
