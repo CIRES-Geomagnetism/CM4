@@ -64,8 +64,9 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v5
         with:
-          name: wheels-${{ matrix.os }}-cp313
+          pattern: wheels-${{ matrix.os }}-*
           path: dist
+          merge-multiple: true
 
 
       - name: Install the wheel
