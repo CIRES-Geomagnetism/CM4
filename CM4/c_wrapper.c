@@ -89,6 +89,7 @@ static PyObject* py_call_cm4_arr(PyObject* self, PyObject* args) {
     int len;
     char* cof_path;
     int nhmf1 = 13, nhmf2 = 45, nlmf1 = 1, nlmf2 = 14;
+    int cerr = 0;
 
     // Parse the arguments from Python
     if (!PyArg_ParseTuple(args, "OOOOOOpppppppiiiiis",
@@ -130,7 +131,7 @@ static PyObject* py_call_cm4_arr(PyObject* self, PyObject* args) {
     call_cm4_arr(ut, thet , phi, alt, dst, f107,
                                       &pred1b, &pred2b, &pred3b, &pred4b, &pred5b, &pred6b
                                       ,&cordb,
-                                      &nhmf1, &nhmf2, &nlmf1, &nlmf2, &len, cof_path, (double*)bmdl, (double*)jmdl);
+                                      &nhmf1, &nhmf2, &nlmf1, &nlmf2, &len, cof_path, (double*)bmdl, (double*)jmdl, &cerr);
 
     // Convert Fortran order to C order
     fortran_to_c_order((double*) bmdl, (double*) c_bmdl, 3, 7, len);
@@ -159,7 +160,7 @@ static PyObject* py_call_cm4_arr(PyObject* self, PyObject* args) {
     free(dst);
     free(f107);*/
 
-    return results;
+    return Py_BuildValue("(Ni)", results, cerr);
 }
 
 

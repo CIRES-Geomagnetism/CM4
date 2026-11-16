@@ -15,7 +15,7 @@ end function
 
 subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
      pred1,pred2,pred3,pred4,pred5,pred6, &
-     CORD, NHMF1,NHMF2, NLMF1,NLMF2, N, cof_path, bmdl,jmdl) bind(C, name="call_cm4_arr")
+     CORD, NHMF1,NHMF2, NLMF1,NLMF2, N, cof_path, bmdl,jmdl, cerr) bind(C, name="call_cm4_arr")
 
       use iso_c_binding
 
@@ -44,7 +44,9 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       real(c_double), dimension(3, 4), intent(out) :: jmdl
       real(8), dimension(3, 7) :: gmdl
       real(8), dimension(3, 7) :: gather_B
-      integer(4) :: perr, oerr, cerr
+      integer(4) :: perr, oerr
+      integer(c_int), intent(out) :: cerr
+      integer(4) :: step_cerr
       integer :: i, j, k
       character(kind=c_char), intent(in) :: cof_path(*)
 
@@ -114,8 +116,8 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
 
       !dst = 7
       !f107 = 723!723
-      perr = 1
-      oerr = 50
+      perr = 0
+      oerr = 6
       cerr = 0
 
       ! Initialize bmdl, jmdl, gmdl
@@ -128,6 +130,8 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
          CURR, COEF, NHMF, NLMF, UT(i), MUT, thet(i), &
          phi(i), alt(i), dst(i), f107(i),&
          gather_B, jmdl, gmdl, perr, oerr, cerr)
+
+            if (step_cerr > cerr) cerr = step_cerr
 
         do j = 1, 3
 
