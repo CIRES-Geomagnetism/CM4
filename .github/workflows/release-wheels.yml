@@ -8,10 +8,11 @@ on:
 jobs:
   build-linux-wheels:
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "cp311", "cp312", "cp313", "cp314" ]
+        python-version: [ "cp311", "cp312", "cp313", "cp314", "cp315" ]
 
     steps:
       - name: Checkout code
@@ -37,11 +38,12 @@ jobs:
 
   build-mac-wheels:
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
+    timeout-minutes: 5
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ "macos-15", "macos-15-intel" ]
-        python-version: [ "cp311", "cp312", "cp313", "cp314"  ]
+        python-version: [ "cp311", "cp312", "cp313", "cp314", "cp315"  ]
         include:
           - os: "macos-15"
             arch: "arm64"
@@ -78,10 +80,11 @@ jobs:
 
   build-windows-wheels:
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
+    timeout-minutes: 5
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: [ "cp311", "cp312", "cp313", "cp314" ]
+        python-version: [ "cp311", "cp312", "cp313", "cp314", "cp315" ]
 
     steps:
       - name: Checkout code
@@ -120,6 +123,7 @@ jobs:
           retention-days: 1
 
   release:
+    timeout-minutes: 5
     needs: [ build-linux-wheels, build-windows-wheels, build-mac-wheels ]
     runs-on: ubuntu-latest
     steps:

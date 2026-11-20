@@ -2,7 +2,7 @@ name: Build CM4 wheels in macOS
 
 on:
   push:
-    branches: [python315]
+    branches: [your_current_branch_name]
 
 jobs:
   build-mac-wheels:

@@ -2,8 +2,7 @@ name: Build CM4 wheels in Windows
 
 on:
   push:
-    branches-ignore:
-      - "main"
+    branches: [your_current_branch_name]
 
 jobs:
   build-windows-wheel:
