@@ -2,21 +2,23 @@ name: Build CM4 wheels in Linux OS
 
 on:
   push:
-    branches: [vendor_gfortran_into_wheel]
+    branches-ignore:
+      - main
 
 jobs:
   build-linux-wheels:
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "cp311", "cp312", "cp313", "cp314" ]
+        python-version: [ "cp315"]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Build wheels with cibuildwheel
-        uses: pypa/cibuildwheel@v3.4.0
+        uses: pypa/cibuildwheel@v4.3.5
         env:
           CIBW_ARCHS: "x86_64"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28

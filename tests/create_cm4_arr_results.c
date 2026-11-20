@@ -8,7 +8,7 @@
 #include "cm4_c_library.h"
 extern void call_cm4_arr(double* UT,double* thet, double* phi, double* alt,
      double* dst, double* f107, bool* pred1, bool* pred2, bool* pred3, bool* pred4, bool* pred5, bool* pred6,
-     bool* CORD, int* NHMF1, int* NHMF2, int* NLMF1, int* NLMF2, int* N, char* cof_path, double* bmdl, double* jmdl);
+     bool* CORD, int* NHMF1, int* NHMF2, int* NLMF1, int* NLMF2, int* N, char* cof_path, double* bmdl, double* jmdl, int* cerr);
 
 
 bool check_file_exist(const char* filename) {
@@ -103,6 +103,7 @@ int main(int argc, char* argv[]) {
 
     double bmdl[3][7][N];
     double B[3][7][N];
+    int cerr = 0;
 
     call_cm4_arr(uts,geocLat,lons,radAlt,dsts,f107s,
                     &pred1,&pred2,&pred3,&pred4,&pred5,&pred6,
@@ -112,7 +113,7 @@ int main(int argc, char* argv[]) {
                     &N,
                     cof_path,
                     (double*) bmdl,
-                    (double*) jmdl);
+                    (double*) jmdl, &cerr);
 
    fortran_to_c_order((double*)bmdl, (double*)B, 3, 7, N);
 

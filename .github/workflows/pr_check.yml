@@ -8,18 +8,19 @@ on:
 
 jobs:
   build-linux-wheels:
+    timeout-minutes: 5
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "cp311", "cp312", "cp313", "cp314" ]
+        python-version: [ "cp311", "cp312", "cp313", "cp314", "cp315" ]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Build wheels with cibuildwheel
-        uses: pypa/cibuildwheel@v3.4.0
+        uses: pypa/cibuildwheel@v4.3.5
         env:
           CIBW_ARCHS: "x86_64"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
@@ -37,12 +38,13 @@ jobs:
           retention-days: 1
 
   build-mac-wheels:
+    timeout-minutes: 5
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ "macos-15", "macos-15-intel" ]
-        python-version: [ "cp311", "cp312", "cp313", "cp314" ]
+        python-version: [ "cp311", "cp312", "cp313", "cp314", "cp315" ]
         include:
           - os: "macos-15"
             arch: "arm64"
@@ -54,14 +56,13 @@ jobs:
 
       - name: Install Fortran compiler
         run: |
-          brew update
           brew install gcc
           echo "$(brew --prefix)/bin" >> "$GITHUB_PATH"
           echo "FC=$(brew --prefix)/bin/gfortran" >> "$GITHUB_ENV"
           gfortran --version
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v3.4.0
+        uses: pypa/cibuildwheel@v4.3.5
         env:
           CIBW_BUILD: "${{ matrix.python-version }}-*"
           CIBW_ARCHS_MACOS: "${{ matrix.arch }}"
@@ -78,11 +79,12 @@ jobs:
           retention-days: 1
 
   build-windows-wheels:
+    timeout-minutes: 8
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: [ "cp311", "cp312", "cp313", "cp314" ]
+        python-version: [ "cp311", "cp312", "cp313", "cp314", "cp315" ]
 
     steps:
       - name: Checkout code
@@ -104,7 +106,7 @@ jobs:
           version: "latest"
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v3.4.0
+        uses: pypa/cibuildwheel@v4.3.5
         env:
           CIBW_ARCHS: "AMD64"
           CIBW_BUILD: "${{ matrix.python-version }}-*"
@@ -122,6 +124,7 @@ jobs:
 
   test-wheels:
     # Test the built wheels vendor gfortran dylib into the wheel
+    timeout-minutes: 10
     needs: [ build-linux-wheels, build-windows-wheels, build-mac-wheels ]
     runs-on: ${{ matrix.os }}
     strategy:
@@ -154,6 +157,7 @@ jobs:
             python -c "import cm4; print(cm4.__version__)"
             python tests/fortran_python_parity_test.py
   dry-run-release:
+    timeout-minutes: 5
     needs: test-wheels
     runs-on: ubuntu-latest
     steps:

@@ -1,11 +1,30 @@
 import os
+import warnings
+
 import geomaglib.util
 import numpy as np
 
 from cm4 import cm4field_arr
 
 curr_dir = os.path.dirname(__file__)
-COF_PATH = os.path.join(curr_dir, "umdl.CM4")            
+COF_PATH = os.path.join(curr_dir, "umdl.CM4")
+
+
+
+# 3. Check cerr.value after the C call returns
+CM4_MESSAGES = {
+    1: "Geographic polar position detected; B-phi is indeterminable.",
+    2: "Geographic polar position detected; B-phi and phi-derivative gradients are indeterminable.",
+    50: "Input time lies outside the Dst or F10.7 table time span, or invalid degree/order bounds.",
+    51: "Minimum spherical harmonic order < 0.",
+    52: "Minimum spherical harmonic order exceeds maximum order.",
+    53: "Maximum spherical harmonic order exceeds maximum degree.",
+    54: "Input time (UT) lies outside the valid CM4 model B-spline knot domain.",
+    56: "Input time (UT) lies outside the main field knot domain in GETGMF.",
+}
+
+
+
    
 def py_mat_cm4_arr(alt: list[float], lat: list[float], lon: list[float], dst: list[float], f107: list[float],pred: list[bool] = None, 
                    core_nmin: int = 1, core_nmax: int = 13, crust_nmin: int = 14, crust_nmax: int = 45, geodflag: int = 1,
@@ -47,10 +66,17 @@ def py_mat_cm4_arr(alt: list[float], lat: list[float], lon: list[float], dst: li
     nmin = [core_nmin,crust_nmin]
     nmax = [core_nmax,crust_nmax]
 
-    out_b = cm4field_arr.call_cm4(UT, colat , lon, alt, dst, f107,
+    out_b, cerr = cm4field_arr.call_cm4(UT, colat , lon, alt, dst, f107,
                                       pred[0],pred[1],pred[2],pred[3],pred[4],pred[5]
                                       ,cord,
                                       nmax[0],nmax[1], nmin[0],nmin[1], N, COF_PATH)
+
+    if cerr >= 50:
+        msg = CM4_MESSAGES.get(cerr, f"Fatal CM4 model error (code {cerr}).")
+        raise ValueError(f"CM4 evaluation failed (CERR={cerr}): {msg}")
+    elif cerr > 0:
+        msg = CM4_MESSAGES.get(cerr, f"CM4 model warning (code {cerr}).")
+        warnings.warn(f"CM4 warning (CERR={cerr}): {msg}", RuntimeWarning)
 
 
 

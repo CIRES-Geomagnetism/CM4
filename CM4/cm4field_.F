@@ -3647,9 +3647,12 @@ C=======================================================================
           print *, 'Hello, World!'
       end subroutine hello
 
+
+    ! Set `perr = 0` so Fortran never writes to any file or console unit:
+
       subroutine call_cm4(UT,thet, phi, alt, dst,f107,
      1 bmdl,jmdl,pred1,pred2,pred3,pred4,pred5,pred6,
-     2 CORD, NHMF1,NHMF2, NLMF1,NLMF2, cof_path)
+     2 CORD, NHMF1,NHMF2, NLMF1,NLMF2, cof_path, cerr)
 
       implicit none
 
@@ -3719,8 +3722,8 @@ C=======================================================================
 
       !dst = 7
       !f107 = 723!723
-      perr = 1
-      oerr = 50
+      perr = 0
+      oerr = 6
       cerr = 0
 
       ! Initialize bmdl, jmdl, gmdl

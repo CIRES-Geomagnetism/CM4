@@ -2,15 +2,16 @@ name: Build CM4 wheels in macOS
 
 on:
   push:
-    branches: [vendor_gfortran_into_wheel]
+    branches: [your_current_branch_name]
 
 jobs:
   build-mac-wheels:
+    timeout-minutes: 5
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ "macos-15", "macos-15-intel" ]
-        python-version: [ "cp313" ]
+        python-version: [ "cp314", "cp315" ]
         include:
           - os: "macos-15"
             arch: "arm64"
@@ -22,14 +23,13 @@ jobs:
 
       - name: Install Fortran compiler
         run: |
-            brew update
             brew install gcc
             echo "$(brew --prefix)/bin" >> "$GITHUB_PATH"
             echo "FC=$(brew --prefix)/bin/gfortran" >> "$GITHUB_ENV"
             gfortran --version
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v3.4.0
+        uses: pypa/cibuildwheel@v4.3.5
         env:
           CIBW_BUILD: "${{ matrix.python-version }}-*"
           CIBW_ARCHS_MACOS: "${{ matrix.arch }}"
@@ -46,6 +46,7 @@ jobs:
             retention-days: 1
 
   test-mac-wheels:
+    timeout-minutes: 5
     needs: build-mac-wheels
     runs-on: ${{ matrix.os }}
     strategy:
@@ -59,13 +60,14 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-            python-version: "3.13"
+            python-version: "3.15"
 
       - name: Download Artifacts
         uses: actions/download-artifact@v5
         with:
-          name: wheels-${{ matrix.os }}-cp313
+          pattern: wheels-${{ matrix.os }}-cp315
           path: dist
+          merge-multiple: true
 
 
       - name: Install the wheel
