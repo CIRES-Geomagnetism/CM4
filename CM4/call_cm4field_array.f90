@@ -126,10 +126,11 @@ subroutine call_cm4_arr(UT,thet, phi, alt, dst,f107, &
       gmdl = 0.0
 
       do i = 1, N
+            step_cerr = 0.0
             call CM4FIELD(PATH, UNIT, LOAD, INDX, GMUT, FCORD, PRED, &
          CURR, COEF, NHMF, NLMF, UT(i), MUT, thet(i), &
          phi(i), alt(i), dst(i), f107(i),&
-         gather_B, jmdl, gmdl, perr, oerr, cerr)
+         gather_B, jmdl, gmdl, perr, oerr, step_cerr)
 
             if (step_cerr > cerr) cerr = step_cerr
 
