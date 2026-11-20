@@ -80,7 +80,7 @@ jobs:
 
   build-windows-wheels:
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
-    timeout-minutes: 5
+    timeout-minutes: 8
     runs-on: windows-latest
     strategy:
       matrix:

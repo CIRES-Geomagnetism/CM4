@@ -79,7 +79,7 @@ jobs:
           retention-days: 1
 
   build-windows-wheels:
-    timeout-minutes: 5
+    timeout-minutes: 8
     if: github.event.pull_request.draft == false  # ❗ Skip if draft == true
     runs-on: windows-latest
     strategy:
